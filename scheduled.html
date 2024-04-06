@@ -110,11 +110,11 @@
 
             <!-- message composer -->
             <!-- the message composer -->
-            <div class="email-overlay d-none">
+             <div class="email-overlay d-none">
                 <div class="card the-message-maker">
                     <div class="card-header bg-primary text-white py-0">
                         <div class="d-flex justify-content-between align-items-center text-white">
-                            <h4 class="mb-0 p-0 m-0">New message</h4>
+                            <h4 class="mb-0 p-0 m-0 text-uppercase">Customer Transatcion</h4>
                             <div class="control-btns">
                                 <div class="dropdownd-lg-inline-block ms-1">
                                     <button type="button" class="btn header-item noti-icon waves-effect minimize">
@@ -133,68 +133,143 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-12 d-none selected-contacts-message">
-                                <div class="row flex-nowrap">
-                                    <div class="col-1 mr-0  w-auto d-flex ">
-                                        <span class=" ">
-                                            <strong>To:</strong>
-                                        </span>
+
+                            <div class="col-12 mb-4">
+                                <div class="row">
+                                    <div class="col-8 mb-3">
+                                        <div>
+                                            <label class="form-label">Client's Full Names</label>
+                                            <input class="form-control" type="text" placeholder="client's Full Names" spellcheck="false" data-ms-editor="true">
+                                        </div>
                                     </div>
-                                    <div class=" col-11 ml-0 pl-0 flex-wrap d-flex align-items-start">
-                                        <span class="the-selected-contacts text-capitalize">Alex wanjala, juliet kemboi, tesfa ozem, moureen akinyi, salome aringo,kelvin kamau, william njuguna</span>
-                                        <span data-bs-toggle="modal" data-bs-target="#selected-contacts" class="btn-link waves-effect float-left ">+23 Others</span>
+
+                                    <div class="col-4 mb-3">
+                                        <div>
+                                            <label class="form-label">Phone No.</label>
+                                            <input class="form-control" type="text" placeholder="Client's Phone No." spellcheck="false" data-ms-editor="true">
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-12 mb-3">
+                                        <div>
+                                            <label class="form-label text-capitalize">transaction description</label>
+                                            <textarea name="" placeholder="Enter Description" id="" cols="20" rows="3" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+
+                                   <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-5 mb-3 fw-bold">
+                                                <div>
+                                                    <label class="form-label">Tracking Number</label>
+                                                    <input class="form-control fw-bold" type="text" placeholder="Enter Number" spellcheck="false" data-ms-editor="true">
+                                                    <small>eg the manual invoice number</small>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-4 mb-3 fw-bold">
+                                                <div>
+                                                    <label class="form-label">Transaction Amount</label>
+                                                    <input class="form-control fw-bold" type="text" placeholder="Enter AMount" spellcheck="false" data-ms-editor="true">
+                                                </div>
+                                            </div>
+                                        </div>
+                                   </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <h4 class="text-capitalize card-title text-black mb-3 fw-semibold">Select Payment Method From the ones below</h4>
+                                <div class="btn-group btn-group-example mb-3" role="group">
+                                    <button type="button" class="btn btn-outline-primary w-sm mpesa-btn">MPESA</button>
+                                    <button type="button" class="btn btn-outline-primary w-sm card-btn">CARD</button>
+                                    <button type="button" class="btn btn-outline-primary w-sm sms-btn">SEND SMS</button>
+                                </div>
+                            </div>
+
+                            <div class="col-12 payment-methods">
+                                <div class="row">
+                                    <div class="col-12 mpesa-method d-none">
+                                        <div class="row">
+                                            <div class="col-12 mb-3">
+                                                <div>
+                                                    <label class="form-label">MPESA Phone Number</label>
+                                                    <input class="form-control" type="text" placeholder="Enter Phoe Number" spellcheck="false" data-ms-editor="true">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 card-method d-none">
+                                        <div>
+                                            <div class="mt-4">
+                                                <h5 class="font-size-14 mb-4">How would you like to send the request?</h5>
+                                                <div class="d-flex">
+                                                    <div class="form-check mb-3">
+                                                        <input class="form-check-input" type="radio" name="card-method-radio" id="formRadios1" value="sms" checked>
+                                                        <label class="form-check-label" for="formRadios1">
+                                                            SMS
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check mx-4">
+                                                        <input class="form-check-input" type="radio" name="card-method-radio" id="formRadios2" value="email">
+                                                        <label class="form-check-label" for="formRadios2">
+                                                            Via Email
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row text-method-card">
+                                            <div class="col-12 mb-3 phone-card-method">
+                                                <div>
+                                                    <label class="form-label">Phone Number</label>
+                                                    <input class="form-control" type="text" placeholder="07XXXXXXXX" spellcheck="false" data-ms-editor="true">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 mb-3 email-card-method d-none">
+                                                <div>
+                                                    <label class="form-label">Email Address</label>
+                                                    <input class="form-control" type="text" placeholder="email@email.com" spellcheck="false" data-ms-editor="true">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 d-none text-method">
+                                        <div class="row">
+
+                                            <div class="col-12">
+                                                <div class="alert alert-warning border-2 border-warning" role="alert">
+                                                    <h4 class="alert-heading">Send SMS Link</h4>
+                                                    <p>Use this methid to send a payment request link to the customer for them to pay by themselves.</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 mb-3">
+                                                <div>
+                                                    <label class="form-label">Phone Number</label>
+                                                    <input class="form-control" type="text" placeholder="07XXXXXXXX" spellcheck="false" data-ms-editor="true">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
                             </div>
-
-                            <div class="col-12">
-                                <div class="pb-3">
-                                    <button type="button" data-bs-toggle="modal" data-bs-target="#composemodal" class="btn btn-success waves-effect btn-label waves-light d-none"><i class="bx bxs-user-detail label-icon"></i> Select contacts</button>
-                                </div>
-
-                                <div class="pb-3">
-                                    <button type="button" data-bs-toggle="modal" data-bs-target="#upload-contacts" class="btn btn-success waves-effect btn-label waves-light"><i class="mdi-account-details-outline mdi label-icon"></i> Upload Contacts</button>
-                                </div>
-
-                            </div>
-                            <div class="col-12">
-                                <input type="text" placeholder="Subject" class="form-control mb-3">
-                            </div>
-                            <div class="col-12">
-                                <textarea name="" placeholder="Write your message" id="" cols="30" rows="10" class="form-control"></textarea>
-                            </div>
-
+                           
                         </div>
                     </div>
                     <div class="card-footer">
 
                         <div class="d-flex justify-content-between">
-                            <div>
-                                <label for="">Send as?</label>
-                                <div class="d-flex">
-
-                                    <div class="form-check form-check-primary  mr-15px">
-                                        <input class="form-check-input" type="checkbox" id="check-email" checked>
-                                        <label class="form-check-label" for="check-email">
-                                            Email
-                                        </label>
-                                    </div>
-
-                                    <div class="form-check form-check-primary  pl-4  mr-15px">
-                                        <input class="form-check-input" type="checkbox" id="check-sms" checked>
-                                        <label class="form-check-label" for="check-sms">
-                                            SMS
-                                        </label>
-                                    </div>
-
-                                </div>
-                            </div>
+                           
                             <div class="d-flex align-items-end">
-                                <button type="button" class="btn btn-light waves-effect waves-light mr-15px btn-rounded" title="Delete the message">
+                                <button type="button" class="btn btn-light waves-effect waves-light mr-15px btn-rounded d-none" title="Delete the message">
                                     <i class="bx bx-trash font-size-16 align-middle"></i>
                                 </button>
-                                <button type="submit" class="btn btn-outline-primary btn-rounded chat-send w-md waves-effect waves-light mr-15px" title="Set a time and date for when to send this message"><span class="d-none d-sm-inline-block me-2">Schedule Time</span> <i class="mdi mdi-clock-time-four-outline"></i></button>
+                                <button type="submit" class="btn btn-outline-primary btn-rounded chat-send w-md waves-effect waves-light mr-15px d-none" title="Set a time and date for when to send this message"><span class="d-none d-sm-inline-block me-2">Schedule Time</span> <i class="mdi mdi-clock-time-four-outline"></i></button>
                                 <button type="submit" class="btn btn-primary btn-rounded chat-send w-md waves-effect waves-light"><span class="d-none d-sm-inline-block me-2">Send</span> <i class="mdi mdi-send"></i></button>
                             </div>
                         </div>
@@ -1471,11 +1546,11 @@
 
 
             <!-- the message composer -->
-            <div class="email-overlay d-none">
+             <div class="email-overlay d-none">
                 <div class="card the-message-maker">
                     <div class="card-header bg-primary text-white py-0">
                         <div class="d-flex justify-content-between align-items-center text-white">
-                            <h4 class="mb-0 p-0 m-0">New message</h4>
+                            <h4 class="mb-0 p-0 m-0 text-uppercase">Customer Transatcion</h4>
                             <div class="control-btns">
                                 <div class="dropdownd-lg-inline-block ms-1">
                                     <button type="button" class="btn header-item noti-icon waves-effect minimize">
@@ -1494,68 +1569,143 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-12 d-none selected-contacts-message">
-                                <div class="row flex-nowrap">
-                                    <div class="col-1 mr-0  w-auto d-flex ">
-                                        <span class=" ">
-                                            <strong>To:</strong>
-                                        </span>
+
+                            <div class="col-12 mb-4">
+                                <div class="row">
+                                    <div class="col-8 mb-3">
+                                        <div>
+                                            <label class="form-label">Client's Full Names</label>
+                                            <input class="form-control" type="text" placeholder="client's Full Names" spellcheck="false" data-ms-editor="true">
+                                        </div>
                                     </div>
-                                    <div class=" col-11 ml-0 pl-0 flex-wrap d-flex align-items-start">
-                                        <span class="the-selected-contacts text-capitalize">Alex wanjala, juliet kemboi, tesfa ozem, moureen akinyi, salome aringo,kelvin kamau, william njuguna</span>
-                                        <span data-bs-toggle="modal" data-bs-target="#selected-contacts" class="btn-link waves-effect float-left ">+23 Others</span>
+
+                                    <div class="col-4 mb-3">
+                                        <div>
+                                            <label class="form-label">Phone No.</label>
+                                            <input class="form-control" type="text" placeholder="Client's Phone No." spellcheck="false" data-ms-editor="true">
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-12 mb-3">
+                                        <div>
+                                            <label class="form-label text-capitalize">transaction description</label>
+                                            <textarea name="" placeholder="Enter Description" id="" cols="20" rows="3" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+
+                                   <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-5 mb-3 fw-bold">
+                                                <div>
+                                                    <label class="form-label">Tracking Number</label>
+                                                    <input class="form-control fw-bold" type="text" placeholder="Enter Number" spellcheck="false" data-ms-editor="true">
+                                                    <small>eg the manual invoice number</small>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-4 mb-3 fw-bold">
+                                                <div>
+                                                    <label class="form-label">Transaction Amount</label>
+                                                    <input class="form-control fw-bold" type="text" placeholder="Enter AMount" spellcheck="false" data-ms-editor="true">
+                                                </div>
+                                            </div>
+                                        </div>
+                                   </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <h4 class="text-capitalize card-title text-black mb-3 fw-semibold">Select Payment Method From the ones below</h4>
+                                <div class="btn-group btn-group-example mb-3" role="group">
+                                    <button type="button" class="btn btn-outline-primary w-sm mpesa-btn">MPESA</button>
+                                    <button type="button" class="btn btn-outline-primary w-sm card-btn">CARD</button>
+                                    <button type="button" class="btn btn-outline-primary w-sm sms-btn">SEND SMS</button>
+                                </div>
+                            </div>
+
+                            <div class="col-12 payment-methods">
+                                <div class="row">
+                                    <div class="col-12 mpesa-method d-none">
+                                        <div class="row">
+                                            <div class="col-12 mb-3">
+                                                <div>
+                                                    <label class="form-label">MPESA Phone Number</label>
+                                                    <input class="form-control" type="text" placeholder="Enter Phoe Number" spellcheck="false" data-ms-editor="true">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 card-method d-none">
+                                        <div>
+                                            <div class="mt-4">
+                                                <h5 class="font-size-14 mb-4">How would you like to send the request?</h5>
+                                                <div class="d-flex">
+                                                    <div class="form-check mb-3">
+                                                        <input class="form-check-input" type="radio" name="card-method-radio" id="formRadios1" value="sms" checked>
+                                                        <label class="form-check-label" for="formRadios1">
+                                                            SMS
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check mx-4">
+                                                        <input class="form-check-input" type="radio" name="card-method-radio" id="formRadios2" value="email">
+                                                        <label class="form-check-label" for="formRadios2">
+                                                            Via Email
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row text-method-card">
+                                            <div class="col-12 mb-3 phone-card-method">
+                                                <div>
+                                                    <label class="form-label">Phone Number</label>
+                                                    <input class="form-control" type="text" placeholder="07XXXXXXXX" spellcheck="false" data-ms-editor="true">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 mb-3 email-card-method d-none">
+                                                <div>
+                                                    <label class="form-label">Email Address</label>
+                                                    <input class="form-control" type="text" placeholder="email@email.com" spellcheck="false" data-ms-editor="true">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 d-none text-method">
+                                        <div class="row">
+
+                                            <div class="col-12">
+                                                <div class="alert alert-warning border-2 border-warning" role="alert">
+                                                    <h4 class="alert-heading">Send SMS Link</h4>
+                                                    <p>Use this methid to send a payment request link to the customer for them to pay by themselves.</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 mb-3">
+                                                <div>
+                                                    <label class="form-label">Phone Number</label>
+                                                    <input class="form-control" type="text" placeholder="07XXXXXXXX" spellcheck="false" data-ms-editor="true">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
                             </div>
-
-                            <div class="col-12">
-                                <div class="pb-3">
-                                    <button type="button" data-bs-toggle="modal" data-bs-target="#composemodal" class="btn btn-success waves-effect btn-label waves-light d-none"><i class="bx bxs-user-detail label-icon"></i> Select contacts</button>
-                                </div>
-
-                                <div class="pb-3">
-                                    <button type="button" data-bs-toggle="modal" data-bs-target="#upload-contacts" class="btn btn-success waves-effect btn-label waves-light"><i class="mdi-account-details-outline mdi label-icon"></i> Upload Contacts</button>
-                                </div>
-
-                            </div>
-                            <div class="col-12">
-                                <input type="text" placeholder="Subject" class="form-control mb-3">
-                            </div>
-                            <div class="col-12">
-                                <textarea name="" placeholder="Write your message" id="" cols="30" rows="10" class="form-control"></textarea>
-                            </div>
-
+                           
                         </div>
                     </div>
                     <div class="card-footer">
 
                         <div class="d-flex justify-content-between">
-                            <div>
-                                <label for="">Send as?</label>
-                                <div class="d-flex">
-
-                                    <div class="form-check form-check-primary  mr-15px">
-                                        <input class="form-check-input" type="checkbox" id="check-email" checked>
-                                        <label class="form-check-label" for="check-email">
-                                            Email
-                                        </label>
-                                    </div>
-
-                                    <div class="form-check form-check-primary  pl-4  mr-15px">
-                                        <input class="form-check-input" type="checkbox" id="check-sms" checked>
-                                        <label class="form-check-label" for="check-sms">
-                                            SMS
-                                        </label>
-                                    </div>
-
-                                </div>
-                            </div>
+                           
                             <div class="d-flex align-items-end">
-                                <button type="button" class="btn btn-light waves-effect waves-light mr-15px btn-rounded" title="Delete the message">
+                                <button type="button" class="btn btn-light waves-effect waves-light mr-15px btn-rounded d-none" title="Delete the message">
                                     <i class="bx bx-trash font-size-16 align-middle"></i>
                                 </button>
-                                <button type="submit" class="btn btn-outline-primary btn-rounded chat-send w-md waves-effect waves-light mr-15px" title="Set a time and date for when to send this message"><span class="d-none d-sm-inline-block me-2">Schedule Time</span> <i class="mdi mdi-clock-time-four-outline"></i></button>
+                                <button type="submit" class="btn btn-outline-primary btn-rounded chat-send w-md waves-effect waves-light mr-15px d-none" title="Set a time and date for when to send this message"><span class="d-none d-sm-inline-block me-2">Schedule Time</span> <i class="mdi mdi-clock-time-four-outline"></i></button>
                                 <button type="submit" class="btn btn-primary btn-rounded chat-send w-md waves-effect waves-light"><span class="d-none d-sm-inline-block me-2">Send</span> <i class="mdi mdi-send"></i></button>
                             </div>
                         </div>
