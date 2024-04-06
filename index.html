@@ -109,7 +109,7 @@
                 <div class="card the-message-maker">
                     <div class="card-header bg-primary text-white py-0">
                         <div class="d-flex justify-content-between align-items-center text-white">
-                            <h4 class="mb-0 p-0 m-0">New message</h4>
+                            <h4 class="mb-0 p-0 m-0 text-uppercase">Customer Transatcion</h4>
                             <div class="control-btns">
                                 <div class="dropdownd-lg-inline-block ms-1">
                                     <button type="button" class="btn header-item noti-icon waves-effect minimize">
@@ -128,68 +128,143 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-12 d-none selected-contacts-message">
-                                <div class="row flex-nowrap">
-                                    <div class="col-1 mr-0  w-auto d-flex ">
-                                        <span class=" ">
-                                            <strong>To:</strong>
-                                        </span>
+
+                            <div class="col-12 mb-4">
+                                <div class="row">
+                                    <div class="col-8 mb-3">
+                                        <div>
+                                            <label class="form-label">Client's Full Names</label>
+                                            <input class="form-control" type="text" placeholder="client's Full Names" spellcheck="false" data-ms-editor="true">
+                                        </div>
                                     </div>
-                                    <div class=" col-11 ml-0 pl-0 flex-wrap d-flex align-items-start">
-                                        <span class="the-selected-contacts text-capitalize">Alex wanjala, juliet kemboi, tesfa ozem, moureen akinyi, salome aringo,kelvin kamau, william njuguna</span>
-                                        <span data-bs-toggle="modal" data-bs-target="#selected-contacts" class="btn-link waves-effect float-left ">+23 Others</span>
+
+                                    <div class="col-4 mb-3">
+                                        <div>
+                                            <label class="form-label">Phone No.</label>
+                                            <input class="form-control" type="text" placeholder="Client's Phone No." spellcheck="false" data-ms-editor="true">
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-12 mb-3">
+                                        <div>
+                                            <label class="form-label text-capitalize">transaction description</label>
+                                            <textarea name="" placeholder="Enter Description" id="" cols="20" rows="3" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+
+                                   <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-5 mb-3 fw-bold">
+                                                <div>
+                                                    <label class="form-label">Tracking Number</label>
+                                                    <input class="form-control fw-bold" type="text" placeholder="Enter Number" spellcheck="false" data-ms-editor="true">
+                                                    <small>eg the manual invoice number</small>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-4 mb-3 fw-bold">
+                                                <div>
+                                                    <label class="form-label">Transaction Amount</label>
+                                                    <input class="form-control fw-bold" type="text" placeholder="Enter AMount" spellcheck="false" data-ms-editor="true">
+                                                </div>
+                                            </div>
+                                        </div>
+                                   </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <h4 class="text-capitalize card-title text-black mb-3 fw-semibold">Select Payment Method From the ones below</h4>
+                                <div class="btn-group btn-group-example mb-3" role="group">
+                                    <button type="button" class="btn btn-outline-primary w-sm mpesa-btn">MPESA</button>
+                                    <button type="button" class="btn btn-outline-primary w-sm card-btn">CARD</button>
+                                    <button type="button" class="btn btn-outline-primary w-sm sms-btn">SEND SMS</button>
+                                </div>
+                            </div>
+
+                            <div class="col-12 payment-methods">
+                                <div class="row">
+                                    <div class="col-12 mpesa-method d-none">
+                                        <div class="row">
+                                            <div class="col-12 mb-3">
+                                                <div>
+                                                    <label class="form-label">MPESA Phone Number</label>
+                                                    <input class="form-control" type="text" placeholder="Enter Phoe Number" spellcheck="false" data-ms-editor="true">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 card-method d-none">
+                                        <div>
+                                            <div class="mt-4">
+                                                <h5 class="font-size-14 mb-4">How would you like to send the request?</h5>
+                                                <div class="d-flex">
+                                                    <div class="form-check mb-3">
+                                                        <input class="form-check-input" type="radio" name="card-method-radio" id="formRadios1" value="sms" checked>
+                                                        <label class="form-check-label" for="formRadios1">
+                                                            SMS
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check mx-4">
+                                                        <input class="form-check-input" type="radio" name="card-method-radio" id="formRadios2" value="email">
+                                                        <label class="form-check-label" for="formRadios2">
+                                                            Via Email
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row text-method-card">
+                                            <div class="col-12 mb-3 phone-card-method">
+                                                <div>
+                                                    <label class="form-label">Phone Number</label>
+                                                    <input class="form-control" type="text" placeholder="07XXXXXXXX" spellcheck="false" data-ms-editor="true">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 mb-3 email-card-method d-none">
+                                                <div>
+                                                    <label class="form-label">Email Address</label>
+                                                    <input class="form-control" type="text" placeholder="email@email.com" spellcheck="false" data-ms-editor="true">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 d-none text-method">
+                                        <div class="row">
+
+                                            <div class="col-12">
+                                                <div class="alert alert-warning border-2 border-warning" role="alert">
+                                                    <h4 class="alert-heading">Send SMS Link</h4>
+                                                    <p>Use this methid to send a payment request link to the customer for them to pay by themselves.</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 mb-3">
+                                                <div>
+                                                    <label class="form-label">Phone Number</label>
+                                                    <input class="form-control" type="text" placeholder="07XXXXXXXX" spellcheck="false" data-ms-editor="true">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
                             </div>
-
-                            <div class="col-12">
-                                <div class="pb-3">
-                                    <button type="button" data-bs-toggle="modal" data-bs-target="#composemodal" class="btn btn-success waves-effect btn-label waves-light d-none"><i class="bx bxs-user-detail label-icon"></i> Select contacts</button>
-                                </div>
-
-                                <div class="pb-3">
-                                    <button type="button" data-bs-toggle="modal" data-bs-target="#upload-contacts" class="btn btn-success waves-effect btn-label waves-light"><i class="mdi-account-details-outline mdi label-icon"></i> Upload Contacts</button>
-                                </div>
-
-                            </div>
-                            <div class="col-12">
-                                <input type="text" placeholder="Subject" class="form-control mb-3">
-                            </div>
-                            <div class="col-12">
-                                <textarea name="" placeholder="Write your message" id="" cols="30" rows="10" class="form-control"></textarea>
-                            </div>
-
+                           
                         </div>
                     </div>
                     <div class="card-footer">
 
                         <div class="d-flex justify-content-between">
-                            <div>
-                                <label for="">Send as?</label>
-                                <div class="d-flex">
-
-                                    <div class="form-check form-check-primary  mr-15px">
-                                        <input class="form-check-input" type="checkbox" id="check-email" checked>
-                                        <label class="form-check-label" for="check-email">
-                                            Email
-                                        </label>
-                                    </div>
-
-                                    <div class="form-check form-check-primary  pl-4  mr-15px">
-                                        <input class="form-check-input" type="checkbox" id="check-sms" checked>
-                                        <label class="form-check-label" for="check-sms">
-                                            SMS
-                                        </label>
-                                    </div>
-
-                                </div>
-                            </div>
+                           
                             <div class="d-flex align-items-end">
-                                <button type="button" class="btn btn-light waves-effect waves-light mr-15px btn-rounded" title="Delete the message">
+                                <button type="button" class="btn btn-light waves-effect waves-light mr-15px btn-rounded d-none" title="Delete the message">
                                     <i class="bx bx-trash font-size-16 align-middle"></i>
                                 </button>
-                                <button type="submit" class="btn btn-outline-primary btn-rounded chat-send w-md waves-effect waves-light mr-15px" title="Set a time and date for when to send this message"><span class="d-none d-sm-inline-block me-2">Schedule Time</span> <i class="mdi mdi-clock-time-four-outline"></i></button>
+                                <button type="submit" class="btn btn-outline-primary btn-rounded chat-send w-md waves-effect waves-light mr-15px d-none" title="Set a time and date for when to send this message"><span class="d-none d-sm-inline-block me-2">Schedule Time</span> <i class="mdi mdi-clock-time-four-outline"></i></button>
                                 <button type="submit" class="btn btn-primary btn-rounded chat-send w-md waves-effect waves-light"><span class="d-none d-sm-inline-block me-2">Send</span> <i class="mdi mdi-send"></i></button>
                             </div>
                         </div>
@@ -200,6 +275,239 @@
             <!-- message composer end -->
             <!-- end of message composer -->
         <!-- end of common modals -->
+
+        <!-- payment modal -->
+        <div class="modal fade" id="payment-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-bs-labelledby="exampleModalCenterTitle" aria-bs-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header d-none">
+                    <span class="badge badge-soft-success text-uppercase badge font-12px bg-primary-blink text-white">Receive Payment</span>
+                   
+                        
+                    <button type="button" class="btn btn-light position-relative p-0 avatar-xs rounded-circle close-modal" data-dismiss="modal"  aria-label="Close">
+                        <span class="avatar-title bg-transparent text-reset font-18px">
+                            <i class="bx bx-x"></i>
+                        </span>
+                    </button>
+
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge  badge-soft-success text-uppercase badge font-12px bg-primary-blink text-white">Receive Payment</span>
+                   
+                        
+                    <button type="button" class="btn btn-light position-relative p-0 avatar-xs rounded-circle pull-right close-modal" data-dismiss="modal" aria-label="Close">
+                        <span class="avatar-title bg-transparent text-reset font-18px">
+                            <i class="bx bx-x"></i>
+                        </span>
+                    </button>
+                    </div>
+
+                    <div class="payment-panel-parent">
+                        
+                        <div class="send-method payment-panel payment-active-panel">
+                            <label for="" class="mb-0 pb-0">Payment Method</label>
+                            <p><small class="text-muted">How would you like to send this money?</small></p>
+
+                            <div>
+                                <div class="accordion" id="accordionExample">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingOne">
+                                            <button class="accordion-button fw-medium" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <img class="rounded-circle" src="assets/images/users/mpesa.jpg" alt="Mobile Money" height="65">
+                                                </div>
+                                                <div class="d-flex flex-column">
+                                                    <p class="m-0 p-0 text-uppercase fw-semibold">MPESA</p>                                                
+                                                    <p class="mb-0 p-0"> <small>A payment request will be sent directly to the customer</small></p>
+                                                </div>
+                                            </button>
+                                        </h2>
+                                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                            <div class="accordion-body">
+                                                <div>
+                                                    <p>
+                                                        A payment request of <strong class="text-black">KES 1,500</strong> will be sent to the MPESA number you enter below.
+                                                    </p>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="">MPESA Number</label>
+                                                    <div class="form-floating mb-3">
+                                                        <input type="text" class="form-control font-21 text-success form-control-lg" id="phone-input" placeholder="Enter Name">
+                                                        <label for="floatingnameInput">Phone No.</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingTwo">
+                                            <button class="accordion-button fw-medium collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <img class="rounded-circle" src="assets/images/users/money.jpg" alt="Mobile Money" height="65">
+                                                </div>
+                                                <div class="d-flex flex-column">
+                                                    <p class="m-0 p-0 text-uppercase fw-semibold">Cash</p>                                                
+                                                    <p class="mb-0 p-0"> <small>By selecting this option you confirm that you have received the payment inform of cash</small></p>
+
+                                                    
+                                                </div>
+                                            </button>
+                                        </h2>
+                                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                                            <div class="accordion-body">
+                                                
+                                                <div class="form-check form-check-primary mb-3">
+                                                    <input class="form-check-input" type="checkbox" id="confirm-cash">
+                                                    <label class="form-check-label" for="confirm-cash">
+                                                        Confirm having received <strong>KES 1,500.00</strong>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-none transaction-summary payment-panel">
+                            <label for="">Transaction Breakdown</label>
+                            <div class="border p-4 rounded ">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="text-muted ">
+                                            Receipt NO.                                            
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6 align-self-end">
+                                        <div class=" text-right text-black">
+                                            RTS12364558T                                         
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6">
+                                        <div class="text-muted mt-2">
+                                            Receipt For                                           
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6 align-self-end">
+                                        <div class=" text-right text-black">
+                                            Alex Wanjala                                         
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6">
+                                        <div class="text-muted mt-2">
+                                            Payment Method                                           
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6 align-self-end">
+                                        <div class=" text-right text-black">
+                                            MPESA                                         
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6">
+                                        <div class="text-muted mt-2">
+                                            Transaction Amount                                           
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6 align-self-end">
+                                        <div class=" text-right text-black">
+                                            KES 1,500                                        
+                                        </div>
+                                    </div>
+
+                                    
+                                    <div class="col-12 text-black"><hr class="mb-0 pb-0"></div>
+
+                                    <div class="col-lg-6 text-uppercase">
+                                        <div class="text-muted mt-2 font-21">
+                                            Total                                          
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6 align-self-end text-uppercase">
+                                        <div class=" text-right text-black font-21 fw-bold">
+                                            KES 1,500                                        
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mpesa-confirmation ">
+                                    <p class="text-muted mt-2">A payment request of <strong class="text-black">KES 1,500</strong> will be sent to <strong class="text-black">phone number (0704549859)</strong> soon after you click the <strong class="text-black text-capitalize">Send Request</strong> button bellow. 
+                                        <br>
+                                        <br>
+                                        Remember to <strong class="text-black">Check your phone</strong> to confirm payment by entering your Mpesa pin.</p>
+
+                                        <button href="javascript: void(0);" class="btn btn-primary btn-flex flex-grow-1 waves-effect btn-send waves-light text-center w-100">
+                                            <div class="d-flex justify-content-center align-items-center"> 
+                                                <div class="stk-timer-container d-none justify-content-center align-items-center">
+                                                    <span class="mdi mdi-timer-outline font-16px"></span>
+                                                    <span class="stk-timer px-2"></span>
+                                                </div>
+                                                <div class="justify-content-center align-items-center d-flex">
+                                                    <span class="px-2">Send Request</span> 
+                                                    <div class="flip-x"><i class="mdi mdi-reply ms-3 font-16px"></i></div>
+                                                </div>
+
+                                            </div>
+                                         </button>
+                                </div>
+
+                                <div class="my-wallet-confirmation d-none">
+                                    <p class="text-muted mt-2 "><strong class="text-uppercase text-black">KES 300</strong> will be deducted from your guardian blink wallet and amount will be credited to <strong class="text-capitalize text-black">Alex's pocket money account</strong>.</p>
+                                    <p class="text-muted">confirm transaction by clicking the <strong class="text-capitalize text-black">send money</strong> button.</p>
+                                    
+                                    <button href="javascript: void(0);" class="btn btn-primary btn-flex flex-grow-1 waves-effect waves-light text-center w-100">
+                                        <div class="d-flex justify-content-center align-items-center"> <span class="mx-2">Send Money</span> <div class="flip-x"><i class="mdi mdi-reply flip-x ms-3 font-16px"></i></div></div>
+                                     </button>
+
+                                </div>
+
+                                
+                            </div>
+                        </div>
+                        <div class="d-none loader-panel">
+                            <div class="loader-modal p-5">
+                                <div class="d-flex align-items-center justify-content-center p-5 text-center flex-column">
+                                    <div class="spinner-border text-dark m-1" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                    <p class="pt-4 fw-strong text-uppercase">Processing Payment Please Wait <br>
+                                    <span class="fw-semibold text-black">STK Push sent to client</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center d-flex flex-column justify-content-around align-items-center sent-success d-none payment-panel p-4">
+                            <div class="success-image mb-4">
+                                <img src="assets/images/transactionReceipt-confirm.png" style="height: 65px;"  height="200" alt="">                                
+                            </div>
+                            <h4 class="text-blink-primary fw-bold">Transaction Complete</h4>
+                            <p class="text-muted mb-4"><strong class="text-black">KES 1,500.00</strong> has been received for <strong class="text-black">Invoice No. YUB48997.  </strong> The receipt Number for this transaction is <strong class="text-black">YUB48997.  </strong> </p>
+                            <p>Feel free to dismiss this pop-up or print the receipt for this transaction at your convenience.</p>
+
+                            <a href="PrintDocs/Receipts/receipts.html" target="new" type="button" class="btn btn-primary waves-effect waves-light w-100 mb-5 btn-lg">
+                                <i class="bx bxs-printer font-size-16 align-middle me-2"></i> Print Receipt
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex modal-footer-btn-pay">
+                    <button href="javascript: void(0);" disabled class="btn btn-outline-light waves-effect waves-light payment-prev"> <i class="mdi mdi-arrow-left ms-1"></i> Previouse </button>
+                    <button href="javascript: void(0);" class="btn btn-primary waves-effect waves-light payment-next">Next <i class="mdi mdi-arrow-right ms-1"></i></button>
+                    <button href="javascript: void(0);" class="btn btn-primary btn-flex flex-grow-1 waves-effect waves-light text-center d-none">
+                       <div class="d-flex justify-content-center align-items-center"> <span>Send Money</span> <div class="flip-x"><i class="mdi mdi-reply flip-x ms-3 font-16px"></i></div></div>
+                    </button>
+                </div>
+            </div>
+            </div>
+        </div>
+        <!-- end of payment modal -->
 
 
         <header id="page-topbar">
@@ -469,10 +777,10 @@
                     <!-- Left Menu Start -->
                     <ul class="metismenu list-unstyled" id="side-menu">
                         <li class="menu-title" key="t-apps">Merchant payment Gateway</li>
-                        <li class="side-bar-button d-none">
+                        <li class="side-bar-button">
                             <a href="#" class="waves-effect btn btn-light btn-rounded text-left write-msg-btn">
                                 <i class=""><img src="assets/images/plus-icon.svg" alt=""></i>
-                                <span>Compose</span>
+                                <span>Transact</span>
                             </a>
                         </li>
 
@@ -482,73 +790,36 @@
                             </a>
                         </li>
 
-                        <li class="menu-title" key="t-apps">Production Unit</li>
-                        <li>
-                            <a href="javascript: void(0);" class="waves-effect has-arrow">
-                                <i class="mdi mdi-chef-hat"></i>
-                                <span>Materials/Ingredients</span>
-                            </a>
-                            <ul class="sub-menu" aria-expanded="false">
-                                <li><a href="material-stock.html">Stock Taking</a></li>
-                                <li><a href="material-new.html">Add New Material</a></li>
-                                <li><a href="materials-all.html">All Materials/Ingredients</a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="javascript: void(0);" class="waves-effect has-arrow">
-                                <i class="bx bx-restaurant"></i>
-                                <span>Menu Items</span>
-                            </a>
-                            <ul class="sub-menu" aria-expanded="false">
-                                <li><a href="production-stock-taking.html">Stock Taking</a></li>
-                                <li><a href="production-item-new.html">Add New Item</a></li>
-                                <li><a href="production-category.html">Menu Categories</a></li>
-                                <li class="d-none"><a href="production-all-products.html">All Menu Items</a></li>
-                            </ul>
-                        </li>
-
-                        <li class="menu-title" key="t-apps">
-                            <hr class="p-0 m-0">
-                        </li>
                         <li class="menu-title" key="t-apps">Reports</li>
                         <li>
-                            <a href="javascript: void(0);" class="waves-effect has-arrow">
-                                <i class="bx bx-cart"></i>
-                                <span>Product Sales</span>
+                            <a href="transactions.html" class="waves-effect">
+                                <i class="mdi mdi-cash-check"></i>
+                                <span>Transactions</span>
                             </a>
-                            <ul class="sub-menu" aria-expanded="false">
-                                <li><a href="product-reports.html">Sales Reports</a></li>
-                                <li><a href="product-orders.html">Pending Payments</a></li>
-                                <li><a href="product-sales.html">Product Perfomance</a></li>
-                            </ul>
                         </li>
+
+                        <li>
+                            <a href="transactions-pending.html" class="waves-effect">
+                                <i class="mdi mdi-progress-clock"></i>
+                                <span>Pending Payments</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="transactions-archived.html" class="waves-effect">
+                                <i class="mdi mdi-archive-arrow-up-outline"></i>
+                                <span>Archived Requests</span>
+                            </a>
+                        </li>
+
                         <li>
                             <a href="cashier-sales.html" class="waves-effect">
                                 <i class="mdi mdi-account-cash-outline"></i>
                                 <span>Cashier Sales Reports</span>
                             </a>
                         </li>
-                        <li class="d-none">
-                            <a href="javascript: void(0);" class="waves-effect has-arrow">
-                                <i class="mdi mdi-account-cash-outline"></i>
-                                <span>Cashier Reports</span>
-                            </a>
-                            <ul class="sub-menu" aria-expanded="false">
-                                <li><a href="cashier-sales.html">Cashier Sales</a></li>
-                                <li><a href="cashier-logs.html">Cashier Logs</a></li>
-                                
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="javascript: void(0);" class="waves-effect has-arrow">
-                                <i class="bx bx-store-alt"></i>
-                                <span>Stock Movement</span>
-                            </a>
-                            <ul class="sub-menu" aria-expanded="false">
-                                <li><a href="materials-stock-reports.html">Materials/Ingredients Stk</a></li>
-                                <li><a href="products-stock-reports.html">Products Stock</a></li>
-                            </ul>
-                        </li>
+
+                       
 
                         <li>
                             <a href="clients.html" class="waves-effect">
@@ -556,37 +827,8 @@
                                 <span>Clients Register</span>
                             </a>
                         </li>
-
-                        <li class="menu-title" key="t-apps">
-                            <hr class="p-0 m-0">
-                        </li>
-                        <li class="menu-title" key="t-apps">Messanger</li>
-                        <li>
-                            <li>
-                                <a href="javascript: void(0);" class="waves-effect write-msg-btn">
-                                    <i class="bx bx-edit-alt"></i>
-                                    <span>Compose Message</span>
-                                </a>
-                            </li>
-                            <li>    
-                                <a href="messages.html" class="waves-effect">
-                                    <i class="mdi mdi-comment-text-multiple-outline"></i>
-                                    <span>Sent Messages</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript: void(0);" class="waves-effect has-arrow">
-                                    <i class="mdi mdi-account-details-outline"></i>
-                                    <span>Address Book</span>
-                                </a>
-                                <ul class="sub-menu" aria-expanded="false">
-                                    <li>
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#add-contact" class="btn btn-info text-center mx-4 px-3 text-white  mb-3"><i class="mdi mdi-account-multiple-plus-outline text-white m-0 p-0"></i>Add Contact</a>
-                                    </li>
-                                    <li><a href="messanger-contacts.html">Contact Book list</a></li>
-                                </ul>
-                            </li>
-                        </li>
+                        
+                       
                         <li class="menu-title" key="t-apps">
                             <hr class="p-0 m-0">
                         </li>
@@ -1107,6 +1349,39 @@
     <script src="assets/js/app.js "></script>
     <script src="assets/js/custom.js "></script>
     <script src="assets/js/pages/heatMap.js "></script>
+
+    <script>
+
+
+        $('.mpesa-btn').on('click', function(){
+            $(this).addClass('active').siblings().removeClass('active')
+            $('.mpesa-method').removeClass('d-none').siblings().addClass('d-none')
+        })
+
+
+        $('.sms-btn').on('click', function(){
+            $(this).addClass('active').siblings().removeClass('active')
+            $('.text-method').removeClass('d-none').siblings().addClass('d-none')
+        })
+
+
+        $('.card-btn').on('click', function(){
+            $(this).addClass('active').siblings().removeClass('active')
+            $('.card-method').removeClass('d-none').siblings().addClass('d-none')
+        })
+
+        $("body").on('change', '[name="card-method-radio"]', function() {
+        var theVal = $(this).val();
+        if (theVal =="sms") {
+            // alert('checked');
+            $('.phone-card-method').removeClass('d-none').siblings().addClass('d-none')
+        }
+        if (theVal == "email") {
+          $('.email-card-method').removeClass('d-none').siblings().addClass('d-none')
+        }
+
+    });
+    </script>
    
 </body>
 
