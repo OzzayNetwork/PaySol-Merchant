@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+
+# Production build output (per AGENTS.md: never commit dist/)
+dist/
+dist-ssr/
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
+# Local & temporary Vite configs / logs
+*.local
+vite.tmp-proxy.config.mjs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and OS metadata
+.DS_Store
+Thumbs.db
+
+# Admin console pages copied in and not used by the business app (kept for reference, never committed)
+_admin_leftovers/
+.env
+
+# Large raw media, mock attachments, and non-web binary design assets
+*.pdf
+*.ai
+*.psd
+*.jfif
+*.mp4
+*.zip
+*.tar.gz
+
+# Unused large legacy marketing/demo image scrapings
+src/assets/images/modern-bg/
+src/assets/images/Frost/
+src/assets/images/crypto/
+src/assets/images/404Img.png
+src/assets/images/dribbble_1.gif
+src/assets/images/Circular-on-Priority-Allowances-for-Other-Public-Officers-1.pdf
+src/assets/libs/pdfmake/
+src/assets/libs/echarts/
+
