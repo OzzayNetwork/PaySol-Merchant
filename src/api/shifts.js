@@ -22,6 +22,14 @@ export default {
     return tenantClient.post(`/shifts/${id}/join`);
   },
 
+  leave(id, data = {}) {
+    return tenantClient.post(`/shifts/${id}/leave`, data);
+  },
+
+  close(id, data = {}) {
+    return tenantClient.post(`/shifts/${id}/close`, data);
+  },
+
   list(params = {}) {
     return tenantClient.get("/shifts", { params });
   },

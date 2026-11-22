@@ -51,7 +51,7 @@ export default [
   { heading: true, label: 'Selling', roles: SELLERS },
 
   // The till: product grid, cart, payment (checkout S1)
-  { label: 'Counter', to: '/sell', icon: 'ri:shopping-cart-2-line', iconActive: 'ri:shopping-cart-2-fill', roles: SELLERS, soon: true },
+  { label: 'Counter', to: '/sell', icon: 'ri:shopping-cart-2-line', iconActive: 'ri:shopping-cart-2-fill', roles: SELLERS, otherLinks: ['/sell'] },
 
   // Open bills: rounds, split and partial payments, handover (checkout S3)
   { label: 'Open Tabs', to: '/sell/tabs', icon: 'ri:file-list-3-line', iconActive: 'ri:file-list-3-fill', roles: SELLERS, soon: true },

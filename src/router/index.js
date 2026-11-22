@@ -47,6 +47,8 @@ const BusinessDetails = () => import("@/pages/Business/Business.Details.vue");
 const PaymentMethodsList = () => import("@/pages/PaymentMethods/PaymentMethods.List.vue");
 // Selling › Counter Shifts & History (22 Nov 2026)
 const ShiftsList = () => import("@/pages/Shifts/Shifts.List.vue");
+// Selling › Counter POS (22 Nov 2026)
+const CounterSell = () => import("@/pages/Sell/Counter.vue");
 
 // Error pages
 const SearchResults = () => import("@/pages/Search/Search.Results.vue");
@@ -88,6 +90,14 @@ const routes = [
     name: "Home",
     component: Home,
     meta: { requiresAuth: true, title: "Home" },
+  },
+
+  // ---- Selling (owner, manager, cashier, waiter) › Counter POS ----
+  {
+    path: "/sell",
+    name: "CounterSell",
+    component: CounterSell,
+    meta: { requiresAuth: true, roles: ["owner", "manager", "cashier", "waiter"], title: "Counter POS" },
   },
 
   // ---- Selling (owner, manager, cashier) › Counter Shifts & History ----
