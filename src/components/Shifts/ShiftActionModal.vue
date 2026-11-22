@@ -282,13 +282,13 @@
                     </button>
                   </div>
 
-                  <!-- Denominations Grid (When Expanded, Scrollable with Sticky Header) -->
+                  <!-- Denominations Grid (When Expanded) -->
                   <div
                     v-if="showDenominations"
-                    class="mt-3 p-3 p-sm-4 rounded-3 bg-white currency-breakdown-scroll"
+                    class="mt-3 p-3 p-sm-4 rounded-3 bg-white"
                     style="border: 1px solid #e2e8f0 !important;"
                   >
-                    <div class="fw-bold text-dark fs-12 mb-3 d-flex justify-content-between align-items-center pb-2 border-bottom sticky-top bg-white pt-1" style="border-color: #eef0f4 !important; z-index: 2; top: -1rem;">
+                    <div class="fw-bold text-dark fs-12 mb-3 d-flex justify-content-between align-items-center pb-2 border-bottom" style="border-color: #eef0f4 !important;">
                       <span class="text-uppercase letter-spacing-1 fs-11 text-muted">Currency Breakdown</span>
                       <span class="text-success fw-bold fs-13">{{ formatMoney(denominationsTotal) }}</span>
                     </div>
@@ -686,26 +686,17 @@ onMounted(async () => {
   background: #f8faff;
   border-color: #e2e8f0 !important;
 }
-.currency-breakdown-scroll {
-  max-height: 290px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-.currency-breakdown-scroll::-webkit-scrollbar,
 .custom-scroll::-webkit-scrollbar {
   width: 5px;
 }
-.currency-breakdown-scroll::-webkit-scrollbar-track,
 .custom-scroll::-webkit-scrollbar-track {
   background: #f8f9fa;
   border-radius: 4px;
 }
-.currency-breakdown-scroll::-webkit-scrollbar-thumb,
 .custom-scroll::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
 }
-.currency-breakdown-scroll::-webkit-scrollbar-thumb:hover,
 .custom-scroll::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
