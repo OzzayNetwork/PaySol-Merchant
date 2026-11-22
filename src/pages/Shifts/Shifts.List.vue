@@ -17,6 +17,16 @@
           <div class="d-flex gap-2 flex-shrink-0 align-items-center">
             <button
               type="button"
+              class="btn btn-white d-flex align-items-center justify-content-center gap-2 flex-nowrap"
+              :disabled="!shifts.length || loading"
+              @click="exportCsv"
+              title="Download shifts as a CSV"
+            >
+              <i class="bx bx-download fs-5"></i>
+              <span class="d-none d-sm-inline">Export</span>
+            </button>
+            <button
+              type="button"
               class="btn d-flex align-items-center justify-content-center gap-2 flex-nowrap"
               :class="shiftStore.hasActiveShift ? 'btn-success text-white' : 'btn-primary text-white'"
               @click="shiftStore.openModal"
@@ -224,20 +234,6 @@
               <!-- Date Range Picker (Existing Facebook style shared component) -->
               <div class="position-relative d-flex align-items-center flex-shrink-0 text-nowrap">
                 <DateRangePicker v-model:dateFrom="dateFrom" v-model:dateTo="dateTo" @change="reload()" />
-              </div>
-
-              <!-- Export CSV Button -->
-              <div class="d-none d-lg-flex">
-                <button
-                  type="button"
-                  class="d-flex align-items-center fw-bold btn btn-light waves-effect gap-2"
-                  :disabled="!shifts.length || loading"
-                  @click="exportCsv"
-                  title="Download shifts as a CSV"
-                >
-                  <i class="bx bx-download fs-4"></i>
-                  <span>Export</span>
-                </button>
               </div>
             </div>
           </div>
