@@ -120,7 +120,7 @@
                 <div class="alert alert-info py-2 px-3 border-0 rounded-3 mb-0 fs-12 d-flex align-items-center gap-2">
                   <Icon icon="ri:information-line" class="fs-5 flex-shrink-0 text-info" />
                   <div>
-                    The drawer float is already logged. Tap below to connect your device and begin ringing sales immediately.
+                    The counter float is already logged. Tap below to connect your device and begin ringing sales immediately.
                   </div>
                 </div>
 
@@ -218,7 +218,7 @@
                       />
                     </div>
                     <div class="text-muted fs-11 mt-1">
-                      Cash in drawer or pouch before making sales
+                      Cash at counter or pouch before making sales
                     </div>
                   </div>
 
@@ -381,7 +381,7 @@
                     type="text"
                     class="form-control form-control-sm"
                     v-model="form.opening_notes"
-                    placeholder="e.g. Morning counter kickoff, drawer clean"
+                    placeholder="e.g. Morning counter kickoff, float ready"
                     maxlength="150"
                   />
                 </div>

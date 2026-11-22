@@ -296,7 +296,7 @@
                       <th>Duration</th>
                       <th class="text-end">Float</th>
                       <th class="text-end">Sales Total</th>
-                      <th class="text-end">Drawer Variance</th>
+                      <th class="text-end">Counter Variance</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -531,7 +531,7 @@
         <div class="offcanvas-body p-0 custom-scroll" style="overflow-y: auto;">
           <!-- Section 1: Cash Balancing -->
           <div class="p-3 bg-light border-bottom font-size-11 fw-bold text-uppercase text-muted letter-spacing-1">
-            Cash Drawer Balancing
+            Counter Cash Balancing
           </div>
           <div class="p-3 border-bottom">
             <div class="row g-3">
@@ -540,7 +540,7 @@
                 <span class="fw-bold font-size-14 text-dark">{{ formatMoney(activeShiftDetail.opening_float) }}</span>
               </div>
               <div class="col-6">
-                <span class="text-muted font-size-11 d-block">Expected in Drawer</span>
+                <span class="text-muted font-size-11 d-block">Expected at Counter</span>
                 <span class="fw-bold font-size-14 text-dark">
                   {{ activeShiftDetail.expected_cash !== null ? formatMoney(activeShiftDetail.expected_cash) : 'In progress' }}
                 </span>
@@ -813,7 +813,7 @@ const kpiCards = computed(() => {
       key: "active_shift",
       label: "Active Shift",
       value: shiftStore.hasActiveShift ? (shiftStore.activeShiftNumber || "Active") : "Closed",
-      note: shiftStore.hasActiveShift ? `${shiftStore.activeMembersCount} on duty` : "Drawer locked",
+      note: shiftStore.hasActiveShift ? `${shiftStore.activeMembersCount} on duty` : "Counter locked",
       color: shiftStore.hasActiveShift ? "#34c38f" : "#74788d",
       icon: shiftStore.hasActiveShift ? "ri:time-fill" : "ri:time-line",
     },
@@ -837,7 +837,7 @@ const kpiCards = computed(() => {
       key: "cash_variance",
       label: "Cash Variance",
       value: (totalPeriodVariance.value > 0 ? "+" : "") + "KES " + Math.round(totalPeriodVariance.value).toLocaleString("en-KE"),
-      note: totalPeriodVariance.value === 0 ? "Balanced drawer" : (totalPeriodVariance.value < 0 ? "Cash shortage" : "Cash surplus"),
+      note: totalPeriodVariance.value === 0 ? "Balanced counter" : (totalPeriodVariance.value < 0 ? "Counter shortage" : "Counter surplus"),
       color: totalPeriodVariance.value < 0 ? "#f46a6a" : (totalPeriodVariance.value > 0 ? "#34c38f" : "#74788d"),
       icon: "ri:scales-3-line",
     },
