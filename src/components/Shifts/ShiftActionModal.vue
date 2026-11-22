@@ -684,7 +684,19 @@ onMounted(async () => {
 <style scoped>
 .cash-input-card {
   background: #f8faff;
-  border-color: #e2e8f0 !important;
+  border-color: #ced4da !important;
+  box-shadow: none !important;
+}
+.denomination-box {
+  min-height: 116px;
+  box-shadow: none !important;
+  transition: all 0.15s ease;
+}
+.modal-content,
+.btn,
+.badge,
+input {
+  box-shadow: none !important;
 }
 .custom-scroll::-webkit-scrollbar {
   width: 5px;
@@ -699,10 +711,6 @@ onMounted(async () => {
 }
 .custom-scroll::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
-}
-.denomination-box {
-  min-height: 116px;
-  transition: all 0.15s ease;
 }
 .letter-spacing-1 {
   letter-spacing: 0.5px;

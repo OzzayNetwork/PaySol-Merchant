@@ -1,741 +1,653 @@
 <template>
-  <div class="shifts-page">
-    <!-- Page Title & Header Controls -->
+  <div>
+    <!-- Page title, matching Staff.List.vue and Products.List.vue -->
     <div class="row">
       <div class="col-12">
-        <div class="page-title-box d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <div class="page-title-box d-flex align-items-center justify-content-between gap-2">
           <div>
-            <h4 class="mb-sm-0 font-size-18 pb-1">Register Shifts &amp; History</h4>
+            <h4 class="mb-sm-0 font-size-18 pb-2">Register Shifts</h4>
             <div class="page-title-right">
-              <ol class="breadcrumb m-0 flex-nowrap">
+              <ol class="breadcrumb m-0">
                 <li class="breadcrumb-item"><router-link to="/">Home</router-link></li>
                 <li class="breadcrumb-item">Selling</li>
-                <li class="breadcrumb-item active text-truncate">Shifts</li>
+                <li class="breadcrumb-item active">Register Shifts</li>
               </ol>
             </div>
           </div>
-
-          <div class="d-flex flex-wrap gap-2 align-items-center">
-            <!-- Launch / Current Shift Action Pill -->
+          <div class="d-flex gap-2 flex-shrink-0 align-items-center">
             <button
-              v-if="shiftStore.hasActiveShift"
               type="button"
-              class="btn btn-outline-success d-flex align-items-center gap-2 fw-medium border"
-              style="border-color: #34c38f !important;"
+              class="btn d-flex align-items-center justify-content-center gap-2 flex-nowrap"
+              :class="shiftStore.hasActiveShift ? 'btn-success text-white' : 'btn-primary text-white'"
               @click="shiftStore.openModal"
             >
-              <span class="spinner-grow spinner-grow-sm text-success" style="width: 8px; height: 8px;" role="status"></span>
-              <span>Active Shift: {{ shiftStore.activeShiftNumber }}</span>
-            </button>
-            <button
-              v-else
-              type="button"
-              class="btn btn-primary d-flex align-items-center gap-2 fw-medium"
-              @click="shiftStore.openModal"
-            >
-              <Icon icon="ri:cash-line" class="fs-5" />
-              <span>Open Shift</span>
-            </button>
-
-            <!-- Export to CSV -->
-            <button
-              type="button"
-              class="btn btn-white d-flex align-items-center gap-2 border text-secondary"
-              style="border-color: #e2e8f0 !important;"
-              @click="exportCsv"
-              :disabled="loading || !shifts.length"
-              title="Export shift history to CSV"
-            >
-              <Icon icon="ri:download-line" class="fs-5" />
-              <span class="d-none d-sm-inline">Export</span>
-            </button>
-
-            <!-- Refresh Button -->
-            <button
-              type="button"
-              class="btn btn-white d-flex align-items-center justify-content-center p-0 rounded-circle border text-secondary"
-              style="width: 36px; height: 36px; border-color: #e2e8f0 !important;"
-              @click="loadShifts"
-              :disabled="loading"
-              title="Refresh shifts"
-            >
-              <Icon icon="ri:refresh-line" :class="{ 'spin-animation': loading }" class="fs-5" />
+              <i :class="shiftStore.hasActiveShift ? 'mdi mdi-clock-check-outline fs-4' : 'dripicons-plus fs-4 d-flex'"></i>
+              <span class="d-none d-sm-inline">{{ shiftStore.hasActiveShift ? 'Manage Active Shift' : 'Open Shift' }}</span>
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Top Metrics Overview Cards -->
-    <div class="row g-3 mb-4">
-      <!-- Card 1: Shift Status -->
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card h-100 mb-0 border" style="border-color: #eef0f4 !important; border-radius: 10px;">
-          <div class="card-body p-3">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <span class="text-uppercase letter-spacing-1 fs-11 text-muted fw-bold">Live Status</span>
-              <span
-                class="badge rounded-pill px-2 py-1 fs-10"
-                :class="shiftStore.hasActiveShift ? 'bg-success-subtle text-success' : 'bg-light text-secondary border'"
-              >
-                {{ shiftStore.hasActiveShift ? 'Open Running' : 'Closed' }}
-              </span>
-            </div>
-            <div class="fw-bold fs-5 text-dark font-monospace mb-1">
-              {{ shiftStore.hasActiveShift ? shiftStore.activeShiftNumber : 'No Active Shift' }}
-            </div>
-            <div class="text-muted fs-11 d-flex align-items-center gap-1">
-              <Icon :icon="shiftStore.hasActiveShift ? 'ri:user-star-line' : 'ri:lock-line'" class="text-secondary" />
-              <span v-if="shiftStore.hasActiveShift">
-                Lead: {{ shiftStore.activeShift?.opened_by?.name || 'On Duty' }} ({{ shiftStore.activeMembersCount }} staff)
-              </span>
-              <span v-else>Register drawer is locked</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 2: Shifts Recorded -->
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card h-100 mb-0 border" style="border-color: #eef0f4 !important; border-radius: 10px;">
-          <div class="card-body p-3">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <span class="text-uppercase letter-spacing-1 fs-11 text-muted fw-bold">Total Shifts</span>
-              <div class="avatar-xs rounded-circle bg-primary-subtle d-flex align-items-center justify-content-center text-primary" style="width: 28px; height: 28px;">
-                <Icon icon="ri:time-line" class="fs-5" />
-              </div>
-            </div>
-            <div class="fw-bold fs-4 text-dark mb-1">
-              {{ pagination.total || 0 }}
-            </div>
-            <div class="text-muted fs-11">
-              {{ selectedStatus ? (selectedStatus === 'open' ? 'Active shifts' : 'Closed shifts') : 'Total sessions' }} in period
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 3: Total Sales Recorded -->
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card h-100 mb-0 border" style="border-color: #eef0f4 !important; border-radius: 10px;">
-          <div class="card-body p-3">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <span class="text-uppercase letter-spacing-1 fs-11 text-muted fw-bold">Period Sales</span>
-              <div class="avatar-xs rounded-circle bg-success-subtle d-flex align-items-center justify-content-center text-success" style="width: 28px; height: 28px;">
-                <Icon icon="ri:shopping-bag-3-line" class="fs-5" />
-              </div>
-            </div>
-            <div class="fw-bold fs-4 text-dark mb-1">
-              {{ formatMoney(totalPeriodSales) }}
-            </div>
-            <div class="text-muted fs-11">
-              Across {{ shifts.length }} displayed shifts
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 4: Drawer Variance -->
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card h-100 mb-0 border" style="border-color: #eef0f4 !important; border-radius: 10px;">
-          <div class="card-body p-3">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <span class="text-uppercase letter-spacing-1 fs-11 text-muted fw-bold">Cash Variance</span>
-              <div
-                class="avatar-xs rounded-circle d-flex align-items-center justify-content-center"
-                :class="totalPeriodVariance < 0 ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'"
-                style="width: 28px; height: 28px;"
-              >
-                <Icon :icon="totalPeriodVariance < 0 ? 'ri:arrow-down-line' : 'ri:scales-3-line'" class="fs-5" />
-              </div>
-            </div>
-            <div
-              class="fw-bold fs-4 mb-1"
-              :class="totalPeriodVariance < 0 ? 'text-danger' : (totalPeriodVariance > 0 ? 'text-success' : 'text-dark')"
-            >
-              {{ totalPeriodVariance > 0 ? '+' : '' }}{{ formatMoney(totalPeriodVariance) }}
-            </div>
-            <div class="text-muted fs-11">
-              {{ totalPeriodVariance === 0 ? 'Drawers perfectly balanced' : (totalPeriodVariance < 0 ? 'Net drawer shortage' : 'Net drawer surplus') }}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Filters & Toolbar -->
-    <div class="card mb-4 border" style="border-color: #eef0f4 !important; border-radius: 10px;">
-      <div class="card-body p-3">
-        <div class="d-flex flex-wrap gap-2 gap-md-3 align-items-center justify-content-between">
-          <!-- Left: Status Tabs -->
-          <div class="d-flex flex-wrap gap-1 bg-light p-1 rounded-3 border" style="border-color: #e2e8f0 !important;">
-            <button
-              type="button"
-              class="btn btn-sm px-3 rounded-2 fw-medium transition-all"
-              :class="selectedStatus === null ? 'btn-white bg-white text-dark shadow-none' : 'text-muted border-0 bg-transparent'"
-              @click="setStatusFilter(null)"
-            >
-              All Shifts
-            </button>
-            <button
-              type="button"
-              class="btn btn-sm px-3 rounded-2 fw-medium transition-all"
-              :class="selectedStatus === 'open' ? 'btn-white bg-white text-success shadow-none' : 'text-muted border-0 bg-transparent'"
-              @click="setStatusFilter('open')"
-            >
-              Active Now
-            </button>
-            <button
-              type="button"
-              class="btn btn-sm px-3 rounded-2 fw-medium transition-all"
-              :class="selectedStatus === 'closed' ? 'btn-white bg-white text-dark shadow-none' : 'text-muted border-0 bg-transparent'"
-              @click="setStatusFilter('closed')"
-            >
-              Closed
-            </button>
-          </div>
-
-          <!-- Right: Search, Branch Selector & Date Picker -->
-          <div class="d-flex flex-wrap gap-2 align-items-center flex-grow-1 justify-content-sm-end">
-            <!-- Search Input -->
-            <div class="position-relative" style="min-width: 200px; max-width: 280px;">
-              <input
-                type="text"
-                class="form-control form-control-sm ps-4 bg-light border"
-                style="border-color: #e2e8f0 !important;"
-                placeholder="Search shift #, staff..."
-                v-model="searchQuery"
-              />
-              <Icon icon="ri:search-line" class="position-absolute text-muted fs-13" style="left: 10px; top: 8px;" />
-              <button
-                v-if="searchQuery"
-                type="button"
-                class="btn btn-link btn-sm p-0 position-absolute text-secondary"
-                style="right: 8px; top: 4px;"
-                @click="searchQuery = ''"
-              >
-                &times;
-              </button>
-            </div>
-
-            <!-- Branch Selector (if multi-branch) -->
-            <div v-if="shiftStore.branches.length > 1" class="dropdown">
-              <button
-                type="button"
-                class="btn btn-sm btn-white border d-flex align-items-center gap-1.5"
-                style="border-color: #e2e8f0 !important;"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <Icon icon="ri:store-2-line" class="text-primary fs-13" />
-                <span class="fs-12 fw-medium">{{ activeBranchName }}</span>
-                <Icon icon="ri:arrow-down-s-line" class="text-muted fs-13" />
-              </button>
-              <div class="dropdown-menu dropdown-menu-end p-1 border" style="border-color: #e2e8f0 !important;">
+    <!-- ONE Single main card — identical to Staff.List.vue and Products.List.vue -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card flat-card">
+          <!-- Toolbar: refresh, search, status, branch, dates, export -->
+          <div class="card-body border-bottom">
+            <div class="d-flex gap-2 gap-md-3 align-items-center">
+              <!-- Refresh button -->
+              <div>
                 <button
+                  @click="reload()"
                   type="button"
-                  class="dropdown-item fs-12 py-1.5 rounded-1"
-                  :class="{ active: selectedBranchId === null }"
-                  @click="setBranchFilter(null)"
+                  class="btn waves-effect btn-lg btn-light position-relative p-0 avatar-sm rounded-circle"
+                  :disabled="loading"
                 >
-                  All Branches
-                </button>
-                <button
-                  v-for="b in shiftStore.branches"
-                  :key="b.id"
-                  type="button"
-                  class="dropdown-item fs-12 py-1.5 rounded-1"
-                  :class="{ active: selectedBranchId === b.id }"
-                  @click="setBranchFilter(b.id)"
-                >
-                  {{ b.name }} <span v-if="b.is_main" class="text-muted">(Main)</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Date Range Picker Component -->
-            <div class="d-flex align-items-center">
-              <DateRangePicker v-model:dateFrom="dateFrom" v-model:dateTo="dateTo" @change="loadShifts" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Shifts Data Container -->
-    <div class="card border" style="border-color: #eef0f4 !important; border-radius: 10px;">
-      <!-- Loading Skeleton -->
-      <div v-if="loading" class="p-5 text-center">
-        <div class="spinner-border text-primary mb-3" role="status"></div>
-        <p class="text-muted fs-12 mb-0">Loading shifts history...</p>
-      </div>
-
-      <!-- Empty State -->
-      <div v-else-if="!filteredShifts.length" class="p-5 text-center">
-        <div
-          class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
-          style="width: 56px; height: 56px; background: rgba(85, 110, 230, 0.08); color: #556ee6;"
-        >
-          <Icon icon="ri:time-line" class="fs-2" />
-        </div>
-        <h5 class="fw-bold text-dark fs-15 mb-1">No shifts found</h5>
-        <p class="text-muted fs-12 mb-3" style="max-width: 380px; margin: 0 auto;">
-          {{ searchQuery || selectedStatus || selectedBranchId || dateFrom ? 'No shifts match your selected filter criteria. Try adjusting your dates or keywords.' : 'No cash register shifts have been opened yet. Kick off your first shift to begin ringing sales.' }}
-        </p>
-        <button
-          v-if="!shiftStore.hasActiveShift"
-          type="button"
-          class="btn btn-primary btn-sm px-3 fw-medium"
-          @click="shiftStore.openModal"
-        >
-          Open First Shift
-        </button>
-      </div>
-
-      <!-- Data Table (Desktop View) -->
-      <div v-else class="d-none d-lg-block">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light fs-11 text-uppercase text-muted border-bottom">
-              <tr>
-                <th class="ps-3 py-2.5">Shift Number</th>
-                <th class="py-2.5">Branch</th>
-                <th class="py-2.5">Shift Lead</th>
-                <th class="py-2.5">Staff On Duty</th>
-                <th class="py-2.5">Opened / Duration</th>
-                <th class="py-2.5 text-end">Float</th>
-                <th class="py-2.5 text-end">Sales Recorded</th>
-                <th class="py-2.5 text-end">Variance</th>
-                <th class="pe-3 py-2.5 text-end">Action</th>
-              </tr>
-            </thead>
-            <tbody class="fs-12">
-              <tr
-                v-for="shift in filteredShifts"
-                :key="shift.id"
-                class="cursor-pointer"
-                @click="openShiftDetail(shift)"
-              >
-                <!-- Shift # & Status Badge -->
-                <td class="ps-3 py-3">
-                  <div class="d-flex align-items-center gap-2">
-                    <span
-                      class="badge rounded-pill px-2 py-0.5 fs-10"
-                      :class="shift.status === 'open' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-light text-secondary border'"
-                    >
-                      <span v-if="shift.status === 'open'" class="spinner-grow spinner-grow-sm me-0.5" style="width: 6px; height: 6px;" role="status"></span>
-                      {{ shift.status === 'open' ? 'Active' : 'Closed' }}
-                    </span>
-                    <span class="fw-bold font-monospace text-dark">{{ shift.shift_number }}</span>
-                  </div>
-                </td>
-
-                <!-- Branch -->
-                <td class="py-3 text-secondary">
-                  {{ shift.branch?.name || 'Main Branch' }}
-                </td>
-
-                <!-- Shift Lead -->
-                <td class="py-3">
-                  <div class="d-flex align-items-center gap-2">
-                    <span
-                      class="avatar-title rounded-circle bg-primary-subtle text-primary fw-bold fs-11"
-                      style="width: 26px; height: 26px;"
-                    >
-                      {{ getInitials(shift.opened_by?.name) }}
-                    </span>
-                    <span class="text-dark fw-medium">{{ shift.opened_by?.name || 'Unknown' }}</span>
-                  </div>
-                </td>
-
-                <!-- Staff on Duty -->
-                <td class="py-3">
-                  <span class="badge bg-light text-secondary border px-2 py-1 rounded-pill fs-11">
-                    {{ shift.active_members_count || shift.active_members?.length || 1 }} on duty
+                  <span class="avatar-title bg-transparent text-reset">
+                    <Icon title="Refresh shifts" icon="boxicons:refresh-ccw" class="fs-4" :class="{ 'spin-anim': loading }" />
                   </span>
-                </td>
+                </button>
+              </div>
 
-                <!-- Opened & Duration -->
-                <td class="py-3">
-                  <div class="text-dark fw-medium">{{ formatDateTime(shift.opened_at) }}</div>
-                  <div class="text-muted fs-11">
-                    {{ getShiftDuration(shift) }}
+              <!-- Search -->
+              <div class="flex-grow-1" style="min-width: 0;">
+                <div class="search-box mb-0 me-0">
+                  <div class="position-relative">
+                    <form @submit.prevent="reload()" class="input-group bg-light rounded pb-0 flex-nowrap">
+                      <div class="flex-grow-1">
+                        <input
+                          style="border-radius: 0px; padding-right: 35px;"
+                          type="text"
+                          class="form-control bg-light rounded flex-grow-1"
+                          placeholder="Search by shift #, staff name, branch..."
+                          spellcheck="false"
+                          aria-label="Search shifts"
+                          v-model="searchQuery"
+                          @input="onSearch"
+                        />
+                        <i class="bx bx-search-alt search-icon fs-4"></i>
+                        <i
+                          v-if="searchQuery != ''"
+                          title="Clear search"
+                          style="right: 15px; left:unset;"
+                          class="mdi mdi-close search-icon cursor-pointer fs-3 waves-effect"
+                          @click="searchQuery = ''; reload();"
+                        ></i>
+                      </div>
+                    </form>
                   </div>
-                </td>
-
-                <!-- Opening Float -->
-                <td class="py-3 text-end fw-medium text-dark">
-                  {{ formatMoney(shift.opening_float) }}
-                </td>
-
-                <!-- Sales Recorded -->
-                <td class="py-3 text-end">
-                  <div class="fw-bold text-dark">{{ formatMoney(shift.total_sales_amount) }}</div>
-                  <div class="text-muted fs-11" v-if="shift.total_cash_sales > 0 || shift.total_mpesa_sales > 0">
-                    Cash: {{ formatMoney(shift.total_cash_sales) }} · M-Pesa: {{ formatMoney(shift.total_mpesa_sales) }}
-                  </div>
-                </td>
-
-                <!-- Variance -->
-                <td class="py-3 text-end">
-                  <template v-if="shift.status === 'closed'">
-                    <span
-                      class="fw-bold"
-                      :class="shift.cash_variance < 0 ? 'text-danger' : (shift.cash_variance > 0 ? 'text-success' : 'text-muted')"
-                    >
-                      {{ shift.cash_variance > 0 ? '+' : '' }}{{ formatMoney(shift.cash_variance || 0) }}
-                    </span>
-                  </template>
-                  <template v-else>
-                    <span class="text-muted fs-11 italic">In progress</span>
-                  </template>
-                </td>
-
-                <!-- Action Button -->
-                <td class="pe-3 py-3 text-end" @click.stop>
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-white border px-2.5 py-1 text-secondary"
-                    style="border-color: #e2e8f0 !important;"
-                    @click="openShiftDetail(shift)"
-                    title="View full shift audit"
-                  >
-                    <Icon icon="ri:eye-line" class="fs-13 me-1" />
-                    Details
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Mobile / Tablet Cards View -->
-      <div v-if="!loading && filteredShifts.length" class="d-lg-none p-3">
-        <div class="d-flex flex-column gap-3">
-          <div
-            v-for="shift in filteredShifts"
-            :key="shift.id"
-            class="card mb-0 p-3 rounded-3 border bg-white"
-            style="border-color: #e2e8f0 !important;"
-            @click="openShiftDetail(shift)"
-          >
-            <!-- Card Header -->
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <div class="d-flex align-items-center gap-1.5">
-                <span
-                  class="badge rounded-pill px-2 py-0.5 fs-10"
-                  :class="shift.status === 'open' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-light text-secondary border'"
-                >
-                  {{ shift.status === 'open' ? 'Active' : 'Closed' }}
-                </span>
-                <span class="fw-bold font-monospace text-dark fs-13">{{ shift.shift_number }}</span>
-              </div>
-              <span class="badge bg-light text-secondary border fs-10">
-                {{ shift.branch?.name || 'Main Branch' }}
-              </span>
-            </div>
-
-            <!-- Lead & Time -->
-            <div class="d-flex justify-content-between align-items-center py-2 border-top border-bottom my-1.5" style="border-color: #f1f3f7 !important;">
-              <div class="d-flex align-items-center gap-2">
-                <span class="avatar-title rounded-circle bg-primary-subtle text-primary fw-bold fs-10" style="width: 24px; height: 24px;">
-                  {{ getInitials(shift.opened_by?.name) }}
-                </span>
-                <span class="fs-12 text-dark fw-medium">{{ shift.opened_by?.name }}</span>
-              </div>
-              <div class="text-muted fs-11 text-end">
-                {{ formatDateTime(shift.opened_at) }}
-              </div>
-            </div>
-
-            <!-- Financials Grid -->
-            <div class="row g-2 pt-1 text-center">
-              <div class="col-4">
-                <div class="fs-10 text-muted text-uppercase">Float</div>
-                <div class="fw-bold text-dark fs-12 mt-0.5">{{ formatMoney(shift.opening_float) }}</div>
-              </div>
-              <div class="col-4">
-                <div class="fs-10 text-muted text-uppercase">Sales</div>
-                <div class="fw-bold text-dark fs-12 mt-0.5">{{ formatMoney(shift.total_sales_amount) }}</div>
-              </div>
-              <div class="col-4">
-                <div class="fs-10 text-muted text-uppercase">Variance</div>
-                <div
-                  class="fw-bold fs-12 mt-0.5"
-                  :class="shift.cash_variance < 0 ? 'text-danger' : (shift.cash_variance > 0 ? 'text-success' : 'text-muted')"
-                >
-                  {{ shift.status === 'closed' ? ((shift.cash_variance > 0 ? '+' : '') + formatMoney(shift.cash_variance || 0)) : 'Running' }}
                 </div>
               </div>
+
+              <!-- Phones & tablets: filters in one menu (matching Staff.List.vue) -->
+              <div class="position-relative d-flex d-lg-none">
+                <button
+                  type="button"
+                  title="Filter shifts"
+                  class="btn btn-light waves-effect position-relative p-0 avatar-sm rounded-circle"
+                  data-bs-toggle="dropdown"
+                  data-bs-auto-close="outside"
+                  aria-expanded="false"
+                >
+                  <span class="avatar-title bg-transparent text-reset"><i class="mdi mdi-filter-variant fs-4"></i></span>
+                  <span v-if="statusFilter || branchFilter" class="filter-dot"></span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end p-2" style="min-width: 220px;">
+                  <h6 class="dropdown-header">Status</h6>
+                  <a
+                    v-for="s in statusOptions"
+                    :key="`m-s-${s.key}`"
+                    href="javascript:void(0);"
+                    class="dropdown-item"
+                    :class="{ active: statusFilter === s.key }"
+                    @click="setStatus(s.key)"
+                  >
+                    {{ s.label }}
+                  </a>
+                  <template v-if="branches.length > 1">
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Branch</h6>
+                    <a
+                      href="javascript:void(0);"
+                      class="dropdown-item"
+                      :class="{ active: !branchFilter }"
+                      @click="setBranch(null)"
+                    >
+                      All Branches
+                    </a>
+                    <a
+                      v-for="b in branches"
+                      :key="`m-b-${b.id}`"
+                      href="javascript:void(0);"
+                      class="dropdown-item"
+                      :class="{ active: branchFilter === b.id }"
+                      @click="setBranch(b.id)"
+                    >
+                      {{ b.name }}
+                    </a>
+                  </template>
+                </div>
+              </div>
+
+              <!-- Status filter (Desktop) -->
+              <div class="position-relative d-none d-lg-flex">
+                <button
+                  class="d-flex align-items-center fw-bold btn btn-light waves-effect gap-2"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <i class="mdi mdi-toggle-switch-outline fs-4"></i>
+                  <span>{{ statusFilter ? statusLabel(statusFilter) : 'Status' }}</span>
+                  <i class="mdi mdi-chevron-down fs-4"></i>
+                </button>
+                <div class="dropdown-menu p-2" style="min-width: 180px;">
+                  <a
+                    v-for="s in statusOptions"
+                    :key="s.key"
+                    href="javascript:void(0);"
+                    class="dropdown-item d-flex align-items-center gap-2"
+                    :class="{ active: statusFilter === s.key }"
+                    @click="setStatus(s.key)"
+                  >
+                    {{ s.label }}
+                    <span v-if="s.count != null" class="ms-auto text-muted small">{{ s.count }}</span>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Branch filter (Desktop, if multi-branch) -->
+              <div v-if="branches.length > 1" class="position-relative d-none d-lg-flex">
+                <button
+                  class="d-flex align-items-center fw-bold btn btn-light waves-effect gap-2"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <i class="bx bx-store-alt fs-4"></i>
+                  <span class="text-truncate" style="max-width: 160px;">{{ branchFilterLabel }}</span>
+                  <i class="mdi mdi-chevron-down fs-4"></i>
+                </button>
+                <div class="dropdown-menu p-2" style="min-width: 200px;">
+                  <a
+                    href="javascript:void(0);"
+                    class="dropdown-item"
+                    :class="{ active: !branchFilter }"
+                    @click="setBranch(null)"
+                  >
+                    All Branches
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a
+                    v-for="b in branches"
+                    :key="b.id"
+                    href="javascript:void(0);"
+                    class="dropdown-item d-flex align-items-center justify-content-between"
+                    :class="{ active: branchFilter === b.id }"
+                    @click="setBranch(b.id)"
+                  >
+                    <span>{{ b.name }}</span>
+                    <small v-if="b.is_main" class="text-muted">(Main)</small>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Date Range Picker (Existing Facebook style shared component) -->
+              <div class="position-relative d-flex align-items-center flex-shrink-0 text-nowrap">
+                <DateRangePicker v-model:dateFrom="dateFrom" v-model:dateTo="dateTo" @change="reload()" />
+              </div>
+
+              <!-- Export CSV Button -->
+              <div class="d-none d-lg-flex">
+                <button
+                  type="button"
+                  class="d-flex align-items-center fw-bold btn btn-light waves-effect gap-2"
+                  :disabled="!shifts.length || loading"
+                  @click="exportCsv"
+                  title="Download shifts as a CSV"
+                >
+                  <i class="bx bx-download fs-4"></i>
+                  <span>Export</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- "Showing X of Y" and the filters in use (matching Staff.List.vue) -->
+          <div class="card-body py-2 border-bottom d-flex flex-wrap align-items-center gap-2 font-size-13">
+            <div v-if="loading && !shifts.length">
+              <SkeletonLoader type="text" :lines="1" height="10px" width="150px" />
+            </div>
+            <span v-else class="text-muted">
+              Showing <span class="fw-bold text-black">{{ shifts.length }}</span> of <span class="fw-bold text-black">{{ total }}</span> {{ total === 1 ? 'shift' : 'shifts' }}
+            </span>
+
+            <template v-if="chips.length">
+              <span class="text-muted">· Filters in use:</span>
+              <span
+                v-for="c in chips"
+                :key="c.key"
+                class="badge rounded-pill bg-primary bg-soft text-primary font-size-12 fw-medium px-2 py-1 d-inline-flex align-items-center gap-1"
+              >
+                {{ c.label }}
+                <a href="javascript:void(0);" class="text-primary" :title="`Remove ${c.label}`" @click="c.clear()">
+                  <i class="mdi mdi-close"></i>
+                </a>
+              </span>
+              <a v-if="chips.length > 1" href="javascript:void(0);" class="ms-1 font-size-12" @click="clearAll">Clear all</a>
+            </template>
+          </div>
+
+          <!-- Main Table Body (matching Staff.List.vue) -->
+          <div class="card-body p-0" style="min-height: 55vh;">
+            <!-- Empty state -->
+            <div v-if="!loading && !shifts.length" class="text-center p-5">
+              <Icon icon="ri:time-line" class="text-black opacity-25" style="font-size: 120px;" />
+              <h4 class="fw-bold text-dark mb-2">{{ hasFilters ? 'No shifts match' : 'No shifts yet' }}</h4>
+              <p class="text-muted mb-3">
+                {{ hasFilters ? 'No shifts match your search or filter settings.' : 'Open your first cash register shift to start ringing sales with your team.' }}
+              </p>
+              <button
+                v-if="!hasFilters && !shiftStore.hasActiveShift"
+                type="button"
+                class="btn btn-primary"
+                @click="shiftStore.openModal"
+              >
+                Open First Shift
+              </button>
             </div>
 
-            <!-- Footer Details Button -->
-            <div class="pt-2 mt-2 border-top d-flex justify-content-between align-items-center" style="border-color: #f1f3f7 !important;">
-              <span class="fs-11 text-muted">
-                {{ shift.active_members_count || 1 }} on duty
+            <template v-else>
+              <!-- Tablets and up: the table -->
+              <div class="table-responsive d-none d-md-block">
+                <table class="table verticle-middle table-hover mb-0">
+                  <thead class="table-light text-nowrap">
+                    <tr>
+                      <th>Shift Number</th>
+                      <th>Branch</th>
+                      <th>Shift Lead</th>
+                      <th>On Duty</th>
+                      <th>Opened</th>
+                      <th>Duration</th>
+                      <th class="text-end">Float</th>
+                      <th class="text-end">Sales Total</th>
+                      <th class="text-end">Drawer Variance</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+
+                  <!-- Rows -->
+                  <tbody v-if="!(loading && page === 1)">
+                    <tr
+                      v-for="s in filteredShifts"
+                      :key="s.id"
+                      class="shift-row cursor-pointer"
+                      @click="openDetails(s)"
+                    >
+                      <td>
+                        <div class="d-flex align-items-center gap-2">
+                          <span
+                            class="badge rounded-pill font-size-11 px-2"
+                            :class="s.status === 'open' ? 'bg-success bg-soft text-success' : 'bg-secondary bg-soft text-secondary'"
+                          >
+                            {{ s.status === 'open' ? 'Active' : 'Closed' }}
+                          </span>
+                          <span class="font-monospace fw-bold text-dark">{{ s.shift_number }}</span>
+                        </div>
+                      </td>
+
+                      <td class="text-nowrap text-muted">
+                        {{ s.branch?.name || 'Main Branch' }}
+                      </td>
+
+                      <td>
+                        <div class="d-flex align-items-center gap-2">
+                          <div class="avatar-xs flex-shrink-0">
+                            <span class="avatar-title rounded-circle fw-semibold font-size-11 bg-light text-muted">
+                              {{ initialsOf(s.opened_by?.name) }}
+                            </span>
+                          </div>
+                          <span class="fw-medium text-dark text-truncate">{{ s.opened_by?.name || '—' }}</span>
+                        </div>
+                      </td>
+
+                      <td class="text-nowrap">
+                        <span class="text-muted font-size-12">
+                          {{ s.active_members_count || 1 }} {{ (s.active_members_count || 1) === 1 ? 'person' : 'people' }}
+                        </span>
+                      </td>
+
+                      <td class="text-nowrap font-size-12 text-muted">
+                        {{ formatDateTime(s.opened_at) }}
+                      </td>
+
+                      <td class="text-nowrap font-size-12 text-muted">
+                        {{ getShiftDuration(s) }}
+                      </td>
+
+                      <td class="text-end text-nowrap font-size-12 fw-medium text-dark">
+                        {{ formatMoney(s.opening_float) }}
+                      </td>
+
+                      <td class="text-end text-nowrap font-size-12 fw-bold text-dark">
+                        {{ formatMoney(s.total_sales_amount) }}
+                      </td>
+
+                      <td class="text-end text-nowrap font-size-12">
+                        <template v-if="s.status === 'closed'">
+                          <span
+                            class="fw-bold"
+                            :class="s.cash_variance < 0 ? 'text-danger' : (s.cash_variance > 0 ? 'text-success' : 'text-muted')"
+                          >
+                            {{ s.cash_variance > 0 ? '+' : '' }}{{ formatMoney(s.cash_variance || 0) }}
+                          </span>
+                        </template>
+                        <template v-else>
+                          <span class="text-muted font-size-11">Running</span>
+                        </template>
+                      </td>
+
+                      <!-- Action menu -->
+                      <td @click.stop class="text-end">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-light waves-effect"
+                          @click="openDetails(s)"
+                          title="View shift details"
+                        >
+                          <Icon icon="ri:information-line" class="fs-5 align-middle" />
+                          <span class="ms-1">Details</span>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+
+                  <!-- Skeleton rows -->
+                  <tbody v-if="loading">
+                    <tr v-for="n in (page === 1 ? 6 : 2)" :key="`sk-${n}`">
+                      <td><SkeletonLoader type="text" :lines="1" height="12px" width="130px" /></td>
+                      <td><SkeletonLoader type="text" :lines="1" height="12px" width="80px" /></td>
+                      <td><SkeletonLoader type="text" :lines="1" height="12px" width="100px" /></td>
+                      <td><SkeletonLoader type="text" :lines="1" height="12px" width="60px" /></td>
+                      <td><SkeletonLoader type="text" :lines="1" height="12px" width="90px" /></td>
+                      <td><SkeletonLoader type="text" :lines="1" height="12px" width="70px" /></td>
+                      <td class="text-end"><SkeletonLoader type="text" :lines="1" height="12px" width="70px" /></td>
+                      <td class="text-end"><SkeletonLoader type="text" :lines="1" height="12px" width="70px" /></td>
+                      <td class="text-end"><SkeletonLoader type="text" :lines="1" height="12px" width="60px" /></td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Phones: cards (matching Staff.List.vue mobile list pattern) -->
+              <div class="d-md-none">
+                <template v-if="loading && page === 1">
+                  <div v-for="n in 4" :key="`skc-${n}`" class="p-3 border-bottom">
+                    <SkeletonLoader type="text" :lines="2" height="12px" />
+                  </div>
+                </template>
+                <div
+                  v-for="s in filteredShifts"
+                  :key="`m-${s.id}`"
+                  class="p-3 border-bottom cursor-pointer shift-card-item"
+                  @click="openDetails(s)"
+                >
+                  <div class="d-flex align-items-center justify-content-between mb-1">
+                    <span class="font-monospace fw-bold text-dark font-size-13">{{ s.shift_number }}</span>
+                    <span
+                      class="badge rounded-pill font-size-11 px-2"
+                      :class="s.status === 'open' ? 'bg-success bg-soft text-success' : 'bg-secondary bg-soft text-secondary'"
+                    >
+                      {{ s.status === 'open' ? 'Active' : 'Closed' }}
+                    </span>
+                  </div>
+
+                  <div class="text-muted font-size-12 mb-2">
+                    {{ s.branch?.name || 'Main Branch' }} · Lead: {{ s.opened_by?.name || '—' }} · {{ formatDateTime(s.opened_at) }}
+                  </div>
+
+                  <div class="d-flex justify-content-between font-size-12 pt-1 border-top">
+                    <span>Float: <strong class="text-dark">{{ formatMoney(s.opening_float) }}</strong></span>
+                    <span>Sales: <strong class="text-dark">{{ formatMoney(s.total_sales_amount) }}</strong></span>
+                    <span v-if="s.status === 'closed'">
+                      Diff:
+                      <strong :class="s.cash_variance < 0 ? 'text-danger' : (s.cash_variance > 0 ? 'text-success' : 'text-muted')">
+                        {{ s.cash_variance > 0 ? '+' : '' }}{{ formatMoney(s.cash_variance || 0) }}
+                      </strong>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <!-- Pagination Footer (matching Staff.List.vue / Products.List.vue) -->
+          <div
+            v-if="!loading && total > perPage"
+            class="card-body border-top py-3 d-flex flex-wrap align-items-center justify-content-between gap-2"
+          >
+            <span class="text-muted font-size-13">
+              Showing {{ paginationStart }} to {{ paginationEnd }} of {{ total }} shifts
+            </span>
+            <div class="d-flex align-items-center gap-1">
+              <button
+                type="button"
+                class="btn btn-sm btn-light waves-effect"
+                :disabled="page <= 1"
+                @click="goToPage(page - 1)"
+              >
+                Previous
+              </button>
+              <span class="px-2 font-size-13 text-muted">
+                Page {{ page }} of {{ lastPage }}
               </span>
               <button
                 type="button"
-                class="btn btn-sm btn-light border px-2.5 py-0.5 fs-11"
-                style="border-color: #e2e8f0 !important;"
+                class="btn btn-sm btn-light waves-effect"
+                :disabled="page >= lastPage"
+                @click="goToPage(page + 1)"
               >
-                View Details &rarr;
+                Next
               </button>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Pagination Footer -->
-      <div
-        v-if="!loading && pagination.total > pagination.per_page"
-        class="card-footer bg-white border-top p-3 d-flex flex-wrap align-items-center justify-content-between gap-2"
-        style="border-color: #eef0f4 !important;"
-      >
-        <span class="text-muted fs-12">
-          Showing {{ paginationStart }} to {{ paginationEnd }} of {{ pagination.total }} shifts
-        </span>
-        <div class="d-flex align-items-center gap-1">
-          <button
-            type="button"
-            class="btn btn-sm btn-white border px-2"
-            style="border-color: #e2e8f0 !important;"
-            :disabled="pagination.current_page <= 1"
-            @click="changePage(pagination.current_page - 1)"
-          >
-            Prev
-          </button>
-          <span class="px-2 fs-12 text-muted">
-            Page {{ pagination.current_page }} of {{ pagination.last_page }}
-          </span>
-          <button
-            type="button"
-            class="btn btn-sm btn-white border px-2"
-            style="border-color: #e2e8f0 !important;"
-            :disabled="pagination.current_page >= pagination.last_page"
-            @click="changePage(pagination.current_page + 1)"
-          >
-            Next
-          </button>
-        </div>
-      </div>
     </div>
 
     <!-- ========================================================= -->
-    <!-- SHIFT DETAILS SLIDE-OVER DRAWER (OFFCANVAS)                -->
+    <!-- SHIFT DETAILS OFFCANVAS (Modelled on ActivityEvent.aside.vue) -->
     <!-- ========================================================= -->
     <div
-      v-if="selectedShift"
+      v-if="activeShiftDetail"
       class="offcanvas-backdrop fade show"
-      @click="selectedShift = null"
+      @click="activeShiftDetail = null"
     ></div>
 
     <div
-      class="offcanvas offcanvas-end custom-drawer"
-      :class="{ show: !!selectedShift }"
+      class="offcanvas offcanvas-end"
+      :class="{ show: !!activeShiftDetail }"
       tabindex="-1"
-      :style="{ visibility: selectedShift ? 'visible' : 'hidden' }"
+      :style="{ visibility: activeShiftDetail ? 'visible' : 'hidden', width: '560px', maxWidth: '100vw' }"
     >
-      <div v-if="selectedShift" class="d-flex flex-column h-100">
-        <!-- Drawer Header -->
-        <div class="offcanvas-header p-3 px-4 border-bottom bg-light bg-opacity-50" style="border-color: #eef0f4 !important;">
-          <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
-              <span
-                class="badge rounded-pill px-2 py-0.5 fs-10"
-                :class="selectedShift.status === 'open' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-light text-secondary border'"
-              >
-                {{ selectedShift.status === 'open' ? 'Active' : 'Closed' }}
-              </span>
-              <h5 class="offcanvas-title fw-bold text-dark font-monospace fs-15 mb-0">
-                {{ selectedShift.shift_number }}
-              </h5>
-            </div>
-            <div class="text-muted fs-11">
-              {{ selectedShift.branch?.name || 'Main Branch' }} · Opened {{ formatDateTime(selectedShift.opened_at) }}
-            </div>
+      <div v-if="activeShiftDetail" class="d-flex flex-column h-100">
+        <!-- Offcanvas Header (matching ActivityEvent.aside.vue) -->
+        <div class="offcanvas-header border-bottom align-items-start gap-3 p-3">
+          <div class="avatar-sm flex-shrink-0">
+            <span class="avatar-title rounded-circle fw-semibold font-size-14 bg-light text-primary">
+              {{ initialsOf(activeShiftDetail.opened_by?.name) }}
+            </span>
           </div>
-          <button
-            type="button"
-            class="btn-close"
-            aria-label="Close"
-            @click="selectedShift = null"
-          ></button>
+          <div class="flex-grow-1 min-w-0">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <h5 class="panel-title mb-0 font-monospace fw-bold">{{ activeShiftDetail.shift_number }}</h5>
+              <span
+                class="badge rounded-pill font-size-11 px-2"
+                :class="activeShiftDetail.status === 'open' ? 'bg-success bg-soft text-success' : 'bg-secondary bg-soft text-secondary'"
+              >
+                {{ activeShiftDetail.status === 'open' ? 'Active' : 'Closed' }}
+              </span>
+            </div>
+            <span class="d-block text-muted font-size-12">
+              {{ activeShiftDetail.branch?.name || 'Main Branch' }} · Opened by <span class="text-dark fw-medium">{{ activeShiftDetail.opened_by?.name || '—' }}</span>
+            </span>
+            <span class="d-block text-muted font-size-12">
+              {{ formatDateTime(activeShiftDetail.opened_at) }}
+              <template v-if="activeShiftDetail.closed_at">
+                · Closed {{ formatDateTime(activeShiftDetail.closed_at) }}
+              </template>
+            </span>
+          </div>
+          <button type="button" class="btn-close" aria-label="Close" @click="activeShiftDetail = null"></button>
         </div>
 
-        <!-- Drawer Body -->
-        <div class="offcanvas-body p-4 custom-scroll" style="overflow-y: auto;">
-          <!-- Cash Drawer Reconciliation Summary Card -->
-          <div class="p-3 rounded-3 bg-light border mb-4" style="border-color: #e2e8f0 !important;">
-            <div class="text-uppercase letter-spacing-1 fs-11 text-muted fw-bold mb-3 pb-2 border-bottom" style="border-color: #e2e8f0 !important;">
-              Cash Drawer Balancing
-            </div>
-
-            <div class="row g-2 mb-2">
+        <!-- Offcanvas Body: Flat sections with border-bottom, zero shadows -->
+        <div class="offcanvas-body p-0 custom-scroll" style="overflow-y: auto;">
+          <!-- Section 1: Cash Balancing -->
+          <div class="p-3 bg-light border-bottom font-size-11 fw-bold text-uppercase text-muted letter-spacing-1">
+            Cash Drawer Balancing
+          </div>
+          <div class="p-3 border-bottom">
+            <div class="row g-3">
               <div class="col-6">
-                <div class="fs-11 text-muted">Opening Float</div>
-                <div class="fw-bold fs-14 text-dark mt-0.5">{{ formatMoney(selectedShift.opening_float) }}</div>
+                <span class="text-muted font-size-11 d-block">Starting Float</span>
+                <span class="fw-bold font-size-14 text-dark">{{ formatMoney(activeShiftDetail.opening_float) }}</span>
               </div>
               <div class="col-6">
-                <div class="fs-11 text-muted">Expected in Drawer</div>
-                <div class="fw-bold fs-14 text-dark mt-0.5">
-                  {{ selectedShift.expected_cash !== null ? formatMoney(selectedShift.expected_cash) : 'In progress' }}
-                </div>
+                <span class="text-muted font-size-11 d-block">Expected in Drawer</span>
+                <span class="fw-bold font-size-14 text-dark">
+                  {{ activeShiftDetail.expected_cash !== null ? formatMoney(activeShiftDetail.expected_cash) : 'In progress' }}
+                </span>
               </div>
-              <div class="col-6 mt-2">
-                <div class="fs-11 text-muted">Actual Cash Counted</div>
-                <div class="fw-bold fs-14 text-dark mt-0.5">
-                  {{ selectedShift.actual_cash !== null ? formatMoney(selectedShift.actual_cash) : 'Pending close' }}
-                </div>
+              <div class="col-6">
+                <span class="text-muted font-size-11 d-block">Actual Counted</span>
+                <span class="fw-bold font-size-14 text-dark">
+                  {{ activeShiftDetail.actual_cash !== null ? formatMoney(activeShiftDetail.actual_cash) : 'Pending close' }}
+                </span>
               </div>
-              <div class="col-6 mt-2">
-                <div class="fs-11 text-muted">Variance (Over / Short)</div>
-                <div
-                  class="fw-bold fs-14 mt-0.5"
-                  :class="selectedShift.cash_variance < 0 ? 'text-danger' : (selectedShift.cash_variance > 0 ? 'text-success' : 'text-dark')"
+              <div class="col-6">
+                <span class="text-muted font-size-11 d-block">Over / Short Variance</span>
+                <span
+                  class="fw-bold font-size-14"
+                  :class="activeShiftDetail.cash_variance < 0 ? 'text-danger' : (activeShiftDetail.cash_variance > 0 ? 'text-success' : 'text-muted')"
                 >
-                  <template v-if="selectedShift.status === 'closed'">
-                    {{ selectedShift.cash_variance > 0 ? '+' : '' }}{{ formatMoney(selectedShift.cash_variance || 0) }}
+                  <template v-if="activeShiftDetail.status === 'closed'">
+                    {{ activeShiftDetail.cash_variance > 0 ? '+' : '' }}{{ formatMoney(activeShiftDetail.cash_variance || 0) }}
                   </template>
                   <template v-else>
-                    <span class="text-muted fs-12">Unbalanced</span>
+                    <span class="text-muted font-size-12">Unbalanced</span>
                   </template>
-                </div>
+                </span>
               </div>
             </div>
 
-            <!-- Notes if present -->
-            <div v-if="selectedShift.opening_notes || selectedShift.closing_notes" class="mt-3 pt-2 border-top fs-11" style="border-color: #e2e8f0 !important;">
-              <div v-if="selectedShift.opening_notes" class="mb-1 text-muted">
-                <strong class="text-dark">Opening Remark:</strong> {{ selectedShift.opening_notes }}
+            <!-- Remarks -->
+            <div v-if="activeShiftDetail.opening_notes || activeShiftDetail.closing_notes" class="mt-3 pt-2 border-top font-size-12 text-muted">
+              <div v-if="activeShiftDetail.opening_notes" class="mb-1">
+                <strong class="text-dark">Opening Remark:</strong> {{ activeShiftDetail.opening_notes }}
               </div>
-              <div v-if="selectedShift.closing_notes" class="text-muted">
-                <strong class="text-dark">Closing Remark:</strong> {{ selectedShift.closing_notes }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Sales By Payment Method Card -->
-          <div class="card p-3 rounded-3 border mb-4" style="border-color: #eef0f4 !important;">
-            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: #eef0f4 !important;">
-              <span class="text-uppercase letter-spacing-1 fs-11 text-muted fw-bold">Sales Channels</span>
-              <span class="fw-bold text-dark fs-14">{{ formatMoney(selectedShift.total_sales_amount) }}</span>
-            </div>
-
-            <div class="d-flex flex-column gap-2 fs-12">
-              <div class="d-flex justify-content-between align-items-center py-1">
-                <div class="d-flex align-items-center gap-2">
-                  <Icon icon="ri:money-cny-box-line" class="text-success fs-14" />
-                  <span class="text-secondary">Cash Sales</span>
-                </div>
-                <span class="fw-semibold text-dark">{{ formatMoney(selectedShift.total_cash_sales) }}</span>
-              </div>
-
-              <div class="d-flex justify-content-between align-items-center py-1">
-                <div class="d-flex align-items-center gap-2">
-                  <Icon icon="ri:smartphone-line" class="text-success fs-14" />
-                  <span class="text-secondary">M-Pesa Sales</span>
-                </div>
-                <span class="fw-semibold text-dark">{{ formatMoney(selectedShift.total_mpesa_sales) }}</span>
-              </div>
-
-              <div class="d-flex justify-content-between align-items-center py-1">
-                <div class="d-flex align-items-center gap-2">
-                  <Icon icon="ri:bank-card-line" class="text-primary fs-14" />
-                  <span class="text-secondary">Card / Bank Sales</span>
-                </div>
-                <span class="fw-semibold text-dark">{{ formatMoney(selectedShift.total_bank_sales) }}</span>
-              </div>
-
-              <div class="d-flex justify-content-between align-items-center py-1">
-                <div class="d-flex align-items-center gap-2">
-                  <Icon icon="ri:file-text-line" class="text-warning fs-14" />
-                  <span class="text-secondary">Credit / Tabs</span>
-                </div>
-                <span class="fw-semibold text-dark">{{ formatMoney(selectedShift.total_credit_sales) }}</span>
+              <div v-if="activeShiftDetail.closing_notes">
+                <strong class="text-dark">Closing Remark:</strong> {{ activeShiftDetail.closing_notes }}
               </div>
             </div>
           </div>
 
-          <!-- Opening Denominations Breakdown (if logged) -->
-          <div v-if="selectedShift.opening_denominations && Object.keys(selectedShift.opening_denominations).length" class="card p-3 rounded-3 border mb-4" style="border-color: #eef0f4 !important;">
-            <div class="text-uppercase letter-spacing-1 fs-11 text-muted fw-bold mb-2 pb-2 border-bottom" style="border-color: #eef0f4 !important;">
-              Opening Float Count Breakdown
+          <!-- Section 2: Sales Summary -->
+          <div class="p-3 bg-light border-bottom font-size-11 fw-bold text-uppercase text-muted letter-spacing-1">
+            Sales Channels Summary
+          </div>
+          <div class="p-3 border-bottom font-size-12">
+            <div class="d-flex justify-content-between py-1 border-bottom">
+              <span class="text-muted">Total Sales Rung</span>
+              <span class="fw-bold text-dark font-size-14">{{ formatMoney(activeShiftDetail.total_sales_amount) }}</span>
             </div>
-            <div class="row g-2 text-center fs-11">
-              <div
-                v-for="(count, note) in selectedShift.opening_denominations"
-                :key="note"
-                class="col-4"
-              >
-                <div class="p-2 rounded-2 bg-light border" style="border-color: #e2e8f0 !important;">
-                  <span class="text-muted d-block">{{ note === 'coins' ? 'Loose Coins' : 'KES ' + note }}</span>
-                  <span class="fw-bold text-dark fs-12 mt-0.5 d-block">
-                    {{ note === 'coins' ? formatMoney(count) : count + ' pcs' }}
-                  </span>
-                </div>
-              </div>
+            <div class="d-flex justify-content-between py-1.5 border-bottom">
+              <span class="text-muted">Cash</span>
+              <span class="fw-medium text-dark">{{ formatMoney(activeShiftDetail.total_cash_sales) }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-1.5 border-bottom">
+              <span class="text-muted">M-Pesa</span>
+              <span class="fw-medium text-dark">{{ formatMoney(activeShiftDetail.total_mpesa_sales) }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-1.5 border-bottom">
+              <span class="text-muted">Bank / Card</span>
+              <span class="fw-medium text-dark">{{ formatMoney(activeShiftDetail.total_bank_sales) }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-1.5">
+              <span class="text-muted">Credit / Tabs</span>
+              <span class="fw-medium text-dark">{{ formatMoney(activeShiftDetail.total_credit_sales) }}</span>
             </div>
           </div>
 
-          <!-- Staff On Duty Section -->
-          <div class="card p-3 rounded-3 border mb-3" style="border-color: #eef0f4 !important;">
-            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: #eef0f4 !important;">
-              <span class="text-uppercase letter-spacing-1 fs-11 text-muted fw-bold">Team Members on Duty</span>
-              <span class="badge bg-light text-secondary border fs-11">
-                {{ (selectedShift.all_members || selectedShift.active_members || []).length }} staff
-              </span>
+          <!-- Section 3: Opening Denominations (if counted) -->
+          <template v-if="activeShiftDetail.opening_denominations && Object.keys(activeShiftDetail.opening_denominations).length">
+            <div class="p-3 bg-light border-bottom font-size-11 fw-bold text-uppercase text-muted letter-spacing-1">
+              Opening Float Breakdown
             </div>
-
-            <div class="d-flex flex-column gap-2.5">
-              <div
-                v-for="member in (selectedShift.all_members || selectedShift.active_members || [])"
-                :key="member.id"
-                class="p-2.5 rounded-3 border bg-light d-flex align-items-center justify-content-between"
-                style="border-color: #e2e8f0 !important;"
-              >
-                <div class="d-flex align-items-center gap-2.5">
-                  <span class="avatar-title rounded-circle bg-white text-primary border fw-bold fs-11" style="width: 32px; height: 32px;">
-                    {{ getInitials(member.name) }}
-                  </span>
-                  <div>
-                    <div class="fw-bold text-dark fs-12 d-flex align-items-center gap-1.5">
-                      {{ member.name }}
-                      <span v-if="member.role === 'lead'" class="badge bg-warning-subtle text-warning fs-10 px-1 py-0">Lead</span>
-                      <span v-if="member.status === 'active'" class="badge bg-success-subtle text-success fs-10 px-1 py-0">Active</span>
-                    </div>
-                    <div class="text-muted fs-11">
-                      Joined: {{ formatDateTime(member.joined_at) }}
-                    </div>
+            <div class="p-3 border-bottom font-size-12">
+              <div class="row g-2 text-center">
+                <div
+                  v-for="(count, note) in activeShiftDetail.opening_denominations"
+                  :key="note"
+                  class="col-4"
+                >
+                  <div class="p-2 border rounded bg-light">
+                    <span class="text-muted font-size-11 d-block">{{ note === 'coins' ? 'Loose Coins' : 'KES ' + note }}</span>
+                    <strong class="text-dark font-size-12">{{ note === 'coins' ? formatMoney(count) : count + ' pcs' }}</strong>
                   </div>
                 </div>
+              </div>
+            </div>
+          </template>
 
-                <div class="text-end">
-                  <div class="fs-10 text-muted">Cash Collected</div>
-                  <div class="fw-bold text-dark fs-12">{{ formatMoney(member.cash_collected || 0) }}</div>
+          <!-- Section 4: Team Members on Duty -->
+          <div class="p-3 bg-light border-bottom font-size-11 fw-bold text-uppercase text-muted letter-spacing-1">
+            Team Members on Duty ({{ (activeShiftDetail.all_members || activeShiftDetail.active_members || []).length }})
+          </div>
+          <div class="p-0">
+            <div
+              v-for="m in (activeShiftDetail.all_members || activeShiftDetail.active_members || [])"
+              :key="m.id"
+              class="p-3 border-bottom d-flex align-items-center justify-content-between font-size-12"
+            >
+              <div class="d-flex align-items-center gap-2">
+                <div class="avatar-xs flex-shrink-0">
+                  <span class="avatar-title rounded-circle fw-semibold font-size-11 bg-light text-muted">
+                    {{ initialsOf(m.name) }}
+                  </span>
                 </div>
+                <div>
+                  <div class="fw-bold text-dark d-flex align-items-center gap-1.5">
+                    {{ m.name }}
+                    <span v-if="m.role === 'lead'" class="badge bg-warning bg-soft text-warning font-size-10 px-1 py-0">Lead</span>
+                    <span v-if="m.status === 'active'" class="badge bg-success bg-soft text-success font-size-10 px-1 py-0">Active</span>
+                  </div>
+                  <small class="text-muted">Joined: {{ formatDateTime(m.joined_at) }}</small>
+                </div>
+              </div>
+
+              <div class="text-end">
+                <span class="text-muted font-size-11 d-block">Cash Collected</span>
+                <span class="fw-bold text-dark">{{ formatMoney(m.cash_collected || 0) }}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Drawer Footer -->
-        <div class="offcanvas-footer p-3 px-4 border-top bg-light bg-opacity-25 d-flex justify-content-between" style="border-color: #eef0f4 !important;">
-          <button
-            type="button"
-            class="btn btn-outline-secondary btn-sm px-3"
-            @click="selectedShift = null"
-          >
+        <!-- Offcanvas Footer -->
+        <div class="p-3 border-top d-flex justify-content-between align-items-center bg-light">
+          <button type="button" class="btn btn-white waves-effect" @click="activeShiftDetail = null">
             Close
           </button>
           <button
-            v-if="selectedShift.status === 'open'"
+            v-if="activeShiftDetail.status === 'open'"
             type="button"
-            class="btn btn-primary btn-sm px-3"
+            class="btn btn-primary waves-effect"
             @click="shiftStore.openModal"
           >
-            Manage Live Shift
+            Manage Active Shift
           </button>
         </div>
       </div>
@@ -744,36 +656,94 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { Icon } from "@iconify/vue";
 import shiftsApi from "@/api/shifts";
 import { useShiftStore } from "@/stores/shift";
 import DateRangePicker from "@/components/DatePickers/datePicker.facebookstyle.vue";
+import SkeletonLoader from "@/components/Loaders/SkeletonLoader.vue";
 
 const shiftStore = useShiftStore();
 
 // State
 const loading = ref(false);
 const shifts = ref([]);
-const selectedShift = ref(null);
+const total = ref(0);
+const page = ref(1);
+const perPage = ref(20);
+const lastPage = ref(1);
+
 const searchQuery = ref("");
-const selectedStatus = ref(null); // null | 'open' | 'closed'
-const selectedBranchId = ref(null);
+let searchTimer = null;
+
+const statusFilter = ref(""); // '' | 'open' | 'closed'
+const branchFilter = ref(null);
 const dateFrom = ref("");
 const dateTo = ref("");
 
-const pagination = ref({
-  current_page: 1,
-  last_page: 1,
-  per_page: 15,
-  total: 0,
+const activeShiftDetail = ref(null);
+
+const branches = computed(() => shiftStore.branches || []);
+
+const statusOptions = [
+  { key: "", label: "All Shifts" },
+  { key: "open", label: "Active Only" },
+  { key: "closed", label: "Closed Only" },
+];
+
+const branchFilterLabel = computed(() => {
+  if (!branchFilter.value) return "Branch";
+  const b = branches.value.find((x) => x.id === branchFilter.value);
+  return b ? b.name : "Branch";
 });
 
-// Computed Filters
-const activeBranchName = computed(() => {
-  if (!selectedBranchId.value) return "All Branches";
-  const branch = shiftStore.branches.find((b) => b.id === selectedBranchId.value);
-  return branch ? branch.name : "Branch";
+function statusLabel(key) {
+  return statusOptions.find((s) => s.key === key)?.label || "Status";
+}
+
+const hasFilters = computed(() => {
+  return !!(searchQuery.value || statusFilter.value || branchFilter.value || dateFrom.value || dateTo.value);
+});
+
+// Active filter chips (matching Staff.List.vue)
+const chips = computed(() => {
+  const list = [];
+  if (statusFilter.value) {
+    list.push({
+      key: "status",
+      label: `Status: ${statusLabel(statusFilter.value)}`,
+      clear: () => setStatus(""),
+    });
+  }
+  if (branchFilter.value) {
+    list.push({
+      key: "branch",
+      label: `Branch: ${branchFilterLabel.value}`,
+      clear: () => setBranch(null),
+    });
+  }
+  if (searchQuery.value) {
+    list.push({
+      key: "search",
+      label: `Search: "${searchQuery.value}"`,
+      clear: () => {
+        searchQuery.value = "";
+        reload();
+      },
+    });
+  }
+  if (dateFrom.value || dateTo.value) {
+    list.push({
+      key: "dates",
+      label: `Dates: ${dateFrom.value || "Start"} to ${dateTo.value || "Now"}`,
+      clear: () => {
+        dateFrom.value = "";
+        dateTo.value = "";
+        reload();
+      },
+    });
+  }
+  return list;
 });
 
 const filteredShifts = computed(() => {
@@ -783,46 +753,31 @@ const filteredShifts = computed(() => {
     return (
       s.shift_number?.toLowerCase().includes(q) ||
       s.opened_by?.name?.toLowerCase().includes(q) ||
-      s.branch?.name?.toLowerCase().includes(q) ||
-      s.opening_notes?.toLowerCase().includes(q)
+      s.branch?.name?.toLowerCase().includes(q)
     );
   });
 });
 
-const totalPeriodSales = computed(() => {
-  return shifts.value.reduce((acc, s) => acc + (Number(s.total_sales_amount) || 0), 0);
-});
-
-const totalPeriodVariance = computed(() => {
-  return shifts.value.reduce((acc, s) => {
-    if (s.status === 'closed' && s.cash_variance !== null) {
-      return acc + Number(s.cash_variance);
-    }
-    return acc;
-  }, 0);
-});
-
 const paginationStart = computed(() => {
-  if (!pagination.value.total) return 0;
-  return (pagination.value.current_page - 1) * pagination.value.per_page + 1;
+  if (!total.value) return 0;
+  return (page.value - 1) * perPage.value + 1;
 });
 
 const paginationEnd = computed(() => {
-  const end = pagination.value.current_page * pagination.value.per_page;
-  return Math.min(end, pagination.value.total);
+  const end = page.value * perPage.value;
+  return Math.min(end, total.value);
 });
 
-// Actions
-async function loadShifts(page = 1) {
+// Data fetching
+async function getShifts() {
   loading.value = true;
   try {
     const params = {
-      page,
-      per_page: pagination.value.per_page,
+      page: page.value,
+      per_page: perPage.value,
     };
-
-    if (selectedStatus.value) params.status = selectedStatus.value;
-    if (selectedBranchId.value) params.branch_id = selectedBranchId.value;
+    if (statusFilter.value) params.status = statusFilter.value;
+    if (branchFilter.value) params.branch_id = branchFilter.value;
     if (dateFrom.value) params.date_from = dateFrom.value;
     if (dateTo.value) params.date_to = dateTo.value;
 
@@ -830,53 +785,115 @@ async function loadShifts(page = 1) {
     if (res.data) {
       shifts.value = res.data.data || [];
       if (res.data.meta) {
-        pagination.value = {
-          current_page: res.data.meta.current_page,
-          last_page: res.data.meta.last_page,
-          per_page: res.data.meta.per_page,
-          total: res.data.meta.total,
-        };
+        page.value = res.data.meta.current_page;
+        lastPage.value = res.data.meta.last_page;
+        perPage.value = res.data.meta.per_page;
+        total.value = res.data.meta.total;
+      } else {
+        total.value = shifts.value.length;
       }
     }
   } catch (err) {
-    console.error("Failed to load shifts:", err);
+    console.error("Failed to fetch shifts:", err);
   } finally {
     loading.value = false;
   }
 }
 
-function setStatusFilter(status) {
-  selectedStatus.value = status;
-  loadShifts(1);
+function reload() {
+  page.value = 1;
+  getShifts();
 }
 
-function setBranchFilter(branchId) {
-  selectedBranchId.value = branchId;
-  loadShifts(1);
+function onSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    reload();
+  }, 300);
 }
 
-function changePage(page) {
-  if (page >= 1 && page <= pagination.value.last_page) {
-    loadShifts(page);
+function setStatus(key) {
+  statusFilter.value = key;
+  reload();
+}
+
+function setBranch(id) {
+  branchFilter.value = id;
+  reload();
+}
+
+function clearAll() {
+  searchQuery.value = "";
+  statusFilter.value = "";
+  branchFilter.value = null;
+  dateFrom.value = "";
+  dateTo.value = "";
+  reload();
+}
+
+function goToPage(p) {
+  if (p >= 1 && p <= lastPage.value) {
+    page.value = p;
+    getShifts();
   }
 }
 
-async function openShiftDetail(shift) {
+async function openDetails(shift) {
   try {
     const res = await shiftsApi.get(shift.id);
     if (res.data?.shift) {
-      selectedShift.value = res.data.shift;
+      activeShiftDetail.value = res.data.shift;
     } else {
-      selectedShift.value = shift;
+      activeShiftDetail.value = shift;
     }
   } catch {
-    selectedShift.value = shift;
+    activeShiftDetail.value = shift;
   }
+}
+
+// Helpers
+function formatMoney(amount) {
+  const num = Number(amount) || 0;
+  return "KES " + num.toLocaleString("en-KE", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+}
+
+function initialsOf(name) {
+  if (!name) return "S";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+function formatDateTime(isoStr) {
+  if (!isoStr) return "—";
+  try {
+    const d = new Date(isoStr);
+    return d.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return isoStr;
+  }
+}
+
+function getShiftDuration(shift) {
+  if (!shift.opened_at) return "—";
+  const start = new Date(shift.opened_at).getTime();
+  const end = shift.closed_at ? new Date(shift.closed_at).getTime() : Date.now();
+  const diffMinutes = Math.max(0, Math.floor((end - start) / 60000));
+  const hours = Math.floor(diffMinutes / 60);
+  const mins = diffMinutes % 60;
+  if (shift.status === 'open') {
+    return `Running (${hours}h ${mins}m)`;
+  }
+  return `${hours}h ${mins}m`;
 }
 
 function exportCsv() {
   if (!shifts.value.length) return;
-
   const headers = [
     "Shift Number",
     "Branch",
@@ -891,7 +908,6 @@ function exportCsv() {
     "Actual Cash (KES)",
     "Variance (KES)",
   ];
-
   const rows = shifts.value.map((s) => [
     `"${s.shift_number}"`,
     `"${s.branch?.name || 'Main'}"`,
@@ -920,79 +936,40 @@ function exportCsv() {
   document.body.removeChild(link);
 }
 
-// Helpers
-function formatMoney(amount) {
-  const num = Number(amount) || 0;
-  return "KES " + num.toLocaleString("en-KE", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-}
-
-function getInitials(name) {
-  if (!name) return "S";
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[1][0]).toUpperCase();
-}
-
-function formatDateTime(isoStr) {
-  if (!isoStr) return "-";
-  try {
-    const d = new Date(isoStr);
-    return d.toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return isoStr;
-  }
-}
-
-function getShiftDuration(shift) {
-  if (!shift.opened_at) return "-";
-  const start = new Date(shift.opened_at).getTime();
-  const end = shift.closed_at ? new Date(shift.closed_at).getTime() : Date.now();
-  const diffMinutes = Math.max(0, Math.floor((end - start) / 60000));
-
-  const hours = Math.floor(diffMinutes / 60);
-  const mins = diffMinutes % 60;
-
-  if (shift.status === 'open') {
-    return `Running (${hours}h ${mins}m)`;
-  }
-  return `Ended (${hours}h ${mins}m)`;
-}
-
-// Watchers & Lifecycle
-watch(
-  () => shiftStore.selectedBranchId,
-  (newBranchId) => {
-    if (newBranchId && !selectedBranchId.value) {
-      selectedBranchId.value = newBranchId;
-    }
-  }
-);
-
 onMounted(async () => {
   await shiftStore.fetchBranches();
-  if (shiftStore.selectedBranchId) {
-    selectedBranchId.value = shiftStore.selectedBranchId;
-  }
   await shiftStore.checkCurrentShift();
-  await loadShifts(1);
+  getShifts();
+});
+
+onBeforeUnmount(() => {
+  clearTimeout(searchTimer);
 });
 </script>
 
 <style scoped>
+/* Strictly flat card with 1px border and ZERO drop shadows */
+.flat-card {
+  box-shadow: none !important;
+  border: 1px solid #ced4da !important;
+}
+
+.shift-row:hover {
+  background-color: #f8f9fa;
+}
+
+.shift-card-item:hover {
+  background-color: #f8f9fa;
+}
+
 .cursor-pointer {
   cursor: pointer;
 }
-.letter-spacing-1 {
-  letter-spacing: 0.5px;
-}
-.spin-animation {
+
+.spin-anim {
   animation: spin 1s linear infinite;
 }
+
 @keyframes spin {
   from {
     transform: rotate(0deg);
@@ -1002,12 +979,8 @@ onMounted(async () => {
   }
 }
 
-/* Offcanvas custom drawer */
-.custom-drawer {
-  width: 100%;
-  max-width: 460px;
-  border-left: 1px solid #eef0f4;
-  box-shadow: none !important;
+.letter-spacing-1 {
+  letter-spacing: 0.5px;
 }
 
 .custom-scroll::-webkit-scrollbar {
@@ -1015,32 +988,9 @@ onMounted(async () => {
 }
 .custom-scroll::-webkit-scrollbar-track {
   background: #f8f9fa;
-  border-radius: 4px;
 }
 .custom-scroll::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #ced4da;
   border-radius: 4px;
-}
-.custom-scroll::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-.fs-10 {
-  font-size: 10px;
-}
-.fs-11 {
-  font-size: 11px;
-}
-.fs-12 {
-  font-size: 12px;
-}
-.fs-13 {
-  font-size: 13px;
-}
-.fs-14 {
-  font-size: 14px;
-}
-.fs-15 {
-  font-size: 15px;
 }
 </style>
