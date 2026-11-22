@@ -13,7 +13,7 @@
         <div class="modal-header border-bottom px-4 py-3 d-flex align-items-center justify-content-between">
           <div class="d-flex align-items-center gap-2">
             <div class="tone-chip tone-chip-emerald">
-              <i class="ri-secure-payment-line fs-5"></i>
+              <i class="bx bx-credit-card fs-5"></i>
             </div>
             <div>
               <h5 class="modal-title font-size-16 fw-bold mb-0" id="paymentModalLabel">Checkout & Payment</h5>
@@ -70,7 +70,7 @@
                   :class="activeMethod === 'cash' ? 'active btn-primary' : 'btn-white'"
                   @click="activeMethod = 'cash'"
                 >
-                  <i class="ri-money-dollar-circle-line me-1"></i> Cash
+                  <i class="bx bx-money me-1 font-size-14"></i> Cash
                 </button>
               </li>
               <li class="nav-item">
@@ -80,7 +80,7 @@
                   :class="activeMethod === 'mpesa' ? 'active btn-primary' : 'btn-white'"
                   @click="activeMethod = 'mpesa'"
                 >
-                  <i class="ri-smartphone-line me-1"></i> M-Pesa
+                  <i class="bx bx-mobile-alt me-1 font-size-14"></i> M-Pesa
                 </button>
               </li>
               <li class="nav-item">
@@ -90,7 +90,7 @@
                   :class="activeMethod === 'bank' ? 'active btn-primary' : 'btn-white'"
                   @click="activeMethod = 'bank'"
                 >
-                  <i class="ri-bank-card-line me-1"></i> Card / Bank
+                  <i class="bx bx-credit-card me-1 font-size-14"></i> Card / Bank
                 </button>
               </li>
             </ul>
@@ -232,14 +232,14 @@
                     :disabled="splitTenders.length <= 1"
                     @click="removeSplitRow(idx)"
                   >
-                    <i class="ri-delete-bin-line fs-5"></i>
+                    <i class="bx bx-trash fs-5"></i>
                   </button>
                 </div>
               </div>
             </div>
 
             <button type="button" class="btn btn-sm btn-white w-100 mt-2" @click="addSplitRow">
-              <i class="ri-add-line me-1"></i> Add Split Method
+              <i class="bx bx-plus me-1 font-size-14"></i> Add Split Method
             </button>
           </div>
 
@@ -259,7 +259,7 @@
             @click="handleCompleteSale"
           >
             <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-1" role="status"></span>
-            <i v-else class="ri-checkbox-circle-line fs-5"></i>
+            <i v-else class="bx bx-check-circle fs-5"></i>
             <span>{{ isSubmitting ? 'Recording Sale...' : 'Commit & Print Receipt' }}</span>
           </button>
         </div>

@@ -13,7 +13,7 @@
         <div class="modal-header border-bottom px-4 py-3 d-flex align-items-center justify-content-between">
           <div class="d-flex align-items-center gap-2">
             <div class="tone-chip tone-chip-emerald">
-              <i class="ri-check-line fs-5"></i>
+              <i class="bx bx-check-circle fs-5"></i>
             </div>
             <div>
               <h5 class="modal-title font-size-16 fw-bold mb-0" id="receiptModalLabel">Sale Completed</h5>
@@ -103,11 +103,11 @@
 
         <div class="modal-footer border-top px-4 py-3 d-flex justify-content-between">
           <button type="button" class="btn btn-white d-inline-flex align-items-center gap-1" @click="printReceipt">
-            <i class="ri-printer-line"></i>
+            <i class="bx bx-printer font-size-16"></i>
             <span>Print Receipt</span>
           </button>
           <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-1" @click="handleNewSale">
-            <i class="ri-add-line"></i>
+            <i class="bx bx-plus font-size-16"></i>
             <span>New Sale</span>
           </button>
         </div>

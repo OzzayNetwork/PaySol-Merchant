@@ -12,7 +12,7 @@
         <div class="modal-header border-bottom px-4 py-3 d-flex align-items-center justify-content-between">
           <div class="d-flex align-items-center gap-2">
             <div class="tone-chip tone-chip-primary">
-              <i class="ri-user-add-line fs-5"></i>
+              <i class="bx bx-user-plus fs-5"></i>
             </div>
             <div>
               <h5 class="modal-title font-size-16 fw-bold mb-0" id="quickCustomerModalLabel">Register Customer</h5>
@@ -34,7 +34,7 @@
                   :class="form.customer_type === 'individual' ? 'btn-primary' : 'btn-white'"
                   @click="form.customer_type = 'individual'"
                 >
-                  <i class="ri-user-line me-1"></i> Individual
+                  <i class="bx bx-user me-1"></i> Individual
                 </button>
                 <button
                   type="button"
@@ -42,7 +42,7 @@
                   :class="form.customer_type === 'business' ? 'btn-primary' : 'btn-white'"
                   @click="form.customer_type = 'business'"
                 >
-                  <i class="ri-building-line me-1"></i> Business / Corporate
+                  <i class="bx bx-buildings me-1"></i> Business / Corporate
                 </button>
               </div>
             </div>
@@ -145,7 +145,7 @@
             :disabled="isSubmitting || !form.name.trim()"
           >
             <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-1" role="status"></span>
-            <i v-else class="ri-check-line"></i>
+            <i v-else class="bx bx-check font-size-16"></i>
             <span>{{ isSubmitting ? 'Registering...' : 'Save & Select Customer' }}</span>
           </button>
         </div>
