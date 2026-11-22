@@ -20,8 +20,8 @@
         style="max-width: 600px;"
       >
         <div
-          class="modal-content border-0 shadow-lg"
-          style="border-radius: 16px; overflow: hidden;"
+          class="modal-content border-0"
+          style="border-radius: 12px; border: 1px solid #eef0f4 !important; box-shadow: none !important;"
         >
           <!-- Loading State -->
           <div v-if="shiftStore.isLoading && !shiftStore.activeShift" class="p-5 text-center">
@@ -233,7 +233,7 @@
                         v-for="preset in quickPresets"
                         :key="preset.amount"
                         class="btn btn-sm rounded-pill px-3 transition-all fw-medium"
-                        :class="form.opening_float === preset.amount ? 'btn-primary shadow-sm' : 'btn-white bg-white border text-secondary'"
+                        :class="form.opening_float === preset.amount ? 'btn-primary' : 'btn-light border text-secondary'"
                         @click="selectPreset(preset.amount)"
                       >
                         {{ preset.label }}
@@ -246,7 +246,7 @@
                     <button
                       type="button"
                       class="btn w-100 p-2.5 px-3 rounded-3 transition-all d-flex align-items-center justify-content-between border"
-                      :class="showDenominations ? 'btn-light border-primary-subtle shadow-sm' : 'btn-white bg-white shadow-sm'"
+                      :class="showDenominations ? 'btn-light border-primary-subtle' : 'btn-light border'"
                       @click="toggleDenominations"
                     >
                       <div class="d-flex align-items-center gap-2.5">
@@ -272,7 +272,7 @@
                       <div class="d-flex align-items-center gap-2">
                         <span
                           class="badge rounded-pill fs-11 px-2.5 py-1"
-                          :class="showDenominations ? 'bg-primary text-white' : 'bg-light text-secondary border'"
+                          :class="showDenominations ? 'bg-primary text-white' : 'bg-white text-secondary border'"
                         >
                           {{ showDenominations ? 'Collapse' : 'Count' }}
                         </span>
@@ -282,7 +282,7 @@
                   </div>
 
                   <!-- Denominations Grid (When Expanded) -->
-                  <div v-if="showDenominations" class="mt-3 p-3 rounded-3 bg-white border shadow-sm">
+                  <div v-if="showDenominations" class="mt-3 p-3 rounded-3 bg-white border">
                     <div class="fw-bold text-dark fs-12 mb-2 d-flex justify-content-between align-items-center pb-2 border-bottom">
                       <span>Denomination Breakdown</span>
                       <span class="text-success fw-bold fs-13">{{ formatMoney(denominationsTotal) }}</span>
@@ -299,7 +299,7 @@
                           <div class="d-flex align-items-center justify-content-center gap-2 mt-1">
                             <button
                               type="button"
-                              class="btn btn-sm btn-white bg-white border p-0 rounded-circle shadow-xs"
+                              class="btn btn-sm btn-white bg-white border p-0 rounded-circle"
                               style="width: 26px; height: 26px; line-height: 1;"
                               @click="changeNoteCount(note.val, -1)"
                               :disabled="!denominations[note.val]"
@@ -311,7 +311,7 @@
                             </span>
                             <button
                               type="button"
-                              class="btn btn-sm btn-white bg-white border p-0 rounded-circle shadow-xs"
+                              class="btn btn-sm btn-white bg-white border p-0 rounded-circle"
                               style="width: 26px; height: 26px; line-height: 1;"
                               @click="changeNoteCount(note.val, 1)"
                             >
@@ -660,9 +660,6 @@ onMounted(async () => {
 }
 .denomination-box {
   transition: all 0.15s ease;
-}
-.shadow-xs {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 .letter-spacing-1 {
   letter-spacing: 0.5px;

@@ -465,7 +465,7 @@ function handleInventoryFilter() {
         <div class="row g-3">
             <!-- POS Team Shifts & Register Sessions -->
             <section class="col-12">
-                <div class="card border-0 shadow-sm" style="border-radius: 14px;">
+                <div class="card border" style="border-radius: 12px; box-shadow: none !important;">
                     <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
                         <div>
                             <h2 class="h5 mb-1 text-dark fw-bold">POS Team Shifts & Floating Register Sessions</h2>
@@ -492,7 +492,7 @@ function handleInventoryFilter() {
                             <div class="col-12 col-md-5 text-md-end">
                                 <button
                                     type="button"
-                                    class="btn btn-primary d-inline-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm fw-semibold"
+                                    class="btn btn-primary d-inline-flex align-items-center gap-2 px-4 py-2 rounded-pill fw-semibold"
                                     @click="shiftStoreRef.openModal"
                                 >
                                     <Icon icon="ri:rocket-line" class="fs-5" />
