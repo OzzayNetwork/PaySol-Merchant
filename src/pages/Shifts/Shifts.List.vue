@@ -29,6 +29,59 @@
       </div>
     </div>
 
+    <!-- Important Shift Statistics Strip (Using project's built-in MetricCard) -->
+    <div class="metric-strip mb-3" role="tablist" aria-label="Shift statistics">
+      <MetricCard
+        label="Active Shift"
+        icon="ri:time-line"
+        iconActive="ri:time-fill"
+        :value="shiftStore.hasActiveShift ? 1 : 0"
+        :format="() => shiftStore.hasActiveShift ? (shiftStore.activeShiftNumber || 'Active') : 'Closed'"
+        :change-tone="shiftStore.hasActiveShift ? 'positive' : 'neutral'"
+        :change-text="shiftStore.hasActiveShift ? `${shiftStore.activeMembersCount} on duty` : 'Drawer locked'"
+        :active="statusFilter === 'open'"
+        :loading="loading && !shifts.length"
+        @select="setStatus(statusFilter === 'open' ? '' : 'open')"
+      />
+
+      <MetricCard
+        label="Total Shifts"
+        icon="ri:calendar-event-line"
+        iconActive="ri:calendar-event-fill"
+        :value="total"
+        :format="(n) => (n || 0).toLocaleString('en-KE')"
+        change-tone="neutral"
+        change-text="All records"
+        :period="dateFrom ? 'in period' : 'to date'"
+        :active="statusFilter === ''"
+        :loading="loading && !shifts.length"
+        @select="setStatus('')"
+      />
+
+      <MetricCard
+        label="Period Sales"
+        icon="ri:money-cny-circle-line"
+        iconActive="ri:money-cny-circle-fill"
+        :value="totalPeriodSales"
+        :format="(n) => 'KES ' + Math.round(n).toLocaleString('en-KE')"
+        change-tone="positive"
+        change-text="Total rung"
+        :loading="loading && !shifts.length"
+      />
+
+      <MetricCard
+        label="Cash Variance"
+        icon="ri:scales-3-line"
+        iconActive="ri:scales-3-fill"
+        :value="totalPeriodVariance"
+        :format="(n) => (n > 0 ? '+' : '') + 'KES ' + Math.round(n).toLocaleString('en-KE')"
+        :change-tone="totalPeriodVariance < 0 ? 'negative' : (totalPeriodVariance > 0 ? 'positive' : 'neutral')"
+        :change-marker="totalPeriodVariance < 0 ? '▼' : (totalPeriodVariance > 0 ? '▲' : '•')"
+        :change-text="totalPeriodVariance === 0 ? 'Balanced' : (totalPeriodVariance < 0 ? 'Shortage' : 'Surplus')"
+        :loading="loading && !shifts.length"
+      />
+    </div>
+
     <!-- ONE Single main card — identical to Staff.List.vue and Products.List.vue -->
     <div class="row">
       <div class="col-12">
@@ -658,6 +711,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { Icon } from "@iconify/vue";
+import MetricCard from "@/components/Data-tools/Metric.Card.vue";
 import shiftsApi from "@/api/shifts";
 import { useShiftStore } from "@/stores/shift";
 import DateRangePicker from "@/components/DatePickers/datePicker.facebookstyle.vue";
@@ -766,6 +820,20 @@ const paginationStart = computed(() => {
 const paginationEnd = computed(() => {
   const end = page.value * perPage.value;
   return Math.min(end, total.value);
+});
+
+// Important Period Statistics (used in MetricCard strip)
+const totalPeriodSales = computed(() => {
+  return shifts.value.reduce((acc, s) => acc + (Number(s.total_sales_amount) || 0), 0);
+});
+
+const totalPeriodVariance = computed(() => {
+  return shifts.value.reduce((acc, s) => {
+    if (s.status === 'closed' && s.cash_variance !== null && s.cash_variance !== undefined) {
+      return acc + Number(s.cash_variance);
+    }
+    return acc;
+  }, 0);
 });
 
 // Data fetching
@@ -952,6 +1020,23 @@ onBeforeUnmount(() => {
 .flat-card {
   box-shadow: none !important;
   border: 1px solid #ced4da !important;
+}
+
+/* Strictly enforce zero drop shadows across project MetricCards */
+:deep(.metric-tile) {
+  box-shadow: none !important;
+  border-color: #ced4da !important;
+}
+
+:deep(.metric-tile.is-active) {
+  box-shadow: none !important;
+  border-color: #556ee6 !important;
+  background-color: #f7f8ff !important;
+}
+
+:deep(.metric-tile:hover) {
+  transform: none !important;
+  border-color: #a6b0cf !important;
 }
 
 .shift-row:hover {
