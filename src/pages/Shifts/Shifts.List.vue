@@ -29,53 +29,32 @@
       </div>
     </div>
 
-    <!-- Key Shift Statistics Grid (Spanning full width across 4 columns) -->
-    <div class="shift-stats-grid mb-4" aria-label="Shift statistics">
-      <MetricCard
-        label="Active Shift"
-        icon="ri:time-line"
-        iconActive="ri:time-fill"
-        :value="shiftStore.hasActiveShift ? 1 : 0"
-        :format="() => shiftStore.hasActiveShift ? (shiftStore.activeShiftNumber || 'Active') : 'Closed'"
-        :change-tone="shiftStore.hasActiveShift ? 'positive' : 'neutral'"
-        :change-text="shiftStore.hasActiveShift ? `${shiftStore.activeMembersCount} on duty` : 'Drawer locked'"
-        :loading="loading && !shifts.length"
-      />
-
-      <MetricCard
-        label="Total Shifts"
-        icon="ri:calendar-event-line"
-        iconActive="ri:calendar-event-fill"
-        :value="total"
-        :format="(n) => (n || 0).toLocaleString('en-KE')"
-        change-tone="neutral"
-        change-text="All records"
-        :period="dateFrom ? 'in period' : 'to date'"
-        :loading="loading && !shifts.length"
-      />
-
-      <MetricCard
-        label="Period Sales"
-        icon="ri:money-cny-circle-line"
-        iconActive="ri:money-cny-circle-fill"
-        :value="totalPeriodSales"
-        :format="(n) => 'KES ' + Math.round(n).toLocaleString('en-KE')"
-        change-tone="positive"
-        change-text="Total rung"
-        :loading="loading && !shifts.length"
-      />
-
-      <MetricCard
-        label="Cash Variance"
-        icon="ri:scales-3-line"
-        iconActive="ri:scales-3-fill"
-        :value="totalPeriodVariance"
-        :format="(n) => (n > 0 ? '+' : '') + 'KES ' + Math.round(n).toLocaleString('en-KE')"
-        :change-tone="totalPeriodVariance < 0 ? 'negative' : (totalPeriodVariance > 0 ? 'positive' : 'neutral')"
-        :change-marker="totalPeriodVariance < 0 ? '▼' : (totalPeriodVariance > 0 ? '▲' : '•')"
-        :change-text="totalPeriodVariance === 0 ? 'Balanced' : (totalPeriodVariance < 0 ? 'Shortage' : 'Surplus')"
-        :loading="loading && !shifts.length"
-      />
+    <!-- ================= Key Shift KPI Cards (Matching Integrations.List.vue) ================= -->
+    <div class="row">
+      <div v-for="k in kpiCards" :key="k.key" class="col-sm-6 col-xl-3">
+        <div class="card mini-stats-wid flat-card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1 min-w-0">
+                <p class="text-muted fw-medium mb-1 text-truncate">{{ k.label }}</p>
+                <template v-if="loading && !shifts.length">
+                  <SkeletonLoader type="text" width="65%" height="22px" class="my-1" />
+                  <SkeletonLoader type="text" width="45%" height="11px" />
+                </template>
+                <template v-else>
+                  <h4 class="mb-0 text-truncate font-size-20">{{ k.value }}</h4>
+                  <p class="font-size-12 mb-0 mt-1 text-muted text-truncate">{{ k.note }}</p>
+                </template>
+              </div>
+              <span class="avatar-sm flex-shrink-0 ms-2">
+                <span class="avatar-title rounded-circle tone-chip font-size-22" :style="{ '--tone': k.color }">
+                  <Icon :icon="k.icon" />
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ONE Single main card — identical to Staff.List.vue and Products.List.vue -->
@@ -707,7 +686,6 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { Icon } from "@iconify/vue";
-import MetricCard from "@/components/Data-tools/Metric.Card.vue";
 import shiftsApi from "@/api/shifts";
 import { useShiftStore } from "@/stores/shift";
 import DateRangePicker from "@/components/DatePickers/datePicker.facebookstyle.vue";
@@ -830,6 +808,44 @@ const totalPeriodVariance = computed(() => {
     }
     return acc;
   }, 0);
+});
+
+// The four KPI cards (matching Integrations.List.vue mini-stats-wid style)
+const kpiCards = computed(() => {
+  return [
+    {
+      key: "active_shift",
+      label: "Active Shift",
+      value: shiftStore.hasActiveShift ? (shiftStore.activeShiftNumber || "Active") : "Closed",
+      note: shiftStore.hasActiveShift ? `${shiftStore.activeMembersCount} on duty` : "Drawer locked",
+      color: shiftStore.hasActiveShift ? "#34c38f" : "#74788d",
+      icon: shiftStore.hasActiveShift ? "ri:time-fill" : "ri:time-line",
+    },
+    {
+      key: "total_shifts",
+      label: "Total Shifts",
+      value: (total.value || 0).toLocaleString("en-KE"),
+      note: dateFrom.value || dateTo.value ? "In filtered period" : "All records to date",
+      color: "#556ee6",
+      icon: "ri:calendar-event-line",
+    },
+    {
+      key: "period_sales",
+      label: "Period Sales",
+      value: "KES " + Math.round(totalPeriodSales.value).toLocaleString("en-KE"),
+      note: "Total rung",
+      color: "#34c38f",
+      icon: "ri:money-cny-circle-line",
+    },
+    {
+      key: "cash_variance",
+      label: "Cash Variance",
+      value: (totalPeriodVariance.value > 0 ? "+" : "") + "KES " + Math.round(totalPeriodVariance.value).toLocaleString("en-KE"),
+      note: totalPeriodVariance.value === 0 ? "Balanced drawer" : (totalPeriodVariance.value < 0 ? "Cash shortage" : "Cash surplus"),
+      color: totalPeriodVariance.value < 0 ? "#f46a6a" : (totalPeriodVariance.value > 0 ? "#34c38f" : "#74788d"),
+      icon: "ri:scales-3-line",
+    },
+  ];
 });
 
 // Data fetching
@@ -1016,129 +1032,6 @@ onBeforeUnmount(() => {
 .flat-card {
   box-shadow: none !important;
   border: 1px solid #ced4da !important;
-}
-
-/* ==========================================================================
-   Responsive 4-column Stats Grid spanning full width (ZERO drop shadows)
-   ========================================================================== */
-.shift-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  width: 100%;
-}
-
-@media (max-width: 991.98px) {
-  .shift-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-}
-
-@media (max-width: 575.98px) {
-  .shift-stats-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-}
-
-/* Ensure each metric tile fills its 1/4 column with balanced spacing & zero shadow */
-:deep(.shift-stats-grid .metric-tile) {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  flex: 1 1 auto !important;
-  padding: 16px 18px !important;
-  border: 1px solid #ced4da !important;
-  border-radius: 8px !important;
-  background: #ffffff !important;
-  box-shadow: none !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  min-height: 114px !important;
-  transition: border-color 0.2s ease, background-color 0.2s ease !important;
-  cursor: default !important;
-  text-align: left !important;
-}
-
-:deep(.shift-stats-grid .metric-tile:hover) {
-  transform: none !important;
-}
-
-:deep(.shift-stats-grid .metric-tile.is-active) {
-  border-color: #556ee6 !important;
-  background-color: #f7f8ff !important;
-  box-shadow: none !important;
-}
-
-/* Header: Label on the left, Icon on the right */
-:deep(.shift-stats-grid .metric-tile-head) {
-  display: flex !important;
-  flex-direction: row-reverse !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  width: 100% !important;
-  gap: 8px !important;
-  margin-bottom: 4px !important;
-}
-
-:deep(.shift-stats-grid .metric-tile-head > span:first-child) {
-  width: auto !important;
-}
-
-:deep(.shift-stats-grid .metric-tile-head > .metric-tile-label) {
-  flex-grow: 1 !important;
-  width: auto !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  color: #74788d !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-}
-
-:deep(.shift-stats-grid .metric-tile-icon) {
-  width: 36px !important;
-  height: 36px !important;
-  font-size: 20px !important;
-  border-radius: 6px !important;
-  background-color: #f8f9fa !important;
-  color: #495057 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex-shrink: 0 !important;
-}
-
-:deep(.shift-stats-grid .metric-tile.is-active .metric-tile-icon) {
-  background-color: #eef1fd !important;
-  color: #556ee6 !important;
-}
-
-/* Number: prominent typography */
-:deep(.shift-stats-grid .metric-tile-value) {
-  font-size: 22px !important;
-  font-weight: 700 !important;
-  color: #2a3042 !important;
-  margin-top: 4px !important;
-  margin-bottom: 4px !important;
-  letter-spacing: -0.02em !important;
-  line-height: 1.2 !important;
-}
-
-/* Change / Subtitle: clean font, zero top margin */
-:deep(.shift-stats-grid .metric-tile-change) {
-  display: flex !important;
-  align-items: center !important;
-  gap: 5px !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
 }
 
 .shift-row:hover {
