@@ -20,8 +20,8 @@
         style="max-width: 600px;"
       >
         <div
-          class="modal-content border-0"
-          style="border-radius: 12px; border: 1px solid #eef0f4 !important; box-shadow: none !important;"
+          class="modal-content border-0 overflow-hidden"
+          style="border-radius: 12px; border: 1px solid #eef0f4 !important; box-shadow: none !important; max-height: 90vh;"
         >
           <!-- Loading State -->
           <div v-if="shiftStore.isLoading && !shiftStore.activeShift" class="p-5 text-center">
@@ -33,7 +33,7 @@
             <!-- ========================================================= -->
             <!-- CASE 1: TEAM SHIFT ALREADY ACTIVE (JOIN SHIFT)           -->
             <!-- ========================================================= -->
-            <div v-if="shiftStore.hasActiveShift && !shiftStore.isJoined">
+            <div v-if="shiftStore.hasActiveShift && !shiftStore.isJoined" class="d-flex flex-column h-100 flex-grow-1 overflow-hidden">
               <!-- Header -->
               <div class="modal-header border-0 pb-0 pt-4 px-4 bg-light bg-opacity-50">
                 <div class="d-flex align-items-center gap-3">
@@ -62,7 +62,7 @@
               </div>
 
               <!-- Body -->
-              <div class="modal-body p-4">
+              <div class="modal-body p-4 custom-scroll" style="overflow-y: auto; max-height: calc(88vh - 140px);">
                 <div class="p-3 rounded-3 bg-light border mb-4">
                   <div class="d-flex justify-content-between align-items-start mb-2">
                     <div>
@@ -156,7 +156,7 @@
             <!-- ========================================================= -->
             <!-- CASE 2: NO SHIFT ACTIVE -> OPEN SHIFT SCREEN              -->
             <!-- ========================================================= -->
-            <div v-else-if="!shiftStore.hasActiveShift">
+            <div v-else-if="!shiftStore.hasActiveShift" class="d-flex flex-column h-100 flex-grow-1 overflow-hidden">
               <!-- Header -->
               <div class="modal-header border-0 pb-0 pt-4 px-4 bg-light bg-opacity-50">
                 <div class="d-flex align-items-center gap-3">
@@ -184,7 +184,7 @@
               </div>
 
               <!-- Body -->
-              <div class="modal-body p-4">
+              <div class="modal-body p-4 custom-scroll" style="overflow-y: auto; max-height: calc(88vh - 140px);">
                 <!-- Branch Selector (if multiple branches exist) -->
                 <div v-if="shiftStore.branches.length > 1" class="mb-3">
                   <label class="form-label small fw-bold text-uppercase text-muted">Branch / Shop</label>
@@ -282,13 +282,13 @@
                     </button>
                   </div>
 
-                  <!-- Denominations Grid (When Expanded) -->
+                  <!-- Denominations Grid (When Expanded, Scrollable with Sticky Header) -->
                   <div
                     v-if="showDenominations"
-                    class="mt-3 p-3 p-sm-4 rounded-3 bg-white"
+                    class="mt-3 p-3 p-sm-4 rounded-3 bg-white currency-breakdown-scroll"
                     style="border: 1px solid #e2e8f0 !important;"
                   >
-                    <div class="fw-bold text-dark fs-12 mb-3 d-flex justify-content-between align-items-center pb-2 border-bottom" style="border-color: #eef0f4 !important;">
+                    <div class="fw-bold text-dark fs-12 mb-3 d-flex justify-content-between align-items-center pb-2 border-bottom sticky-top bg-white pt-1" style="border-color: #eef0f4 !important; z-index: 2; top: -1rem;">
                       <span class="text-uppercase letter-spacing-1 fs-11 text-muted">Currency Breakdown</span>
                       <span class="text-success fw-bold fs-13">{{ formatMoney(denominationsTotal) }}</span>
                     </div>
@@ -418,7 +418,7 @@
             <!-- ========================================================= -->
             <!-- CASE 3: CURRENTLY ON DUTY (STATUS VIEW)                   -->
             <!-- ========================================================= -->
-            <div v-else>
+            <div v-else class="d-flex flex-column h-100 flex-grow-1 overflow-hidden">
               <div class="modal-header border-0 pb-0 pt-4 px-4 bg-light bg-opacity-50">
                 <div class="d-flex align-items-center gap-3">
                   <div
@@ -444,7 +444,7 @@
                 ></button>
               </div>
 
-              <div class="modal-body p-4">
+              <div class="modal-body p-4 custom-scroll" style="overflow-y: auto; max-height: calc(88vh - 140px);">
                 <div class="p-3 rounded-3 bg-light border mb-3">
                   <div class="row g-2">
                     <div class="col-6">
@@ -685,6 +685,29 @@ onMounted(async () => {
 .cash-input-card {
   background: #f8faff;
   border-color: #e2e8f0 !important;
+}
+.currency-breakdown-scroll {
+  max-height: 290px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.currency-breakdown-scroll::-webkit-scrollbar,
+.custom-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.currency-breakdown-scroll::-webkit-scrollbar-track,
+.custom-scroll::-webkit-scrollbar-track {
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+.currency-breakdown-scroll::-webkit-scrollbar-thumb,
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.currency-breakdown-scroll::-webkit-scrollbar-thumb:hover,
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 .denomination-box {
   min-height: 116px;
