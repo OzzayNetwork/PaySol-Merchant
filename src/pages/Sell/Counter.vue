@@ -47,8 +47,8 @@
     <div class="row justify-content-center">
       <div class="col-12">
         <div class="row">
-          <!-- LEFT 8 COLS: PRODUCT CATALOGUE -->
-          <div class="col-12 col-lg-8">
+          <!-- LEFT 7/8 COLS: PRODUCT CATALOGUE -->
+          <div class="col-12 col-lg-7 col-xl-7 col-xxl-8">
             <div class="card">
               <!-- Top Toolbar: Search & Action Buttons -->
               <div class="card-body border-bottom">
@@ -176,7 +176,7 @@
                     v-for="product in filteredProducts"
                     :key="product.id"
                     @click="handleProductClick(product)"
-                    class="col-6 col-sm-6 col-md-6 col-lg-4 col-xl-3 mb-4 position-relative"
+                    class="col-6 col-sm-6 col-md-6 col-lg-6 col-xl-4 col-xxl-3 mb-4 position-relative"
                   >
                     <!-- Quantity Badge -->
                     <div v-if="cartStore.getItemQuantity(product.id) > 0">
@@ -200,7 +200,7 @@
                       <div>
                         <div
                           style="height: 160px;"
-                          class="img-cont d-flex align-items-center justify-content-center overflow-hidden rounded w-100 bg-white border"
+                          class="img-cont d-flex align-items-center justify-content-center overflow-hidden rounded w-100 bg-white"
                         >
                           <img
                             v-if="product.image_url"
@@ -213,20 +213,20 @@
                         </div>
                       </div>
 
-                      <div class="pt-3">
-                        <h5 class="text-capitalize text-truncate mb-1 font-size-14 fw-semibold text-dark" :title="product.name">
+                      <div class="pt-4">
+                        <h5 class="text-capitalize text-truncate mb-0 font-size-14 fw-semibold text-dark" :title="product.name">
                           {{ product.name || "Unknown" }}
                         </h5>
-                        <p class="mb-2 text-muted font-size-11">
-                          <small>{{ product.sku || product.barcode || '' }}</small>
+                        <p class="mb-2">
+                          <small class="text-muted">{{ product.size_label || product.sku || product.barcode || '' }}</small>
                         </p>
-                        <div class="d-flex gap-2 align-items-center justify-content-between">
+                        <div class="d-flex gap-1 align-items-center justify-content-between">
                           <div>
-                            <h5 class="my-0 font-size-14 fw-bold text-dark">
+                            <h5 class="my-0 font-size-13 font-size-md-14 fw-bold text-dark text-nowrap">
                               {{ formatMoney(product.selling_price) }}
                             </h5>
                           </div>
-                          <span class="text-end font-size-11">
+                          <span class="text-end font-size-11 text-nowrap">
                             <span :class="product.stock_on_hand > 0 ? 'text-muted' : 'text-danger fw-semibold'">
                               {{ product.stock_on_hand > 0 ? `${product.stock_on_hand - cartStore.getItemQuantity(product.id)} In stock` : 'Out of stock' }}
                             </span>
@@ -292,8 +292,8 @@
             </div>
           </div>
 
-          <!-- RIGHT 4 COLS: STICKY CART (Direct match to POS Make a sale) -->
-          <div class="col-12 col-lg-4">
+          <!-- RIGHT 5/4 COLS: STICKY CART (Direct match to POS Make a sale) -->
+          <div class="col-12 col-lg-5 col-xl-5 col-xxl-4">
             <div class="card position-sticky" style="top: 20px;">
               <!-- Cart Header -->
               <div class="card-header bg-white border-bottom">
@@ -377,7 +377,7 @@
                     <!-- Dropdown search results -->
                     <div
                       v-if="showCustomerDropdown && (customersList.length > 0 || isSearchingCustomers)"
-                      class="position-absolute start-0 end-0 mt-1 bg-white border rounded p-1 shadow-sm"
+                      class="position-absolute start-0 end-0 mt-1 bg-white border rounded p-1"
                       style="z-index: 1000; max-height: 220px; overflow-y: auto;"
                     >
                       <div
@@ -413,44 +413,46 @@
               </div>
 
               <!-- Cart Line Items Container (Table styling from reference) -->
-              <div class="card-body cart-container pt-1 p-2" style="height: 38vh; overflow-y: auto;">
-                <table v-if="!cartStore.isEmpty" class="table table-s align-middle mb-0">
+              <div class="card-body cart-container pt-1 px-3 py-2" style="height: 38vh; overflow-y: auto; overflow-x: hidden;">
+                <table v-if="!cartStore.isEmpty" class="table table-sm align-middle mb-0 w-100" style="table-layout: auto;">
                   <tbody>
                     <tr
                       v-for="(cartItem, index) in cartStore.items"
                       :key="cartItem.id"
                       class="table-striped"
                     >
-                      <th class="d-flex gap-2 align-items-center pl-0 border-0">
-                        <div
-                          class="product-img bg-light d-flex align-items-center justify-content-center rounded overflow-hidden"
-                          style="width: 44px; height: 44px; min-width: 44px;"
-                        >
-                          <img
-                            v-if="cartItem.product.image_url"
-                            :src="cartItem.product.image_url"
-                            class="img-fluid"
-                            style="width: 100%; height: 100%; object-fit: cover;"
-                            alt=""
-                          />
-                          <i v-else class="bx bx-package text-muted"></i>
+                      <td class="align-middle border-0 ps-0 pe-1">
+                        <div class="d-flex gap-2 align-items-center">
+                          <div
+                            class="product-img bg-light d-flex align-items-center justify-content-center rounded overflow-hidden flex-shrink-0"
+                            style="width: 36px; height: 36px; min-width: 36px;"
+                          >
+                            <img
+                              v-if="cartItem.product.image_url"
+                              :src="cartItem.product.image_url"
+                              class="img-fluid"
+                              style="width: 100%; height: 100%; object-fit: cover;"
+                              alt=""
+                            />
+                            <i v-else class="bx bx-package text-muted"></i>
+                          </div>
+                          <div class="text-truncate" style="max-width: 110px;">
+                            <p class="m-0 fw-bold text-black font-size-13 text-truncate">
+                              {{ cartItem.product.name }}
+                            </p>
+                            <small class="text-muted">{{ formatMoney(cartItem.unit_price) }}</small>
+                          </div>
                         </div>
-                        <div class="text-truncate">
-                          <p class="m-0 fw-bold text-black font-size-13 text-truncate" style="max-width: 130px;">
-                            {{ cartItem.product.name }}
-                          </p>
-                          <small class="text-muted">{{ formatMoney(cartItem.unit_price) }}</small>
-                        </div>
-                      </th>
-                      <td class="border-0">
-                        <div class="d-flex align-items-center p-0 gap-1">
+                      </td>
+                      <td class="align-middle border-0 px-0 text-center text-nowrap" style="width: 65px;">
+                        <div class="d-flex align-items-center justify-content-center p-0 gap-1">
                           <span
                             @click="cartStore.decreaseQty(cartItem.id)"
                             class="waves-effect p-1 cursor-pointer"
                           >
                             <i class="mdi mdi-minus fs-6"></i>
                           </span>
-                          <span class="fw-bold font-size-13 px-1">{{ cartItem.quantity }}</span>
+                          <span class="fw-bold font-size-12 px-1">{{ cartItem.quantity }}</span>
                           <span
                             @click="cartStore.increaseQty(cartItem.id)"
                             class="waves-effect p-1 cursor-pointer"
@@ -459,20 +461,20 @@
                           </span>
                         </div>
                       </td>
-                      <th class="text-end border-0 px-1">
-                        <div class="d-flex w-100 align-items-center gap-1 justify-content-end text-end">
-                          <span class="fw-bold font-size-13 text-dark">
+                      <td class="align-middle text-end border-0 pe-0 ps-1 text-nowrap" style="width: 80px;">
+                        <div class="d-flex align-items-center gap-1 justify-content-end text-end">
+                          <span class="fw-bold font-size-12 text-dark">
                             {{ formatMoney(cartItem.quantity * cartItem.unit_price) }}
                           </span>
                           <span
                             title="Remove item from cart"
-                            class="waves-effect p-1 d-flex cursor-pointer text-danger"
+                            class="waves-effect p-1 d-flex cursor-pointer text-danger ms-1"
                             @click="cartStore.removeItem(cartItem.id)"
                           >
                             <i class="mdi mdi-close fs-5"></i>
                           </span>
                         </div>
-                      </th>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -650,15 +652,23 @@ const formatMoney = (val) => {
 const fetchProducts = async () => {
   isLoadingProducts.value = true;
   try {
-    const res = await productsApi.list();
+    const branchId = shiftStore.selectedBranchId || shiftStore.activeShift?.branch_id || null;
+    const params = { per_page: 100 };
+    if (branchId) params.branch_id = branchId;
+    const res = await productsApi.list(params);
     const data = res.data?.data || res.data || [];
-    products.value = data.map((p) => ({
-      ...p,
-      name: p.name || p.productname,
-      selling_price: p.selling_price || p.sellingPrice || 0,
-      stock_on_hand: p.stock_on_hand ?? p.stockLevel ?? 0,
-      category_name: typeof p.category === 'object' && p.category !== null ? p.category.name : (p.category || 'Uncategorized'),
-    }));
+    products.value = data.map((p) => {
+      const stock = Number(p.stock_on_hand ?? p.branch_stock ?? p.total_stock ?? p.stockLevel ?? 0);
+      return {
+        ...p,
+        name: p.name || p.productname,
+        selling_price: Number(p.selling_price || p.sellingPrice || 0),
+        stock_on_hand: stock,
+        stockLevel: stock,
+        size_label: p.size_label || p.unit || '',
+        category_name: typeof p.category === 'object' && p.category !== null ? p.category.name : (p.category || 'Uncategorized'),
+      };
+    });
 
     // Extract categories with counts
     const catMap = {};

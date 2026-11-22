@@ -265,7 +265,7 @@
                     >
                       <i class="bx bx-dots-vertical-rounded"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end font-size-12 shadow-sm">
+                    <ul class="dropdown-menu dropdown-menu-end font-size-12 border">
                       <li v-if="tbl.status !== 'available'">
                         <a class="dropdown-item cursor-pointer" @click="updateTableStatus(tbl.id, 'available')">
                           <i class="bx bx-check text-success me-1"></i> Mark Available
