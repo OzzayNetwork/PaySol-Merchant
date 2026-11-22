@@ -168,7 +168,7 @@
                   </div>
                   <div>
                     <h5 class="modal-title fw-bold text-dark fs-5 mb-0">
-                      Open Cash Register Shift
+                      Open Counter Shift
                     </h5>
                     <p class="text-muted small mb-0">
                       Set your starting float to begin today's sales.
@@ -381,7 +381,7 @@
                     type="text"
                     class="form-control form-control-sm"
                     v-model="form.opening_notes"
-                    placeholder="e.g. Morning register kickoff, drawer clean"
+                    placeholder="e.g. Morning counter kickoff, drawer clean"
                     maxlength="150"
                   />
                 </div>

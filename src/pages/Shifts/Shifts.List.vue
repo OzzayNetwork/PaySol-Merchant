@@ -5,12 +5,12 @@
       <div class="col-12">
         <div class="page-title-box d-flex align-items-center justify-content-between gap-2">
           <div>
-            <h4 class="mb-sm-0 font-size-18 pb-2">Register Shifts</h4>
+            <h4 class="mb-sm-0 font-size-18 pb-2">Counter Shifts</h4>
             <div class="page-title-right">
               <ol class="breadcrumb m-0">
                 <li class="breadcrumb-item"><router-link to="/">Home</router-link></li>
                 <li class="breadcrumb-item">Selling</li>
-                <li class="breadcrumb-item active">Register Shifts</li>
+                <li class="breadcrumb-item active">Counter Shifts</li>
               </ol>
             </div>
           </div>
@@ -270,7 +270,7 @@
               <Icon icon="ri:time-line" class="text-black opacity-25" style="font-size: 120px;" />
               <h4 class="fw-bold text-dark mb-2">{{ hasFilters ? 'No shifts match' : 'No shifts yet' }}</h4>
               <p class="text-muted mb-3">
-                {{ hasFilters ? 'No shifts match your search or filter settings.' : 'Open your first cash register shift to start ringing sales with your team.' }}
+                {{ hasFilters ? 'No shifts match your search or filter settings.' : 'Open your first counter shift to start ringing sales with your team.' }}
               </p>
               <button
                 v-if="!hasFilters && !shiftStore.hasActiveShift"

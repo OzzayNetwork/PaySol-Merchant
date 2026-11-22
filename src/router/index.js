@@ -45,7 +45,7 @@ const BranchesList = () => import("@/pages/Branches/Branches.List.vue");
 const BusinessDetails = () => import("@/pages/Business/Business.Details.vue");
 // Money › How You Get Paid (§10.2)
 const PaymentMethodsList = () => import("@/pages/PaymentMethods/PaymentMethods.List.vue");
-// Selling › Register Shifts & History (22 Nov 2026)
+// Selling › Counter Shifts & History (22 Nov 2026)
 const ShiftsList = () => import("@/pages/Shifts/Shifts.List.vue");
 
 // Error pages
@@ -90,12 +90,12 @@ const routes = [
     meta: { requiresAuth: true, title: "Home" },
   },
 
-  // ---- Selling (owner, manager, cashier) › Register Shifts & History ----
+  // ---- Selling (owner, manager, cashier) › Counter Shifts & History ----
   {
     path: "/shifts",
     name: "ShiftsList",
     component: ShiftsList,
-    meta: { requiresAuth: true, roles: ["owner", "manager", "cashier"], title: "Register Shifts" },
+    meta: { requiresAuth: true, roles: ["owner", "manager", "cashier"], title: "Counter Shifts" },
   },
 
   // ---- People (owner, manager): /tenant/staff is tenant.role:owner,manager ----

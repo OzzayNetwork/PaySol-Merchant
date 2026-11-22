@@ -503,7 +503,7 @@ function handleInventoryFilter() {
                                 </div>
                                 <div class="mt-3">
                                     <router-link to="/shifts" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                                        Open Register Shifts &amp; History &rarr;
+                                        Open Counter Shifts &amp; History &rarr;
                                     </router-link>
                                 </div>
                             </div>
