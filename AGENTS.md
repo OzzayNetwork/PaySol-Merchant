@@ -311,6 +311,11 @@ the backend offers, used or not, is `README.md` §8; what is still missing is §
 | GET | `/tenant/suppliers/{id}` | `suppliers.get` | `pages/Suppliers/components/SupplierDetails.aside.vue` | any (page: owner, manager) |
 | PATCH | `/tenant/suppliers/{id}` | `suppliers.update` | `pages/Suppliers/components/SupplierForm.modal.vue` | owner, manager |
 | DELETE | `/tenant/suppliers/{id}` | `suppliers.remove` | `pages/Suppliers/Suppliers.List.vue` | owner, manager |
+| GET | `/tenant/shifts/current` | `shifts.current` | `components/Shifts/HeaderShiftWidget.vue`, `components/Shifts/ShiftActionModal.vue` | any |
+| POST | `/tenant/shifts/open` | `shifts.open` | `components/Shifts/ShiftActionModal.vue` | any |
+| POST | `/tenant/shifts/{id}/join` | `shifts.join` | `components/Shifts/ShiftActionModal.vue` | any |
+| GET | `/tenant/shifts` | `shifts.list` | `pages/Shifts/Shifts.List.vue` | any |
+| GET | `/tenant/shifts/{id}` | `shifts.get` | `components/Shifts/ShiftActionModal.vue` | any |
 
 ## 13. `_admin_leftovers/` (11 Nov 2026)
 

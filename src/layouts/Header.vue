@@ -48,6 +48,9 @@
                     </button>
                 </div>
 
+                <!-- Live POS Shift Status Widget -->
+                <HeaderShiftWidget v-if="auth.isAuthenticated" />
+
                 <!-- The signed-in person -->
                 <div v-if="auth.isAuthenticated" class="dropdown d-inline-block">
                     <button type="button" class="btn header-item waves-effect d-flex align-items-center"
@@ -109,6 +112,9 @@
                 </div>
             </div>
         </div>
+
+        <!-- Live Shift Modal -->
+        <ShiftActionModal v-if="auth.isAuthenticated" />
     </header>
 
     <ScrollUp />
@@ -145,6 +151,8 @@ import GlobalSearch from "@/components/search/GlobalSearch.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useSessionStart } from "@/composables/useSessionStart";
 import errorImage from "@/assets/images/icons/error.png";
+import HeaderShiftWidget from "@/components/Shifts/HeaderShiftWidget.vue";
+import ShiftActionModal from "@/components/Shifts/ShiftActionModal.vue";
 
 const auth = useAuthStore();
 const router = useRouter();

@@ -86,6 +86,12 @@ const sampleBranches = [
     { id: 3, name: 'Old Thika Road', is_main: false, is_active: false },
 ]
 
+// POS Shifts & Registers (22 Nov 2026)
+import HeaderShiftWidget from '@/components/Shifts/HeaderShiftWidget.vue'
+import ShiftActionModal from '@/components/Shifts/ShiftActionModal.vue'
+import { useShiftStore } from '@/stores/shift'
+const shiftStoreRef = useShiftStore()
+
 // Document.Picker card: the four legal documents with sample status lines, and a loading toggle
 const pickedDoc = ref('terms')
 const pickerLoading = ref(false)
@@ -457,6 +463,50 @@ function handleInventoryFilter() {
         </div>
 
         <div class="row g-3">
+            <!-- POS Team Shifts & Register Sessions -->
+            <section class="col-12">
+                <div class="card border-0 shadow-sm" style="border-radius: 14px;">
+                    <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div>
+                            <h2 class="h5 mb-1 text-dark fw-bold">POS Team Shifts & Floating Register Sessions</h2>
+                            <code class="text-muted small">src/components/Shifts/ShiftActionModal.vue · HeaderShiftWidget.vue</code>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 rounded-pill">
+                                Shift Lifecycle
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-12 col-md-7">
+                                <h6 class="fw-bold text-dark mb-1">Live Topbar Widget Preview</h6>
+                                <p class="text-muted small mb-3">
+                                    Adaptive status badge displayed in the navigation bar. Click to trigger the modal, toggle presets, or join an active shift.
+                                </p>
+                                <div class="p-3 rounded-3 bg-light border d-inline-flex align-items-center gap-3">
+                                    <span class="text-muted small fw-medium">Simulated Top Bar:</span>
+                                    <HeaderShiftWidget />
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-5 text-md-end">
+                                <button
+                                    type="button"
+                                    class="btn btn-primary d-inline-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm fw-semibold"
+                                    @click="shiftStoreRef.openModal"
+                                >
+                                    <Icon icon="ri:rocket-line" class="fs-5" />
+                                    Launch Shift Modal
+                                </button>
+                                <div class="text-muted fs-11 mt-2">
+                                    One-tap presets, note counters, and team joining.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Address-to-map flow: one Google Places selection centers Google Maps and the attached Leaflet.js map. -->
             <section class="col-12">
                 <ReferenceAddressMaps />
@@ -1914,6 +1964,9 @@ function handleInventoryFilter() {
             <p class="text-muted small mt-3 mb-0">The white sticky heading keeps the date-range control visible while scrolling analytics.</p>
         </div>
     </ReferenceAside>
+
+    <!-- Shift Action Modal Reference -->
+    <ShiftActionModal />
 </template>
 
 <style scoped>
