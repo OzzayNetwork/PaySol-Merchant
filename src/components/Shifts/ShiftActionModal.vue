@@ -199,103 +199,148 @@
                   </select>
                 </div>
 
-                <!-- Hero Float Input -->
-                <div class="mb-4 text-center">
-                  <label class="form-label fs-12 fw-bold text-uppercase text-muted letter-spacing-1 mb-1">
-                    Starting Cash Float (KES)
-                  </label>
-                  <div class="input-group input-group-lg mx-auto" style="max-width: 320px;">
-                    <span class="input-group-text fw-bold text-primary bg-light border-end-0">KES</span>
-                    <input
-                      type="number"
-                      class="form-control text-center fw-bold fs-3 border-start-0"
-                      v-model.number="form.opening_float"
-                      min="0"
-                      step="50"
-                      placeholder="0.00"
-                    />
+                <!-- Cash Keying-in Section Card with Distinct Background Tint -->
+                <div class="cash-input-card p-3 p-sm-4 rounded-4 mb-4 border">
+                  <!-- Hero Float Input -->
+                  <div class="text-center mb-3">
+                    <label class="form-label fs-11 fw-bold text-uppercase text-muted letter-spacing-1 mb-2">
+                      Starting Cash Float (Change Money)
+                    </label>
+                    <div class="input-group input-group-lg mx-auto" style="max-width: 320px;">
+                      <span class="input-group-text fw-bold text-primary bg-white border-end-0">KES</span>
+                      <input
+                        type="number"
+                        class="form-control text-center fw-bold fs-3 border-start-0 bg-white"
+                        v-model.number="form.opening_float"
+                        min="0"
+                        step="50"
+                        placeholder="0.00"
+                      />
+                    </div>
+                    <div class="text-muted fs-11 mt-1">
+                      Cash in drawer or pouch before making sales
+                    </div>
                   </div>
-                  <div class="text-muted fs-11 mt-1">
-                    Money currently in the cash drawer or pouch for change.
-                  </div>
-                </div>
 
-                <!-- Quick Preset Chips (Effortless 1-Tap) -->
-                <div class="mb-4">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="fs-11 text-uppercase text-muted fw-bold">Quick Presets</span>
-                    <span class="fs-11 text-primary cursor-pointer" @click="toggleDenominations">
-                      <Icon :icon="showDenominations ? 'ri:subtract-line' : 'ri:add-line'" class="me-1" />
-                      {{ showDenominations ? 'Hide Note Breakdown' : 'Count Notes & Coins' }}
-                    </span>
+                  <!-- Quick Preset Chips (Effortless 1-Tap) -->
+                  <div class="mb-3">
+                    <div class="fs-11 text-uppercase text-muted fw-bold mb-2 text-center text-sm-start">
+                      Fast Presets (1-Tap)
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-center justify-content-sm-start gap-2">
+                      <button
+                        type="button"
+                        v-for="preset in quickPresets"
+                        :key="preset.amount"
+                        class="btn btn-sm rounded-pill px-3 transition-all fw-medium"
+                        :class="form.opening_float === preset.amount ? 'btn-primary shadow-sm' : 'btn-white bg-white border text-secondary'"
+                        @click="selectPreset(preset.amount)"
+                      >
+                        {{ preset.label }}
+                      </button>
+                    </div>
                   </div>
-                  <div class="d-flex flex-wrap gap-2">
+
+                  <!-- Prominent Count Notes & Coins Toggle Bar -->
+                  <div class="pt-3 border-top border-secondary border-opacity-10">
                     <button
                       type="button"
-                      v-for="preset in quickPresets"
-                      :key="preset.amount"
-                      class="btn btn-sm rounded-pill px-3 transition-all"
-                      :class="form.opening_float === preset.amount ? 'btn-primary shadow-sm' : 'btn-light border'"
-                      @click="selectPreset(preset.amount)"
+                      class="btn w-100 p-2.5 px-3 rounded-3 transition-all d-flex align-items-center justify-content-between border"
+                      :class="showDenominations ? 'btn-light border-primary-subtle shadow-sm' : 'btn-white bg-white shadow-sm'"
+                      @click="toggleDenominations"
                     >
-                      {{ preset.label }}
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Optional Note Breakdown Accordion -->
-                <div v-if="showDenominations" class="p-3 rounded-3 bg-light border mb-4">
-                  <div class="fw-semibold text-dark fs-12 mb-2 d-flex justify-content-between">
-                    <span>Currency Denominations</span>
-                    <span class="text-primary">{{ formatMoney(denominationsTotal) }}</span>
-                  </div>
-
-                  <div class="row g-2">
-                    <div
-                      v-for="note in noteDenominations"
-                      :key="note.val"
-                      class="col-6 col-sm-4"
-                    >
-                      <div class="bg-white p-2 rounded-2 border text-center">
-                        <span class="fs-11 text-muted d-block">KES {{ note.val }} note</span>
-                        <div class="d-flex align-items-center justify-content-center gap-2 mt-1">
-                          <button
-                            type="button"
-                            class="btn btn-sm btn-light border p-0 rounded-circle"
-                            style="width: 24px; height: 24px;"
-                            @click="changeNoteCount(note.val, -1)"
-                            :disabled="!denominations[note.val]"
-                          >
-                            -
-                          </button>
-                          <span class="fw-bold fs-13" style="min-width: 20px;">
-                            {{ denominations[note.val] || 0 }}
-                          </span>
-                          <button
-                            type="button"
-                            class="btn btn-sm btn-light border p-0 rounded-circle"
-                            style="width: 24px; height: 24px;"
-                            @click="changeNoteCount(note.val, 1)"
-                          >
-                            +
-                          </button>
+                      <div class="d-flex align-items-center gap-2.5">
+                        <div
+                          class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                          style="width: 36px; height: 36px; background: rgba(85, 110, 230, 0.12); color: #556ee6;"
+                        >
+                          <Icon icon="ri:coins-line" class="fs-5" />
+                        </div>
+                        <div class="text-start">
+                          <div class="fw-bold fs-13 text-dark d-flex align-items-center gap-1.5">
+                            Count Notes & Coins
+                            <span v-if="denominationsTotal > 0" class="badge bg-success-subtle text-success fs-10 px-1.5 py-0.5">
+                              KES {{ denominationsTotal.toLocaleString() }}
+                            </span>
+                          </div>
+                          <div class="text-muted fs-11">
+                            Breakdown by 1,000s, 500s, 200s, 100s, 50s & coins
+                          </div>
                         </div>
                       </div>
+
+                      <div class="d-flex align-items-center gap-2">
+                        <span
+                          class="badge rounded-pill fs-11 px-2.5 py-1"
+                          :class="showDenominations ? 'bg-primary text-white' : 'bg-light text-secondary border'"
+                        >
+                          {{ showDenominations ? 'Collapse' : 'Count' }}
+                        </span>
+                        <Icon :icon="showDenominations ? 'ri:arrow-up-s-line' : 'ri:arrow-down-s-line'" class="fs-5 text-secondary" />
+                      </div>
+                    </button>
+                  </div>
+
+                  <!-- Denominations Grid (When Expanded) -->
+                  <div v-if="showDenominations" class="mt-3 p-3 rounded-3 bg-white border shadow-sm">
+                    <div class="fw-bold text-dark fs-12 mb-2 d-flex justify-content-between align-items-center pb-2 border-bottom">
+                      <span>Denomination Breakdown</span>
+                      <span class="text-success fw-bold fs-13">{{ formatMoney(denominationsTotal) }}</span>
                     </div>
 
-                    <!-- Coins -->
-                    <div class="col-6 col-sm-4">
-                      <div class="bg-white p-2 rounded-2 border text-center">
-                        <span class="fs-11 text-muted d-block">Coins total (KES)</span>
-                        <input
-                          type="number"
-                          class="form-control form-control-sm text-center fw-bold mt-1"
-                          v-model.number="denominations.coins"
-                          min="0"
-                          step="10"
-                          placeholder="0"
-                          @input="syncFromDenominations"
-                        />
+                    <div class="row g-2">
+                      <div
+                        v-for="note in noteDenominations"
+                        :key="note.val"
+                        class="col-6 col-sm-4"
+                      >
+                        <div class="p-2 rounded-2 border text-center denomination-box" :style="{ background: note.bg }">
+                          <span class="fs-11 fw-bold text-dark d-block">KES {{ note.val }}</span>
+                          <div class="d-flex align-items-center justify-content-center gap-2 mt-1">
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-white bg-white border p-0 rounded-circle shadow-xs"
+                              style="width: 26px; height: 26px; line-height: 1;"
+                              @click="changeNoteCount(note.val, -1)"
+                              :disabled="!denominations[note.val]"
+                            >
+                              -
+                            </button>
+                            <span class="fw-bold fs-13 text-dark" style="min-width: 22px;">
+                              {{ denominations[note.val] || 0 }}
+                            </span>
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-white bg-white border p-0 rounded-circle shadow-xs"
+                              style="width: 26px; height: 26px; line-height: 1;"
+                              @click="changeNoteCount(note.val, 1)"
+                            >
+                              +
+                            </button>
+                          </div>
+                          <span class="fs-10 text-muted mt-1 d-block">
+                            = KES {{ ((denominations[note.val] || 0) * note.val).toLocaleString() }}
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Coins -->
+                      <div class="col-6 col-sm-4">
+                        <div class="p-2 rounded-2 border text-center denomination-box" style="background: #fbfbfb;">
+                          <span class="fs-11 fw-bold text-dark d-block">Coins total</span>
+                          <input
+                            type="number"
+                            class="form-control form-control-sm text-center fw-bold mt-1 bg-white"
+                            v-model.number="denominations.coins"
+                            min="0"
+                            step="10"
+                            placeholder="0"
+                            @input="syncFromDenominations"
+                          />
+                          <span class="fs-10 text-muted mt-1 d-block">
+                            = KES {{ (Number(denominations.coins) || 0).toLocaleString() }}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -444,11 +489,11 @@ const quickPresets = [
 ];
 
 const noteDenominations = [
-  { val: 1000 },
-  { val: 500 },
-  { val: 200 },
-  { val: 100 },
-  { val: 50 },
+  { val: 1000, bg: "rgba(178, 126, 70, 0.08)" },
+  { val: 500, bg: "rgba(52, 195, 143, 0.08)" },
+  { val: 200, bg: "rgba(80, 165, 241, 0.08)" },
+  { val: 100, bg: "rgba(244, 106, 106, 0.08)" },
+  { val: 50, bg: "rgba(241, 180, 76, 0.08)" },
 ];
 
 const form = reactive({
@@ -609,6 +654,16 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.cash-input-card {
+  background: #f8faff;
+  border-color: #e2e8f0 !important;
+}
+.denomination-box {
+  transition: all 0.15s ease;
+}
+.shadow-xs {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
 .letter-spacing-1 {
   letter-spacing: 0.5px;
 }
