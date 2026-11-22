@@ -245,25 +245,26 @@
                   <div class="pt-3 border-top border-secondary border-opacity-10">
                     <button
                       type="button"
-                      class="btn w-100 p-2.5 px-3 rounded-3 transition-all d-flex align-items-center justify-content-between border"
-                      :class="showDenominations ? 'btn-light border-primary-subtle' : 'btn-light border'"
+                      class="btn w-100 p-3 rounded-3 transition-all d-flex align-items-center justify-content-between"
+                      style="border: 1px solid #e2e8f0 !important;"
+                      :class="showDenominations ? 'btn-light border-primary-subtle' : 'btn-light'"
                       @click="toggleDenominations"
                     >
-                      <div class="d-flex align-items-center gap-2.5">
+                      <div class="d-flex align-items-center gap-3">
                         <div
                           class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                          style="width: 36px; height: 36px; background: rgba(85, 110, 230, 0.12); color: #556ee6;"
+                          style="width: 38px; height: 38px; background: rgba(85, 110, 230, 0.12); color: #556ee6;"
                         >
                           <Icon icon="ri:coins-line" class="fs-5" />
                         </div>
                         <div class="text-start">
-                          <div class="fw-bold fs-13 text-dark d-flex align-items-center gap-1.5">
+                          <div class="fw-bold fs-13 text-dark d-flex align-items-center gap-2">
                             Count Notes & Coins
-                            <span v-if="denominationsTotal > 0" class="badge bg-success-subtle text-success fs-10 px-1.5 py-0.5">
+                            <span v-if="denominationsTotal > 0" class="badge bg-success-subtle text-success fs-10 px-2 py-0.5">
                               KES {{ denominationsTotal.toLocaleString() }}
                             </span>
                           </div>
-                          <div class="text-muted fs-11">
+                          <div class="text-muted fs-11 mt-0.5">
                             Breakdown by 1,000s, 500s, 200s, 100s, 50s & coins
                           </div>
                         </div>
@@ -282,21 +283,31 @@
                   </div>
 
                   <!-- Denominations Grid (When Expanded) -->
-                  <div v-if="showDenominations" class="mt-3 p-3 rounded-3 bg-white border">
-                    <div class="fw-bold text-dark fs-12 mb-2 d-flex justify-content-between align-items-center pb-2 border-bottom">
-                      <span>Denomination Breakdown</span>
+                  <div
+                    v-if="showDenominations"
+                    class="mt-3 p-3 p-sm-3.5 rounded-3 bg-white"
+                    style="border: 1px solid #e2e8f0 !important;"
+                  >
+                    <div class="fw-bold text-dark fs-12 mb-3 d-flex justify-content-between align-items-center pb-2 border-bottom">
+                      <span class="text-uppercase letter-spacing-1 fs-11 text-muted">Currency Breakdown</span>
                       <span class="text-success fw-bold fs-13">{{ formatMoney(denominationsTotal) }}</span>
                     </div>
 
-                    <div class="row g-2">
+                    <div class="row g-2.5">
                       <div
                         v-for="note in noteDenominations"
                         :key="note.val"
                         class="col-6 col-sm-4"
                       >
-                        <div class="p-2 rounded-2 border text-center denomination-box" :style="{ background: note.bg }">
-                          <span class="fs-11 fw-bold text-dark d-block">KES {{ note.val }}</span>
-                          <div class="d-flex align-items-center justify-content-center gap-2 mt-1">
+                        <div
+                          class="p-2.5 rounded-3 text-center denomination-box d-flex flex-column justify-content-between h-100"
+                          :style="{ background: note.bg, border: '1px solid ' + note.borderColor + ' !important' }"
+                        >
+                          <div>
+                            <span class="fs-11 fw-bold text-dark d-block">KES {{ note.val }}</span>
+                          </div>
+
+                          <div class="d-flex align-items-center justify-content-center gap-2 my-2">
                             <button
                               type="button"
                               class="btn btn-sm btn-white bg-white border p-0 rounded-circle"
@@ -306,7 +317,7 @@
                             >
                               -
                             </button>
-                            <span class="fw-bold fs-13 text-dark" style="min-width: 22px;">
+                            <span class="fw-bold fs-13 text-dark font-monospace" style="min-width: 22px;">
                               {{ denominations[note.val] || 0 }}
                             </span>
                             <button
@@ -318,26 +329,43 @@
                               +
                             </button>
                           </div>
-                          <span class="fs-10 text-muted mt-1 d-block">
+
+                          <span class="fs-10 text-muted d-block">
                             = KES {{ ((denominations[note.val] || 0) * note.val).toLocaleString() }}
                           </span>
                         </div>
                       </div>
 
-                      <!-- Coins -->
+                      <!-- Coins Tile with Subtle Border and Proper Spacing -->
                       <div class="col-6 col-sm-4">
-                        <div class="p-2 rounded-2 border text-center denomination-box" style="background: #fbfbfb;">
-                          <span class="fs-11 fw-bold text-dark d-block">Coins total</span>
-                          <input
-                            type="number"
-                            class="form-control form-control-sm text-center fw-bold mt-1 bg-white"
-                            v-model.number="denominations.coins"
-                            min="0"
-                            step="10"
-                            placeholder="0"
-                            @input="syncFromDenominations"
-                          />
-                          <span class="fs-10 text-muted mt-1 d-block">
+                        <div
+                          class="p-2.5 rounded-3 text-center denomination-box d-flex flex-column justify-content-between h-100"
+                          style="background: #fafbfc; border: 1px solid #e2e8f0 !important;"
+                        >
+                          <div>
+                            <span class="fs-11 fw-bold text-dark d-flex align-items-center justify-content-center gap-1">
+                              <Icon icon="ri:copper-coin-line" class="text-warning fs-13" />
+                              Loose Coins
+                            </span>
+                          </div>
+
+                          <div class="my-1.5 px-1">
+                            <div class="input-group input-group-sm">
+                              <span class="input-group-text bg-white border-end-0 px-1.5 fs-11 text-muted" style="border-color: #e2e8f0;">KES</span>
+                              <input
+                                type="number"
+                                class="form-control form-control-sm text-center fw-bold border-start-0 bg-white"
+                                style="border-color: #e2e8f0;"
+                                v-model.number="denominations.coins"
+                                min="0"
+                                step="5"
+                                placeholder="0"
+                                @input="syncFromDenominations"
+                              />
+                            </div>
+                          </div>
+
+                          <span class="fs-10 text-muted d-block">
                             = KES {{ (Number(denominations.coins) || 0).toLocaleString() }}
                           </span>
                         </div>
@@ -489,11 +517,11 @@ const quickPresets = [
 ];
 
 const noteDenominations = [
-  { val: 1000, bg: "rgba(178, 126, 70, 0.08)" },
-  { val: 500, bg: "rgba(52, 195, 143, 0.08)" },
-  { val: 200, bg: "rgba(80, 165, 241, 0.08)" },
-  { val: 100, bg: "rgba(244, 106, 106, 0.08)" },
-  { val: 50, bg: "rgba(241, 180, 76, 0.08)" },
+  { val: 1000, bg: "rgba(178, 126, 70, 0.06)", borderColor: "#ecdccb" },
+  { val: 500, bg: "rgba(52, 195, 143, 0.06)", borderColor: "#c8eedd" },
+  { val: 200, bg: "rgba(80, 165, 241, 0.06)", borderColor: "#cfe5fa" },
+  { val: 100, bg: "rgba(244, 106, 106, 0.06)", borderColor: "#fad2d2" },
+  { val: 50, bg: "rgba(241, 180, 76, 0.06)", borderColor: "#fae8c8" },
 ];
 
 const form = reactive({
