@@ -30,7 +30,7 @@
     </div>
 
     <!-- Key Shift Statistics Grid (Spanning full width across 4 columns) -->
-    <div class="shift-stats-grid mb-4" role="tablist" aria-label="Shift statistics">
+    <div class="shift-stats-grid mb-4" aria-label="Shift statistics">
       <MetricCard
         label="Active Shift"
         icon="ri:time-line"
@@ -39,9 +39,7 @@
         :format="() => shiftStore.hasActiveShift ? (shiftStore.activeShiftNumber || 'Active') : 'Closed'"
         :change-tone="shiftStore.hasActiveShift ? 'positive' : 'neutral'"
         :change-text="shiftStore.hasActiveShift ? `${shiftStore.activeMembersCount} on duty` : 'Drawer locked'"
-        :active="statusFilter === 'open'"
         :loading="loading && !shifts.length"
-        @select="setStatus(statusFilter === 'open' ? '' : 'open')"
       />
 
       <MetricCard
@@ -53,9 +51,7 @@
         change-tone="neutral"
         change-text="All records"
         :period="dateFrom ? 'in period' : 'to date'"
-        :active="statusFilter === ''"
         :loading="loading && !shifts.length"
-        @select="setStatus('')"
       />
 
       <MetricCard
@@ -1062,13 +1058,12 @@ onBeforeUnmount(() => {
   justify-content: space-between !important;
   min-height: 114px !important;
   transition: border-color 0.2s ease, background-color 0.2s ease !important;
-  cursor: pointer;
+  cursor: default !important;
   text-align: left !important;
 }
 
 :deep(.shift-stats-grid .metric-tile:hover) {
   transform: none !important;
-  border-color: #a6b0cf !important;
 }
 
 :deep(.shift-stats-grid .metric-tile.is-active) {
