@@ -315,7 +315,7 @@ the backend offers, used or not, is `README.md` §8; what is still missing is §
 | POST | `/tenant/shifts/open` | `shifts.open` | `components/Shifts/ShiftActionModal.vue` | any |
 | POST | `/tenant/shifts/{id}/join` | `shifts.join` | `components/Shifts/ShiftActionModal.vue` | any |
 | GET | `/tenant/shifts` | `shifts.list` | `pages/Shifts/Shifts.List.vue` | any |
-| GET | `/tenant/shifts/{id}` | `shifts.get` | `components/Shifts/ShiftActionModal.vue` | any |
+| GET | `/tenant/shifts/{id}` | `shifts.get` | `components/Shifts/ShiftActionModal.vue`, `pages/Shifts/Shifts.List.vue` | any |
 
 ## 13. `_admin_leftovers/` (11 Nov 2026)
 

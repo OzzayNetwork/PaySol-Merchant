@@ -501,6 +501,11 @@ function handleInventoryFilter() {
                                 <div class="text-muted fs-11 mt-2">
                                     One-tap presets, note counters, and team joining.
                                 </div>
+                                <div class="mt-3">
+                                    <router-link to="/shifts" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                                        Open Register Shifts &amp; History &rarr;
+                                    </router-link>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -59,8 +59,8 @@ export default [
   // Find and reprint a receipt
   { label: 'Receipts', to: '/sell/receipts', icon: 'ri:bill-line', iconActive: 'ri:bill-fill', roles: SELLERS, soon: true },
 
-  // Open / close my shift, count the cash (checkout S5)
-  { label: 'My Shift', to: '/sell/shift', icon: 'ri:time-line', iconActive: 'ri:time-fill', roles: SHIFT_TAKERS, soon: true },
+  // Register shifts & cash sessions history (22 Nov 2026)
+  { label: 'Register Shifts', to: '/shifts', icon: 'ri:time-line', iconActive: 'ri:time-fill', roles: SHIFT_TAKERS, otherLinks: ['/shifts'] },
 
   // ── Money ───────────────────────────────────────────────────────────────
 
