@@ -10,6 +10,8 @@ export const useCartStore = defineStore("cart", {
   state: () => ({
     items: [], // Array of { id, product, quantity, unit_price, tax_rate, discount_amount, notes }
     customer: null, // Selected customer { id, name, phone, loyalty_points, etc. }
+    table: null, // Selected restaurant/hospitality table { id, table_number, label }
+    activeTabId: null, // If working on an existing open tab
     discountAmount: 0,
     deliveryFee: 0,
     notes: "",
@@ -117,6 +119,53 @@ export const useCartStore = defineStore("cart", {
       this.customer = null;
     },
 
+    setTable(table) {
+      this.table = table;
+      if (table) {
+        this.fulfilmentMethod = "dine_in";
+      }
+    },
+
+    clearTable() {
+      this.table = null;
+    },
+
+    loadTab(tab) {
+      this.activeTabId = tab.id;
+      this.items = (tab.items || []).filter((i) => i.status !== "voided").map((item) => ({
+        id: item.product_id || item.product?.id || item.id,
+        product: {
+          id: item.product_id || item.product?.id || item.id,
+          name: item.item_name || item.product?.name,
+          sku: item.sku || item.product?.sku,
+          selling_price: Number(item.unit_price || 0),
+          stock: item.product?.stock_on_hand ?? 999,
+        },
+        unit_price: Number(item.unit_price || 0),
+        quantity: Number(item.quantity || 1),
+        tax_rate: Number(item.tax_rate || 0),
+        discount_amount: Number(item.discount_amount || 0),
+        notes: item.notes || "",
+      }));
+      this.customer = tab.customer ? {
+        id: tab.customer.id,
+        name: `${tab.customer.first_name || ''} ${tab.customer.last_name || ''}`.trim() || tab.customer.name,
+        phone: tab.customer.phone,
+        loyalty_points: tab.customer.loyalty_points_balance || tab.customer.loyalty_points || 0,
+      } : null;
+      this.table = tab.table ? {
+        id: tab.table.id,
+        table_number: tab.table.table_number,
+        label: tab.table.label,
+      } : null;
+      this.discountAmount = Number(tab.discount_amount || 0);
+      this.deliveryFee = Number(tab.delivery_fee || 0);
+      this.notes = tab.notes || "";
+      if (this.table) {
+        this.fulfilmentMethod = "dine_in";
+      }
+    },
+
     setDiscount(amount) {
       this.discountAmount = Math.max(0, Number(amount) || 0);
     },
@@ -132,6 +181,8 @@ export const useCartStore = defineStore("cart", {
     clearCart() {
       this.items = [];
       this.customer = null;
+      this.table = null;
+      this.activeTabId = null;
       this.discountAmount = 0;
       this.deliveryFee = 0;
       this.notes = "";

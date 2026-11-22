@@ -54,7 +54,10 @@ export default [
   { label: 'Counter', to: '/sell', icon: 'ri:shopping-cart-2-line', iconActive: 'ri:shopping-cart-2-fill', roles: SELLERS, otherLinks: ['/sell'] },
 
   // Open bills: rounds, split and partial payments, handover (checkout S3)
-  { label: 'Open Tabs', to: '/sell/tabs', icon: 'ri:file-list-3-line', iconActive: 'ri:file-list-3-fill', roles: SELLERS, soon: true },
+  { label: 'Open Tabs', to: '/sell/tabs', icon: 'ri:file-list-3-line', iconActive: 'ri:file-list-3-fill', roles: SELLERS, otherLinks: ['/sell/tabs'] },
+
+  // Floor and tables management (checkout S3 / restaurant operations)
+  { label: 'Floor & Tables', to: '/sell/tables', icon: 'ri:restaurant-2-line', iconActive: 'ri:restaurant-2-fill', roles: SELLERS, otherLinks: ['/sell/tables'] },
 
   // Find and reprint a receipt
   { label: 'Receipts', to: '/sell/receipts', icon: 'ri:bill-line', iconActive: 'ri:bill-fill', roles: SELLERS, soon: true },

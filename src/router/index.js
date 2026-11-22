@@ -49,6 +49,10 @@ const PaymentMethodsList = () => import("@/pages/PaymentMethods/PaymentMethods.L
 const ShiftsList = () => import("@/pages/Shifts/Shifts.List.vue");
 // Selling › Counter POS (22 Nov 2026)
 const CounterSell = () => import("@/pages/Sell/Counter.vue");
+// Selling › Open Tabs & Bills (22 Nov 2026)
+const TabsList = () => import("@/pages/Sell/Tabs.List.vue");
+// Selling › Tables & Floor (22 Nov 2026)
+const TablesList = () => import("@/pages/Sell/Tables.List.vue");
 
 // Error pages
 const SearchResults = () => import("@/pages/Search/Search.Results.vue");
@@ -98,6 +102,22 @@ const routes = [
     name: "CounterSell",
     component: CounterSell,
     meta: { requiresAuth: true, roles: ["owner", "manager", "cashier", "waiter"], title: "Counter POS" },
+  },
+
+  // ---- Selling (owner, manager, cashier, waiter) › Open Tabs & Bills (22 Nov 2026) ----
+  {
+    path: "/sell/tabs",
+    name: "OpenTabsList",
+    component: TabsList,
+    meta: { requiresAuth: true, roles: ["owner", "manager", "cashier", "waiter"], title: "Open Tabs & Bills" },
+  },
+
+  // ---- Selling (owner, manager, cashier, waiter) › Floor & Tables (22 Nov 2026) ----
+  {
+    path: "/sell/tables",
+    name: "FloorTablesList",
+    component: TablesList,
+    meta: { requiresAuth: true, roles: ["owner", "manager", "cashier", "waiter"], title: "Floor & Table Management" },
   },
 
   // ---- Selling (owner, manager, cashier) › Counter Shifts & History ----

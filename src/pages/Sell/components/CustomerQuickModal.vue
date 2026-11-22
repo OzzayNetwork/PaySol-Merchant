@@ -8,7 +8,7 @@
     ref="modalRef"
   >
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 580px;">
-      <div class="modal-content flat-card border" style="border-radius: 8px;">
+      <div class="modal-content border" style="border-radius: 8px;">
         <div class="modal-header border-bottom px-4 py-3 d-flex align-items-center justify-content-between">
           <div class="d-flex align-items-center gap-2">
             <div class="tone-chip tone-chip-primary">

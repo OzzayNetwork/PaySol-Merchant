@@ -1,9 +1,9 @@
 <template>
-  <div class="container-fluid px-3 py-2">
+  <div class="container-fluid">
     <!-- Non-blocking Counter Shift Notice (if not currently on duty) -->
     <div
       v-if="!shiftStore.isOnDuty"
-      class="alert alert-warning border border-warning-subtle d-flex align-items-center justify-content-between flex-wrap gap-2 p-3 mb-3 flat-card"
+      class="alert alert-warning border border-warning-subtle d-flex align-items-center justify-content-between flex-wrap gap-2 p-3 my-3"
       role="alert"
     >
       <div class="d-flex align-items-center gap-2">
@@ -28,11 +28,11 @@
     <!-- Active Shift Status Bar (if on duty) -->
     <div
       v-else
-      class="d-flex align-items-center justify-content-between mb-2 px-3 py-2 bg-light border rounded flat-card font-size-12"
+      class="d-flex align-items-center justify-content-between my-2 px-3 py-2 bg-light border rounded font-size-12"
     >
       <div class="d-flex align-items-center gap-2">
-        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
-          <i class="bx bx-check-circle me-1 font-size-13"></i> Active Shift: {{ shiftStore.activeShiftNumber }}
+        <span class="badge bg-success font-size-12 px-2 py-1">
+          <i class="bx bx-check-circle me-1"></i> Active Shift: {{ shiftStore.activeShiftNumber }}
         </span>
         <span class="text-muted">Branch: <strong>{{ currentBranchName }}</strong></span>
       </div>
@@ -43,520 +43,498 @@
       </div>
     </div>
 
-    <!-- Main POS Grid -->
-    <div class="row g-3">
-      <!-- LEFT: Product Catalogue -->
-      <div class="col-12 col-lg-7 col-xl-8">
-        <div class="card flat-card border mb-3">
-          <!-- Toolbar: Search & View Switcher -->
-          <div class="card-body border-bottom p-3">
-            <div class="row g-2 align-items-center">
-              <div class="col">
-                <div class="position-relative">
-                  <input
-                    v-model="searchQuery"
-                    type="text"
-                    class="form-control ps-4"
-                    placeholder="Search product name, SKU, or scan barcode..."
-                    @input="handleSearch"
-                  />
-                  <i class="bx bx-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted fs-5"></i>
-                  <button
-                    v-if="searchQuery"
-                    type="button"
-                    class="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-1 p-0 text-muted"
-                    @click="clearSearch"
-                  >
-                    <i class="bx bx-x fs-4"></i>
-                  </button>
-                </div>
-              </div>
+    <!-- Main Layout: Row 8 cols (Products) + 4 cols (Cart) -->
+    <div class="row justify-content-center">
+      <div class="col-12">
+        <div class="row">
+          <!-- LEFT 8 COLS: PRODUCT CATALOGUE -->
+          <div class="col-12 col-lg-8">
+            <div class="card">
+              <!-- Top Toolbar: Search & Action Buttons -->
+              <div class="card-body border-bottom">
+                <div class="row">
+                  <div class="col-12 gap-3 d-flex">
+                    <div class="flex-grow-1">
+                      <div class="search-box mb-0 me-0">
+                        <div class="position-relative">
+                          <form
+                            @submit.prevent="handleSearchInput()"
+                            class="input-group bg-light rounded pb-0 flex-nowrap"
+                          >
+                            <div class="flex-grow-1 position-relative">
+                              <input
+                                style="border-radius: 0px; padding-right: 35px;"
+                                type="text"
+                                class="form-control bg-light rounded flex-grow-1"
+                                placeholder="Search products by name, SKU, or barcode..."
+                                spellcheck="false"
+                                v-model="searchQuery"
+                                @input="handleSearchInput"
+                              />
+                              <i class="bx bx-search-alt search-icon fs-4"></i>
+                              <i
+                                v-if="searchQuery != ''"
+                                title="Clear search"
+                                style="right: 15px; left: unset;"
+                                class="mdi mdi-close search-icon cursor-pointer fs-3 waves-effect"
+                                @click="searchQuery = ''; handleSearchInput()"
+                              ></i>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
 
-              <!-- View Switcher -->
-              <div class="col-auto d-flex align-items-center gap-2">
-                <div class="btn-group" role="group">
-                  <button
-                    type="button"
-                    class="btn btn-sm px-3 py-1 font-size-13 d-inline-flex align-items-center justify-content-center"
-                    :class="viewMode === 'grid' ? 'btn-primary' : 'btn-white'"
-                    title="Grid view"
-                    @click="viewMode = 'grid'"
-                  >
-                    <i class="bx bx-grid-alt fs-5"></i>
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-sm px-3 py-1 font-size-13 d-inline-flex align-items-center justify-content-center"
-                    :class="viewMode === 'compact' ? 'btn-primary' : 'btn-white'"
-                    title="Compact grid"
-                    @click="viewMode = 'compact'"
-                  >
-                    <i class="bx bx-grid fs-5"></i>
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-sm px-3 py-1 font-size-13 d-inline-flex align-items-center justify-content-center"
-                    :class="viewMode === 'list' ? 'btn-primary' : 'btn-white'"
-                    title="List view"
-                    @click="viewMode = 'list'"
-                  >
-                    <i class="bx bx-list-ul fs-5"></i>
-                  </button>
-                </div>
-
-                <button
-                  type="button"
-                  class="btn btn-sm btn-white px-2 py-1 font-size-13 d-inline-flex align-items-center justify-content-center"
-                  title="Refresh catalog"
-                  @click="fetchProducts"
-                >
-                  <i class="bx bx-refresh fs-5" :class="{ 'bx-spin': isLoadingProducts }"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Category Chips Horizontal Bar -->
-          <div class="card-body py-2 px-3 border-bottom bg-light">
-            <div
-              class="d-flex gap-2 overflow-auto category-scroll py-1"
-              style="scrollbar-width: none; -ms-overflow-style: none;"
-            >
-              <button
-                type="button"
-                class="btn btn-sm text-nowrap rounded-pill px-3"
-                :class="selectedCategory === '' ? 'btn-dark text-white' : 'btn-white'"
-                @click="selectCategory('')"
-              >
-                All Products <span class="opacity-75">({{ totalProductsCount }})</span>
-              </button>
-              <button
-                v-for="cat in categories"
-                :key="cat.name"
-                type="button"
-                class="btn btn-sm text-nowrap rounded-pill px-3"
-                :class="selectedCategory === cat.name ? 'btn-dark text-white' : 'btn-white'"
-                @click="selectCategory(cat.name)"
-              >
-                {{ cat.name }} <span class="opacity-75">({{ cat.count }})</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Product Cards Grid / List Area -->
-          <div class="card-body p-3" style="min-height: 520px; max-height: calc(100vh - 270px); overflow-y: auto;">
-            <!-- Loading Skeletons -->
-            <div v-if="isLoadingProducts" class="row g-3">
-              <div v-for="i in 8" :key="i" class="col-6 col-md-4 col-xl-3">
-                <div class="p-3 bg-light rounded border flat-card text-center">
-                  <div class="bg-white rounded mb-2" style="height: 110px;"></div>
-                  <div class="bg-white rounded mb-1" style="height: 14px; width: 80%;"></div>
-                  <div class="bg-white rounded" style="height: 16px; width: 50%;"></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Empty State -->
-            <div
-              v-else-if="filteredProducts.length === 0"
-              class="d-flex flex-column align-items-center justify-content-center py-5 text-center"
-            >
-              <div class="tone-chip tone-chip-primary p-3 mb-3" style="width: 64px; height: 64px;">
-                <i class="ri-shopping-basket-line fs-2"></i>
-              </div>
-              <h5 class="fw-bold text-dark mb-1">No products found</h5>
-              <p class="text-muted font-size-13 mb-3">
-                {{ searchQuery ? `No matches for "${searchQuery}" in this category.` : 'No products available for this branch.' }}
-              </p>
-              <button v-if="searchQuery" type="button" class="btn btn-sm btn-white" @click="clearSearch">
-                Clear Search Filter
-              </button>
-            </div>
-
-            <!-- GRID VIEW (Default) -->
-            <div v-else-if="viewMode === 'grid'" class="row g-3">
-              <div
-                v-for="product in filteredProducts"
-                :key="product.id"
-                class="col-6 col-md-4 col-xl-3"
-              >
-                <div
-                  class="card h-100 p-2 border rounded flat-card cursor-pointer product-card position-relative transition"
-                  :class="{ 'border-primary border-2 bg-primary-subtle': cartStore.getItemQuantity(product.id) > 0 }"
-                  @click="handleProductClick(product)"
-                >
-                  <!-- Cart Quantity Badge -->
-                  <span
-                    v-if="cartStore.getItemQuantity(product.id) > 0"
-                    class="position-absolute top-0 end-0 translate-middle-y me-2 badge rounded-pill bg-primary font-size-12 px-2 py-1"
-                    style="z-index: 10;"
-                  >
-                    {{ cartStore.getItemQuantity(product.id) }} in cart
-                  </span>
-
-                  <!-- Thumbnail -->
-                  <div
-                    class="d-flex align-items-center justify-content-center bg-light rounded mb-2 overflow-hidden"
-                    style="height: 120px;"
-                  >
-                    <img
-                      v-if="product.image_url"
-                      :src="product.image_url"
-                      class="img-fluid"
-                      style="max-height: 110px; object-fit: contain;"
-                      :alt="product.name"
-                    />
-                    <i v-else class="ri-image-line fs-1 text-muted opacity-50"></i>
-                  </div>
-
-                  <!-- Details -->
-                  <div class="px-1 d-flex flex-column justify-content-between flex-grow-1">
-                    <h6 class="font-size-13 fw-bold text-dark text-truncate mb-2" :title="product.name">
-                      {{ product.name }}
-                    </h6>
-                    <div class="mt-auto pt-2 border-top border-light">
-                      <div class="d-flex align-items-center justify-content-between flex-wrap gap-1">
-                        <span class="font-size-14 fw-bold text-dark text-nowrap">
-                          {{ formatMoney(product.selling_price) }}
-                        </span>
-                        <span
-                          class="badge font-size-10 px-2 py-1 text-nowrap"
-                          :class="product.stock_on_hand > 0 ? 'bg-light text-muted border' : 'bg-danger-subtle text-danger border border-danger-subtle'"
+                    <!-- View Switcher & Refresh buttons -->
+                    <div class="position-relative d-flex gap-2">
+                      <div class="btn-group" role="group">
+                        <button
+                          type="button"
+                          class="btn btn-light waves-effect"
+                          :class="{ 'btn-dark text-white': viewMode === 'grid' }"
+                          title="Grid view"
+                          @click="viewMode = 'grid'"
                         >
-                          {{ product.stock_on_hand > 0 ? `${product.stock_on_hand} in stock` : 'Out of stock' }}
+                          <i class="bx bx-grid-alt fs-5"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-light waves-effect"
+                          :class="{ 'btn-dark text-white': viewMode === 'list' }"
+                          title="List view"
+                          @click="viewMode = 'list'"
+                        >
+                          <i class="bx bx-list-ul fs-5"></i>
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        class="btn btn-light waves-effect"
+                        title="Refresh catalogue"
+                        @click="fetchProducts"
+                      >
+                        <i class="bx bx-refresh fs-4" :class="{ 'bx-spin': isLoadingProducts }"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Category Pills Horizontal Scroll -->
+              <div class="card-body py-2 border-bottom">
+                <div class="row mb-0">
+                  <div class="col-12">
+                    <div
+                      class="d-flex flex-row flex-nowrap py-2 category-scroll gap-2"
+                      style="overflow-x: auto; overflow-y: hidden; scrollbar-width: none; -ms-overflow-style: none;"
+                    >
+                      <button
+                        type="button"
+                        class="btn text-capitalize btn-sm fw-bold btn-light btn-rounded waves-effect px-3 text-nowrap flex-shrink-0"
+                        :class="{ 'btn-dark text-light': selectedCategory === '' }"
+                        @click="selectCategory('')"
+                      >
+                        All <span class="opacity-50">({{ totalProductsCount }})</span>
+                      </button>
+
+                      <button
+                        v-for="cat in categories"
+                        :key="cat.name"
+                        type="button"
+                        class="btn btn-sm fw-bold btn-light btn-rounded text-capitalize waves-effect px-3 text-nowrap flex-shrink-0"
+                        :class="{ 'btn-dark text-light': selectedCategory === cat.name }"
+                        @click="selectCategory(cat.name)"
+                      >
+                        {{ cat.name }} <span class="opacity-50">({{ cat.count }})</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Product Grid Cards Body -->
+              <div class="card-body">
+                <div v-if="isLoadingProducts" class="row">
+                  <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary spinner-border-sm mb-2" role="status"></div>
+                    <p class="text-muted font-size-13 mb-0">Loading products...</p>
+                  </div>
+                </div>
+
+                <div v-else-if="filteredProducts.length === 0" class="row">
+                  <div class="col-12 text-center py-5 text-muted">
+                    <i class="bx bx-search fs-1 opacity-50 mb-2"></i>
+                    <h5 class="fw-semibold text-dark font-size-15">No products found</h5>
+                    <p class="font-size-13">Try adjusting your search query or selected category.</p>
+                  </div>
+                </div>
+
+                <!-- GRID VIEW (Direct match to POS Make a sale) -->
+                <div v-else-if="viewMode === 'grid'" class="row">
+                  <div
+                    v-for="product in filteredProducts"
+                    :key="product.id"
+                    @click="handleProductClick(product)"
+                    class="col-6 col-sm-6 col-md-6 col-lg-4 col-xl-3 mb-4 position-relative"
+                  >
+                    <!-- Quantity Badge -->
+                    <div v-if="cartStore.getItemQuantity(product.id) > 0">
+                      <div
+                        class="avatar-xs mx-auto position-absolute"
+                        style="z-index: 30; right: 0px; top: -15px;"
+                      >
+                        <span class="avatar-title rounded-circle bg-success font-size-14 fw-bold text-white shadow-none">
+                          {{ cartStore.getItemQuantity(product.id) }}
                         </span>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            <!-- COMPACT GRID VIEW -->
-            <div v-else-if="viewMode === 'compact'" class="row g-2">
-              <div
-                v-for="product in filteredProducts"
-                :key="product.id"
-                class="col-6 col-sm-4 col-md-3 col-xl-2"
-              >
-                <div
-                  class="card h-100 p-2 border rounded flat-card cursor-pointer product-card position-relative"
-                  :class="{ 'border-primary border-2 bg-primary-subtle': cartStore.getItemQuantity(product.id) > 0 }"
-                  @click="handleProductClick(product)"
-                >
-                  <span
-                    v-if="cartStore.getItemQuantity(product.id) > 0"
-                    class="position-absolute top-0 end-0 badge rounded-pill bg-primary font-size-10 px-1"
-                    style="z-index: 10;"
-                  >
-                    {{ cartStore.getItemQuantity(product.id) }}
-                  </span>
-
-                  <div
-                    class="d-flex align-items-center justify-content-center bg-light rounded mb-1 overflow-hidden"
-                    style="height: 70px;"
-                  >
-                    <img
-                      v-if="product.image_url"
-                      :src="product.image_url"
-                      class="img-fluid"
-                      style="max-height: 65px; object-fit: contain;"
-                      :alt="product.name"
-                    />
-                    <i v-else class="ri-image-line fs-3 text-muted opacity-50"></i>
-                  </div>
-
-                  <div class="text-truncate font-size-12 fw-semibold text-dark mb-1" :title="product.name">
-                    {{ product.name }}
-                  </div>
-                  <div class="fw-bold font-size-13 text-dark">
-                    {{ formatMoney(product.selling_price) }}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- LIST VIEW -->
-            <div v-else-if="viewMode === 'list'" class="table-responsive">
-              <table class="table table-hover align-middle mb-0 font-size-13">
-                <thead class="table-light">
-                  <tr>
-                    <th style="width: 50px;"></th>
-                    <th>Product</th>
-                    <th>SKU / Barcode</th>
-                    <th>Stock</th>
-                    <th class="text-end">Price</th>
-                    <th class="text-center" style="width: 140px;">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="product in filteredProducts" :key="product.id">
-                    <td>
-                      <div class="rounded bg-light d-flex align-items-center justify-content-center overflow-hidden" style="width: 36px; height: 36px;">
-                        <img v-if="product.image_url" :src="product.image_url" style="max-height: 32px; object-fit: contain;" />
-                        <i v-else class="ri-image-line text-muted"></i>
+                    <!-- Card Body -->
+                    <div
+                      class="p-3 bg-light rounded border cursor-pointer waves-effect w-100 h-100 d-flex flex-column justify-content-between"
+                      :class="[
+                        cartStore.getItemQuantity(product.id) > 0 ? 'border-success border-2' : ''
+                      ]"
+                    >
+                      <div>
+                        <div
+                          style="height: 160px;"
+                          class="img-cont d-flex align-items-center justify-content-center overflow-hidden rounded w-100 bg-white border"
+                        >
+                          <img
+                            v-if="product.image_url"
+                            class="img h-auto"
+                            style="width: 100%; max-height: 150px; object-fit: contain;"
+                            :src="product.image_url"
+                            :alt="product.name"
+                          />
+                          <i v-else class="bx bx-package fs-1 text-muted opacity-50"></i>
+                        </div>
                       </div>
-                    </td>
-                    <td>
-                      <strong class="text-dark">{{ product.name }}</strong>
-                    </td>
-                    <td class="text-muted font-monospace font-size-12">
-                      {{ product.sku || product.barcode || '-' }}
-                    </td>
-                    <td>
-                      <span
-                        class="badge font-size-11"
-                        :class="product.stock_on_hand > 0 ? 'bg-light text-muted border' : 'bg-danger-subtle text-danger border'"
-                      >
-                        {{ product.stock_on_hand }}
-                      </span>
-                    </td>
-                    <td class="text-end fw-bold text-dark">
-                      {{ formatMoney(product.selling_price) }}
-                    </td>
-                    <td class="text-center">
-                      <div v-if="cartStore.getItemQuantity(product.id) > 0" class="d-inline-flex align-items-center gap-1">
-                        <button type="button" class="btn btn-sm btn-white px-2 py-0" @click.stop="cartStore.decreaseQty(product.id)">
-                          <i class="bx bx-minus"></i>
-                        </button>
-                        <span class="fw-bold px-2">{{ cartStore.getItemQuantity(product.id) }}</span>
-                        <button type="button" class="btn btn-sm btn-white px-2 py-0" @click.stop="cartStore.increaseQty(product.id)">
-                          <i class="bx bx-plus"></i>
-                        </button>
+
+                      <div class="pt-3">
+                        <h5 class="text-capitalize text-truncate mb-1 font-size-14 fw-semibold text-dark" :title="product.name">
+                          {{ product.name || "Unknown" }}
+                        </h5>
+                        <p class="mb-2 text-muted font-size-11">
+                          <small>{{ product.sku || product.barcode || '' }}</small>
+                        </p>
+                        <div class="d-flex gap-2 align-items-center justify-content-between">
+                          <div>
+                            <h5 class="my-0 font-size-14 fw-bold text-dark">
+                              {{ formatMoney(product.selling_price) }}
+                            </h5>
+                          </div>
+                          <span class="text-end font-size-11">
+                            <span :class="product.stock_on_hand > 0 ? 'text-muted' : 'text-danger fw-semibold'">
+                              {{ product.stock_on_hand > 0 ? `${product.stock_on_hand - cartStore.getItemQuantity(product.id)} In stock` : 'Out of stock' }}
+                            </span>
+                          </span>
+                        </div>
                       </div>
-                      <button
-                        v-else
-                        type="button"
-                        class="btn btn-sm btn-white d-inline-flex align-items-center gap-1"
-                        @click="handleProductClick(product)"
-                      >
-                        <i class="bx bx-cart"></i>
-                        <span>Add</span>
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- RIGHT: Sticky Cart Panel -->
-      <div class="col-12 col-lg-5 col-xl-4">
-        <div class="card flat-card border position-sticky" style="top: 15px;">
-          <!-- Cart Header -->
-          <div class="card-header bg-white border-bottom p-3 d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center gap-2">
-              <div class="tone-chip tone-chip-primary">
-                <i class="bx bx-cart fs-5"></i>
-              </div>
-              <h5 class="card-title font-size-15 fw-bold mb-0">
-                Cart ({{ cartStore.itemCount }})
-              </h5>
-            </div>
-            <button
-              v-if="!cartStore.isEmpty"
-              type="button"
-              class="btn btn-sm btn-white text-danger border-0 d-inline-flex align-items-center gap-1"
-              @click="cartStore.clearCart"
-            >
-              <i class="bx bx-trash"></i>
-              <span>Clear</span>
-            </button>
-          </div>
-
-          <!-- Customer Bar -->
-          <div class="card-body p-2 border-bottom bg-light">
-            <div v-if="cartStore.customer" class="p-2 bg-white rounded border d-flex align-items-center justify-content-between">
-              <div class="d-flex align-items-center gap-2 text-truncate me-2">
-                <div class="tone-chip tone-chip-emerald" style="width: 32px; height: 32px;">
-                  <i class="bx bx-user-check fs-5"></i>
-                </div>
-                <div class="text-truncate">
-                  <div class="fw-bold text-dark font-size-13 text-truncate">{{ cartStore.customer.name }}</div>
-                  <div class="text-muted font-size-11">
-                    {{ cartStore.customer.phone || 'No phone' }} • {{ cartStore.customer.loyalty_points }} pts
-                  </div>
-                </div>
-              </div>
-              <button type="button" class="btn btn-sm btn-white p-1 text-muted" title="Change Customer" @click="cartStore.clearCustomer">
-                <i class="bx bx-x fs-5"></i>
-              </button>
-            </div>
-
-            <!-- Customer Picker Dropdown / Quick Add -->
-            <div v-else class="d-flex gap-2">
-              <div class="flex-grow-1 position-relative">
-                <input
-                  v-model="customerSearch"
-                  type="text"
-                  class="form-control form-control-sm"
-                  placeholder="Select Customer or Walk-in..."
-                  @focus="showCustomerDropdown = true"
-                  @input="searchCustomers"
-                />
-                <!-- Dropdown results -->
-                <div
-                  v-if="showCustomerDropdown && (customersList.length > 0 || isSearchingCustomers)"
-                  class="position-absolute start-0 end-0 mt-1 bg-white border rounded shadow-sm p-1"
-                  style="z-index: 1000; max-height: 220px; overflow-y: auto;"
-                >
-                  <div
-                    class="p-2 hover-bg cursor-pointer rounded font-size-12 text-muted border-bottom"
-                    @click="selectWalkIn"
-                  >
-                    <i class="bx bx-user me-1"></i> Walk-in Customer (Default)
-                  </div>
-                  <div
-                    v-for="c in customersList"
-                    :key="c.id"
-                    class="p-2 hover-bg cursor-pointer rounded font-size-12 d-flex justify-content-between align-items-center"
-                    @click="selectCustomer(c)"
-                  >
-                    <div>
-                      <strong class="text-dark">{{ c.name }}</strong>
-                      <div class="text-muted font-size-11">{{ c.phone || 'No phone' }}</div>
                     </div>
-                    <span class="badge bg-light text-muted border font-size-10">{{ c.loyalty_points }} pts</span>
                   </div>
                 </div>
+
+                <!-- LIST VIEW -->
+                <div v-else-if="viewMode === 'list'" class="table-responsive">
+                  <table class="table table-hover align-middle mb-0 font-size-13">
+                    <thead class="table-light">
+                      <tr>
+                        <th style="width: 50px;"></th>
+                        <th>Product</th>
+                        <th>SKU / Barcode</th>
+                        <th>Stock</th>
+                        <th class="text-end">Price</th>
+                        <th class="text-center" style="width: 140px;">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="product in filteredProducts" :key="product.id">
+                        <td>
+                          <div class="rounded bg-light d-flex align-items-center justify-content-center overflow-hidden" style="width: 36px; height: 36px;">
+                            <img v-if="product.image_url" :src="product.image_url" style="max-height: 32px; object-fit: contain;" />
+                            <i v-else class="bx bx-package text-muted"></i>
+                          </div>
+                        </td>
+                        <td>
+                          <strong class="text-dark">{{ product.name }}</strong>
+                        </td>
+                        <td class="text-muted font-monospace font-size-12">
+                          {{ product.sku || product.barcode || '-' }}
+                        </td>
+                        <td>
+                          <span
+                            class="badge font-size-11"
+                            :class="product.stock_on_hand > 0 ? 'bg-light text-muted border' : 'bg-danger text-white'"
+                          >
+                            {{ product.stock_on_hand > 0 ? `${product.stock_on_hand - cartStore.getItemQuantity(product.id)} in stock` : 'Out of stock' }}
+                          </span>
+                        </td>
+                        <td class="text-end fw-bold text-dark">
+                          {{ formatMoney(product.selling_price) }}
+                        </td>
+                        <td class="text-center">
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-primary px-3"
+                            @click="handleProductClick(product)"
+                          >
+                            <i class="bx bx-plus me-1"></i> Add
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
-              <button
-                type="button"
-                class="btn btn-sm btn-white d-inline-flex align-items-center gap-1 text-nowrap"
-                title="Register Customer"
-                @click="openCustomerModal"
-              >
-                <i class="bx bx-user-plus"></i>
-                <span class="d-none d-xl-inline">New</span>
-              </button>
             </div>
           </div>
 
-          <!-- Cart Line Items -->
-          <div
-            class="card-body p-0"
-            style="min-height: 240px; max-height: 380px; overflow-y: auto;"
-          >
-            <!-- Empty Cart Notice -->
-            <div
-              v-if="cartStore.isEmpty"
-              class="d-flex flex-column align-items-center justify-content-center text-center p-4 text-muted"
-              style="min-height: 240px;"
-            >
-              <i class="bx bx-shopping-bag fs-1 opacity-25 mb-2"></i>
-              <p class="mb-1 fw-semibold text-dark font-size-14">Your cart is empty</p>
-              <small class="text-muted">Tap products on the left to add items to this sale</small>
-            </div>
-
-            <!-- Items List -->
-            <ul v-else class="list-group list-group-flush mb-0 font-size-13">
-              <li
-                v-for="item in cartStore.items"
-                :key="item.id"
-                class="list-group-item p-3 border-bottom d-flex align-items-center justify-content-between"
-              >
-                <div class="d-flex align-items-center gap-2 text-truncate me-2" style="max-width: 60%;">
-                  <div
-                    class="rounded bg-light d-flex align-items-center justify-content-center overflow-hidden flex-shrink-0"
-                    style="width: 38px; height: 38px;"
-                  >
-                    <img
-                      v-if="item.product.image_url"
-                      :src="item.product.image_url"
-                      style="max-height: 34px; object-fit: contain;"
-                    />
-                    <i v-else class="bx bx-image text-muted"></i>
-                  </div>
-                  <div class="text-truncate">
-                    <strong class="text-dark d-block text-truncate">{{ item.product.name }}</strong>
-                    <span class="text-muted font-size-12">{{ formatMoney(item.unit_price) }}</span>
+          <!-- RIGHT 4 COLS: STICKY CART (Direct match to POS Make a sale) -->
+          <div class="col-12 col-lg-4">
+            <div class="card position-sticky" style="top: 20px;">
+              <!-- Cart Header -->
+              <div class="card-header bg-white border-bottom">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h4 class="card-title d-flex align-items-center gap-2 mb-0 font-size-15">
+                    <i class="bx bx-cart fs-4"></i>
+                    <span>Cart ({{ cartStore.itemCount }})</span>
+                  </h4>
+                  <div>
+                    <button
+                      :disabled="cartStore.isEmpty"
+                      type="button"
+                      @click="cartStore.clearCart()"
+                      class="btn btn-soft-danger waves-effect fw-bold flex-nowrap d-flex btn-sm gap-1 align-items-center"
+                    >
+                      <i class="bx bx-trash fs-6"></i> Clear cart
+                    </button>
                   </div>
                 </div>
+              </div>
 
-                <div class="d-flex align-items-center gap-2">
-                  <!-- Stepper -->
-                  <div class="d-inline-flex align-items-center border rounded bg-white">
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-link text-dark p-1 px-2 border-0"
-                      @click="cartStore.decreaseQty(item.id)"
-                    >
-                      <i class="bx bx-minus font-size-12"></i>
-                    </button>
-                    <span class="fw-bold font-size-13 px-1" style="min-width: 24px; text-align: center;">
-                      {{ item.quantity }}
-                    </span>
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-link text-dark p-1 px-2 border-0"
-                      @click="cartStore.increaseQty(item.id)"
-                    >
-                      <i class="bx bx-plus font-size-12"></i>
-                    </button>
+              <!-- Table & Customer Bar -->
+              <div class="card-body py-2 px-3 bg-light border-bottom">
+                <!-- Assigned Table Pill -->
+                <div
+                  v-if="cartStore.table"
+                  class="mb-2 p-2 bg-white rounded border d-flex align-items-center justify-content-between font-size-12"
+                >
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bx bx-restaurant text-primary fs-5"></i>
+                    <div>
+                      <strong>Table {{ cartStore.table.table_number }}</strong>
+                      <span v-if="cartStore.table.label" class="text-muted ms-1">({{ cartStore.table.label }})</span>
+                    </div>
                   </div>
-
-                  <!-- Line Total -->
-                  <span class="fw-bold text-dark font-size-14" style="min-width: 65px; text-align: right;">
-                    {{ formatMoney(item.quantity * item.unit_price) }}
-                  </span>
-
-                  <!-- Delete Item -->
                   <button
                     type="button"
-                    class="btn btn-sm btn-link text-danger p-0 ms-1"
-                    title="Remove item"
-                    @click="cartStore.removeItem(item.id)"
+                    class="btn btn-sm btn-light p-1"
+                    title="Remove Table"
+                    @click="cartStore.clearTable"
                   >
-                    <i class="bx bx-x-circle fs-5"></i>
+                    <i class="bx bx-x fs-6"></i>
                   </button>
                 </div>
-              </li>
-            </ul>
-          </div>
 
-          <!-- Billing Summary -->
-          <div class="card-footer bg-light border-top p-3">
-            <div class="d-flex justify-content-between font-size-13 text-muted mb-1">
-              <span>Subtotal</span>
-              <span>{{ formatMoney(cartStore.subtotal) }}</span>
-            </div>
-            <div v-if="cartStore.discountAmount > 0" class="d-flex justify-content-between font-size-13 text-danger mb-1">
-              <span>Discount</span>
-              <span>-{{ formatMoney(cartStore.discountAmount) }}</span>
-            </div>
-            <div v-if="cartStore.taxAmount > 0" class="d-flex justify-content-between font-size-13 text-muted mb-1">
-              <span>VAT / Tax</span>
-              <span>{{ formatMoney(cartStore.taxAmount) }}</span>
-            </div>
-            <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
-              <span class="fw-bold text-dark font-size-14">TOTAL AMOUNT</span>
-              <span class="fw-bold text-dark font-size-18">{{ formatMoney(cartStore.totalAmount) }}</span>
-            </div>
-
-            <!-- Checkout Action Buttons (Clean single-line wrap-resistant layout) -->
-            <div class="row g-2 mt-2">
-              <div class="col-6">
-                <button
-                  type="button"
-                  class="btn btn-white w-100 font-size-13 fw-semibold text-nowrap py-2 d-inline-flex align-items-center justify-content-center gap-1"
-                  :disabled="cartStore.isEmpty"
-                  @click="handleSaveTabNotice"
+                <!-- Customer Info -->
+                <div
+                  v-if="cartStore.customer"
+                  class="p-2 bg-white rounded border d-flex align-items-center justify-content-between font-size-12"
                 >
-                  <i class="bx bx-bookmark"></i>
-                  <span>Save Tab</span>
-                </button>
+                  <div class="d-flex align-items-center gap-2 text-truncate me-2">
+                    <i class="bx bx-user-check text-success fs-5"></i>
+                    <div class="text-truncate">
+                      <strong class="text-dark">{{ cartStore.customer.name }}</strong>
+                      <div class="text-muted font-size-11">
+                        {{ cartStore.customer.phone || 'No phone' }} • {{ cartStore.customer.loyalty_points }} pts
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light p-1"
+                    title="Change Customer"
+                    @click="cartStore.clearCustomer"
+                  >
+                    <i class="bx bx-x fs-6"></i>
+                  </button>
+                </div>
+
+                <!-- Customer Picker Input -->
+                <div v-else class="d-flex gap-2">
+                  <div class="flex-grow-1 position-relative">
+                    <input
+                      v-model="customerSearch"
+                      type="text"
+                      class="form-control form-control-sm bg-white"
+                      placeholder="Search Customer or Walk-in..."
+                      @focus="showCustomerDropdown = true"
+                      @input="searchCustomers"
+                    />
+                    <!-- Dropdown search results -->
+                    <div
+                      v-if="showCustomerDropdown && (customersList.length > 0 || isSearchingCustomers)"
+                      class="position-absolute start-0 end-0 mt-1 bg-white border rounded p-1 shadow-sm"
+                      style="z-index: 1000; max-height: 220px; overflow-y: auto;"
+                    >
+                      <div
+                        class="p-2 hover-bg cursor-pointer rounded font-size-12 text-muted border-bottom"
+                        @click="selectWalkIn"
+                      >
+                        <i class="bx bx-user me-1"></i> Walk-in Customer (Default)
+                      </div>
+                      <div
+                        v-for="c in customersList"
+                        :key="c.id"
+                        class="p-2 hover-bg cursor-pointer rounded font-size-12 d-flex justify-content-between align-items-center"
+                        @click="selectCustomer(c)"
+                      >
+                        <div>
+                          <strong class="text-dark">{{ c.name }}</strong>
+                          <div class="text-muted font-size-11">{{ c.phone || 'No phone' }}</div>
+                        </div>
+                        <span class="badge bg-light text-muted border font-size-10">{{ c.loyalty_points }} pts</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light border d-inline-flex align-items-center gap-1"
+                    title="Register Customer"
+                    @click="openCustomerModal"
+                  >
+                    <i class="bx bx-user-plus"></i>
+                    <span>New</span>
+                  </button>
+                </div>
               </div>
-              <div class="col-6">
+
+              <!-- Cart Line Items Container (Table styling from reference) -->
+              <div class="card-body cart-container pt-1 p-2" style="height: 38vh; overflow-y: auto;">
+                <table v-if="!cartStore.isEmpty" class="table table-s align-middle mb-0">
+                  <tbody>
+                    <tr
+                      v-for="(cartItem, index) in cartStore.items"
+                      :key="cartItem.id"
+                      class="table-striped"
+                    >
+                      <th class="d-flex gap-2 align-items-center pl-0 border-0">
+                        <div
+                          class="product-img bg-light d-flex align-items-center justify-content-center rounded overflow-hidden"
+                          style="width: 44px; height: 44px; min-width: 44px;"
+                        >
+                          <img
+                            v-if="cartItem.product.image_url"
+                            :src="cartItem.product.image_url"
+                            class="img-fluid"
+                            style="width: 100%; height: 100%; object-fit: cover;"
+                            alt=""
+                          />
+                          <i v-else class="bx bx-package text-muted"></i>
+                        </div>
+                        <div class="text-truncate">
+                          <p class="m-0 fw-bold text-black font-size-13 text-truncate" style="max-width: 130px;">
+                            {{ cartItem.product.name }}
+                          </p>
+                          <small class="text-muted">{{ formatMoney(cartItem.unit_price) }}</small>
+                        </div>
+                      </th>
+                      <td class="border-0">
+                        <div class="d-flex align-items-center p-0 gap-1">
+                          <span
+                            @click="cartStore.decreaseQty(cartItem.id)"
+                            class="waves-effect p-1 cursor-pointer"
+                          >
+                            <i class="mdi mdi-minus fs-6"></i>
+                          </span>
+                          <span class="fw-bold font-size-13 px-1">{{ cartItem.quantity }}</span>
+                          <span
+                            @click="cartStore.increaseQty(cartItem.id)"
+                            class="waves-effect p-1 cursor-pointer"
+                          >
+                            <i class="mdi mdi-plus fs-6"></i>
+                          </span>
+                        </div>
+                      </td>
+                      <th class="text-end border-0 px-1">
+                        <div class="d-flex w-100 align-items-center gap-1 justify-content-end text-end">
+                          <span class="fw-bold font-size-13 text-dark">
+                            {{ formatMoney(cartItem.quantity * cartItem.unit_price) }}
+                          </span>
+                          <span
+                            title="Remove item from cart"
+                            class="waves-effect p-1 d-flex cursor-pointer text-danger"
+                            @click="cartStore.removeItem(cartItem.id)"
+                          >
+                            <i class="mdi mdi-close fs-5"></i>
+                          </span>
+                        </div>
+                      </th>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div
+                  v-else
+                  class="d-flex flex-column text-center align-items-center justify-content-center w-100 h-100 py-4 opacity-50"
+                >
+                  <i class="bx bx-shopping-bag fs-1 mb-2"></i>
+                  <h5 class="fw-bold text-capitalize font-size-14 mb-0">Tap items to add to <br /> the order</h5>
+                </div>
+              </div>
+
+              <!-- Sale Summary Box (From reference) -->
+              <div class="card-body pt-2 border-top border-2">
+                <div class="p-3 pb-1 bg-light rounded border">
+                  <h5 class="card-title d-flex gap-2 align-items-center font-size-13 fw-bold mb-2">
+                    <i class="bx bx-purchase-tag fs-5 text-primary"></i>
+                    <span>Sale Summary</span>
+                  </h5>
+                  <table class="table text-uppercase fs-6 table-sm m-0 font-size-12">
+                    <tbody>
+                      <tr v-if="cartStore.discountAmount > 0" class="border-bottom">
+                        <td>Discount</td>
+                        <th class="text-end text-danger">-{{ formatMoney(cartStore.discountAmount) }}</th>
+                      </tr>
+                      <tr class="border-bottom">
+                        <td>Subtotal</td>
+                        <th class="text-end">{{ formatMoney(cartStore.subtotal) }}</th>
+                      </tr>
+                      <tr v-if="cartStore.taxAmount > 0" class="border-bottom">
+                        <td>Tax / VAT</td>
+                        <th class="text-end">{{ formatMoney(cartStore.taxAmount) }}</th>
+                      </tr>
+                      <tr class="fs-5 text-black">
+                        <th class="pt-2">TOTAL</th>
+                        <th class="text-end pt-2 fw-bold text-primary">{{ formatMoney(cartStore.totalAmount) }}</th>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Card Footer Action Buttons (From reference) -->
+              <div class="card-footer pt-0 bg-white p-3 gap-2 d-flex justify-content-between align-items-center">
                 <button
-                  type="button"
-                  class="btn btn-primary w-100 font-size-13 fw-bold text-nowrap py-2 d-inline-flex align-items-center justify-content-center gap-1"
                   :disabled="cartStore.isEmpty"
+                  type="button"
+                  class="btn btn-light waves-effect fw-bold flex-nowrap d-flex align-items-center justify-content-center btn-lg border"
+                  @click="openSaveTabModal"
+                >
+                  <i class="bx bx-time fs-4 align-middle me-1"></i>
+                  Save as Open Bill
+                </button>
+                <button
+                  :disabled="cartStore.isEmpty"
+                  type="button"
+                  class="btn btn-primary waves-effect btn-lg fw-bold flex-grow-1 d-flex align-items-center justify-content-center"
                   @click="handleProceedToCheckout"
                 >
-                  <i class="bx bx-credit-card"></i>
-                  <span>Checkout</span>
+                  <i class="mdi mdi-check-all fs-4 align-middle me-1"></i>
+                  Complete Payment
                 </button>
               </div>
             </div>
@@ -589,6 +567,11 @@
       @new-sale="cartStore.clearCart"
     />
 
+    <SaveTabModal
+      ref="saveTabModalRef"
+      @tab-saved="onTabSaved"
+    />
+
     <!-- Shift Action Modal (reused from Shifts system) -->
     <ShiftActionModal @shift-updated="onShiftUpdated" />
   </div>
@@ -596,20 +579,27 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import productsApi from '@/api/products';
 import customersApi from '@/api/customers';
+import tabsApi from '@/api/tabs';
+import tablesApi from '@/api/tables';
 import { useCartStore } from '@/stores/cart';
 import { useShiftStore } from '@/stores/shift';
 
 import CustomerQuickModal from './components/CustomerQuickModal.vue';
 import PaymentModal from './components/PaymentModal.vue';
 import ReceiptModal from './components/ReceiptModal.vue';
+import SaveTabModal from './components/SaveTabModal.vue';
 import ShiftActionModal from '@/components/Shifts/ShiftActionModal.vue';
 
+const route = useRoute();
+const router = useRouter();
 const cartStore = useCartStore();
 const shiftStore = useShiftStore();
 
-const viewMode = ref('grid'); // 'grid' | 'compact' | 'list'
+const saveTabModalRef = ref(null);
+const viewMode = ref('grid'); // 'grid' | 'list'
 const searchQuery = ref('');
 const selectedCategory = ref('');
 const isLoadingProducts = ref(false);
@@ -661,79 +651,70 @@ const fetchProducts = async () => {
   isLoadingProducts.value = true;
   try {
     const res = await productsApi.list();
-    const rawData = res.data?.data || res.data || [];
-    products.value = rawData.map((p) => {
-      let catName = 'General';
-      if (p.category && typeof p.category === 'object' && p.category.name) {
-        catName = p.category.name;
-      } else if (typeof p.category === 'string' && p.category) {
-        catName = p.category;
-      } else if (p.category_name) {
-        catName = p.category_name;
-      }
+    const data = res.data?.data || res.data || [];
+    products.value = data.map((p) => ({
+      ...p,
+      name: p.name || p.productname,
+      selling_price: p.selling_price || p.sellingPrice || 0,
+      stock_on_hand: p.stock_on_hand ?? p.stockLevel ?? 0,
+      category_name: typeof p.category === 'object' && p.category !== null ? p.category.name : (p.category || 'Uncategorized'),
+    }));
 
-      return {
-        id: p.id,
-        name: p.name || p.productname,
-        sku: p.sku || '',
-        barcode: p.barcode || '',
-        selling_price: Number(p.selling_price || p.sellingPrice || 0),
-        stock_on_hand: p.stock_on_hand ?? p.stockLevel ?? 0,
-        image_url: p.image_url || p.image || null,
-        category: catName,
-        tax_rate: Number(p.tax_rate || 0),
-      };
-    });
-
-    // Extract categories
+    // Extract categories with counts
     const catMap = {};
-    products.value.forEach((p) => {
-      const cat = p.category || 'General';
+    for (const p of products.value) {
+      const cat = p.category_name || 'Uncategorized';
       catMap[cat] = (catMap[cat] || 0) + 1;
-    });
+    }
     categories.value = Object.keys(catMap).map((k) => ({ name: k, count: catMap[k] }));
   } catch (err) {
-    console.error('Error loading products for POS:', err);
+    console.error('Failed to load products:', err);
   } finally {
     isLoadingProducts.value = false;
   }
-};
-
-const handleSearch = () => {
-  // Reactive via computed
-};
-
-const clearSearch = () => {
-  searchQuery.value = '';
 };
 
 const selectCategory = (catName) => {
   selectedCategory.value = catName;
 };
 
+let searchDebounce = null;
+const handleSearchInput = () => {
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(() => {
+    // reactive filter handles it
+  }, 250);
+};
+
 const handleProductClick = (product) => {
   cartStore.addItem(product, 1);
 };
 
-// Customer Typeahead
-let searchTimeout = null;
+// Customer Selection Logic
+let customerSearchDebounce = null;
 const searchCustomers = () => {
-  clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(async () => {
-    if (!customerSearch.value.trim()) {
-      customersList.value = [];
-      return;
-    }
-    isSearchingCustomers.value = true;
+  clearTimeout(customerSearchDebounce);
+  if (!customerSearch.value.trim()) {
+    customersList.value = [];
+    return;
+  }
+  isSearchingCustomers.value = true;
+  customerSearchDebounce = setTimeout(async () => {
     try {
-      const res = await customersApi.list({ search: customerSearch.value.trim(), limit: 5 });
-      customersList.value = res.data?.data || res.data || [];
-    } catch (e) {
-      console.warn('Customer search failed:', e);
+      const res = await customersApi.list({ search: customerSearch.value.trim() });
+      const raw = res.data?.data || res.data || [];
+      customersList.value = raw.map((c) => ({
+        id: c.id,
+        name: `${c.first_name || ''} ${c.last_name || ''}`.trim() || c.name,
+        phone: c.phone,
+        loyalty_points: c.loyalty_points_balance || c.loyalty_points || 0,
+      }));
+    } catch (err) {
+      console.error('Failed searching customers:', err);
     } finally {
       isSearchingCustomers.value = false;
     }
-  }, 250);
+  }, 300);
 };
 
 const selectCustomer = (c) => {
@@ -769,14 +750,11 @@ const openShiftModal = () => {
 };
 
 const handleProceedToCheckout = () => {
-  // Check if cashier is on duty in an active shift
   if (!shiftStore.isOnDuty) {
-    // Intercept checkout: prompt to open or join shift without clearing cart!
     shiftStore.openModal();
     return;
   }
 
-  // Active shift confirmed: proceed directly to payment modal
   if (window.bootstrap) {
     const el = document.getElementById('paymentModal');
     if (el) {
@@ -790,8 +768,18 @@ const onShiftUpdated = () => {
   shiftStore.checkCurrentShift();
 };
 
-const handleSaveTabNotice = () => {
-  alert('Customer Tabs & Running Bills are scheduled for Phase 3. You can complete the sale directly or keep the cart ready.');
+const openSaveTabModal = () => {
+  saveTabModalRef.value?.open({
+    branchId: shiftStore.selectedBranchId || shiftStore.activeShift?.branch_id || 4,
+    shiftId: shiftStore.activeShift?.id || null,
+  });
+};
+
+const onTabSaved = (savedTab) => {
+  const viewTabs = confirm(`Tab ${savedTab.tab_number} (${savedTab.name}) saved successfully!\n\nWould you like to open the Open Tabs & Bills list?`);
+  if (viewTabs) {
+    router.push('/sell/tabs');
+  }
 };
 
 const onSaleCompleted = (order) => {
@@ -808,20 +796,63 @@ const onSaleCompleted = (order) => {
 onMounted(async () => {
   shiftStore.checkCurrentShift();
   fetchProducts();
+
+  if (route.query.tab_id) {
+    try {
+      const res = await tabsApi.get(route.query.tab_id);
+      if (res.data?.success && res.data?.data) {
+        cartStore.loadTab(res.data.data);
+      }
+    } catch (err) {
+      console.error('Failed to load tab from query:', err);
+    }
+  }
+
+  if (route.query.table_id) {
+    try {
+      const res = await tablesApi.list({ branch_id: shiftStore.selectedBranchId || 4 });
+      if (res.data?.success && res.data?.data) {
+        const found = res.data.data.find((t) => t.id === route.query.table_id);
+        if (found) {
+          cartStore.setTable(found);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load table from query:', err);
+    }
+  }
 });
 </script>
 
 <style scoped>
-.product-card {
-  transition: transform 0.12s ease, border-color 0.12s ease;
+.cart-container {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 transparent;
 }
-.product-card:hover {
-  border-color: #adb5bd;
+
+.cart-container::-webkit-scrollbar {
+  width: 6px;
 }
+
+.cart-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cart-container::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1;
+  border-radius: 10px;
+}
+
 .cursor-pointer {
   cursor: pointer;
 }
+
 .hover-bg:hover {
   background-color: #f8f9fa;
+}
+
+.category-scroll::-webkit-scrollbar {
+  display: none;
 }
 </style>
