@@ -260,11 +260,11 @@
                         <div class="text-start">
                           <div class="fw-bold fs-13 text-dark d-flex align-items-center gap-2">
                             Count Notes & Coins
-                            <span v-if="denominationsTotal > 0" class="badge bg-success-subtle text-success fs-10 px-2 py-0.5">
+                            <span v-if="denominationsTotal > 0" class="badge bg-success-subtle text-success fs-10 px-2 py-1">
                               KES {{ denominationsTotal.toLocaleString() }}
                             </span>
                           </div>
-                          <div class="text-muted fs-11 mt-0.5">
+                          <div class="text-muted fs-11 mt-1">
                             Breakdown by 1,000s, 500s, 200s, 100s, 50s & coins
                           </div>
                         </div>
@@ -272,7 +272,7 @@
 
                       <div class="d-flex align-items-center gap-2">
                         <span
-                          class="badge rounded-pill fs-11 px-2.5 py-1"
+                          class="badge rounded-pill fs-11 px-3 py-1"
                           :class="showDenominations ? 'bg-primary text-white' : 'bg-white text-secondary border'"
                         >
                           {{ showDenominations ? 'Collapse' : 'Count' }}
@@ -285,45 +285,45 @@
                   <!-- Denominations Grid (When Expanded) -->
                   <div
                     v-if="showDenominations"
-                    class="mt-3 p-3 p-sm-3.5 rounded-3 bg-white"
+                    class="mt-3 p-3 p-sm-4 rounded-3 bg-white"
                     style="border: 1px solid #e2e8f0 !important;"
                   >
-                    <div class="fw-bold text-dark fs-12 mb-3 d-flex justify-content-between align-items-center pb-2 border-bottom">
+                    <div class="fw-bold text-dark fs-12 mb-3 d-flex justify-content-between align-items-center pb-2 border-bottom" style="border-color: #eef0f4 !important;">
                       <span class="text-uppercase letter-spacing-1 fs-11 text-muted">Currency Breakdown</span>
                       <span class="text-success fw-bold fs-13">{{ formatMoney(denominationsTotal) }}</span>
                     </div>
 
-                    <div class="row g-2.5">
+                    <div class="row g-2 g-sm-3">
                       <div
                         v-for="note in noteDenominations"
                         :key="note.val"
                         class="col-6 col-sm-4"
                       >
                         <div
-                          class="p-2.5 rounded-3 text-center denomination-box d-flex flex-column justify-content-between h-100"
+                          class="p-2 p-sm-3 rounded-3 text-center denomination-box d-flex flex-column justify-content-between h-100"
                           :style="{ background: note.bg, border: '1px solid ' + note.borderColor + ' !important' }"
                         >
                           <div>
-                            <span class="fs-11 fw-bold text-dark d-block">KES {{ note.val }}</span>
+                            <span class="fs-12 fw-bold text-dark d-block">KES {{ note.val.toLocaleString() }}</span>
                           </div>
 
-                          <div class="d-flex align-items-center justify-content-center gap-2 my-2">
+                          <div class="d-flex align-items-center justify-content-center gap-2 my-2 py-1">
                             <button
                               type="button"
                               class="btn btn-sm btn-white bg-white border p-0 rounded-circle"
-                              style="width: 26px; height: 26px; line-height: 1;"
+                              style="width: 28px; height: 28px; line-height: 1; border-color: #e2e8f0 !important;"
                               @click="changeNoteCount(note.val, -1)"
                               :disabled="!denominations[note.val]"
                             >
                               -
                             </button>
-                            <span class="fw-bold fs-13 text-dark font-monospace" style="min-width: 22px;">
+                            <span class="fw-bold fs-14 text-dark font-monospace text-center" style="min-width: 24px;">
                               {{ denominations[note.val] || 0 }}
                             </span>
                             <button
                               type="button"
                               class="btn btn-sm btn-white bg-white border p-0 rounded-circle"
-                              style="width: 26px; height: 26px; line-height: 1;"
+                              style="width: 28px; height: 28px; line-height: 1; border-color: #e2e8f0 !important;"
                               @click="changeNoteCount(note.val, 1)"
                             >
                               +
@@ -339,19 +339,19 @@
                       <!-- Coins Tile with Subtle Border and Proper Spacing -->
                       <div class="col-6 col-sm-4">
                         <div
-                          class="p-2.5 rounded-3 text-center denomination-box d-flex flex-column justify-content-between h-100"
+                          class="p-2 p-sm-3 rounded-3 text-center denomination-box d-flex flex-column justify-content-between h-100"
                           style="background: #fafbfc; border: 1px solid #e2e8f0 !important;"
                         >
                           <div>
-                            <span class="fs-11 fw-bold text-dark d-flex align-items-center justify-content-center gap-1">
+                            <span class="fs-12 fw-bold text-dark d-flex align-items-center justify-content-center gap-1">
                               <Icon icon="ri:copper-coin-line" class="text-warning fs-13" />
                               Loose Coins
                             </span>
                           </div>
 
-                          <div class="my-1.5 px-1">
+                          <div class="my-2 py-0.5">
                             <div class="input-group input-group-sm">
-                              <span class="input-group-text bg-white border-end-0 px-1.5 fs-11 text-muted" style="border-color: #e2e8f0;">KES</span>
+                              <span class="input-group-text bg-white border-end-0 px-2 fs-11 text-muted" style="border-color: #e2e8f0;">KES</span>
                               <input
                                 type="number"
                                 class="form-control form-control-sm text-center fw-bold border-start-0 bg-white"
@@ -687,6 +687,7 @@ onMounted(async () => {
   border-color: #e2e8f0 !important;
 }
 .denomination-box {
+  min-height: 116px;
   transition: all 0.15s ease;
 }
 .letter-spacing-1 {
