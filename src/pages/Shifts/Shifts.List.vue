@@ -29,8 +29,8 @@
       </div>
     </div>
 
-    <!-- Important Shift Statistics Strip (Using project's built-in MetricCard) -->
-    <div class="metric-strip mb-3" role="tablist" aria-label="Shift statistics">
+    <!-- Key Shift Statistics Grid (Spanning full width across 4 columns) -->
+    <div class="shift-stats-grid mb-4" role="tablist" aria-label="Shift statistics">
       <MetricCard
         label="Active Shift"
         icon="ri:time-line"
@@ -1022,21 +1022,128 @@ onBeforeUnmount(() => {
   border: 1px solid #ced4da !important;
 }
 
-/* Strictly enforce zero drop shadows across project MetricCards */
-:deep(.metric-tile) {
-  box-shadow: none !important;
-  border-color: #ced4da !important;
+/* ==========================================================================
+   Responsive 4-column Stats Grid spanning full width (ZERO drop shadows)
+   ========================================================================== */
+.shift-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
 }
 
-:deep(.metric-tile.is-active) {
-  box-shadow: none !important;
-  border-color: #556ee6 !important;
-  background-color: #f7f8ff !important;
+@media (max-width: 991.98px) {
+  .shift-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
 }
 
-:deep(.metric-tile:hover) {
+@media (max-width: 575.98px) {
+  .shift-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* Ensure each metric tile fills its 1/4 column with balanced spacing & zero shadow */
+:deep(.shift-stats-grid .metric-tile) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  padding: 16px 18px !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  min-height: 114px !important;
+  transition: border-color 0.2s ease, background-color 0.2s ease !important;
+  cursor: pointer;
+  text-align: left !important;
+}
+
+:deep(.shift-stats-grid .metric-tile:hover) {
   transform: none !important;
   border-color: #a6b0cf !important;
+}
+
+:deep(.shift-stats-grid .metric-tile.is-active) {
+  border-color: #556ee6 !important;
+  background-color: #f7f8ff !important;
+  box-shadow: none !important;
+}
+
+/* Header: Label on the left, Icon on the right */
+:deep(.shift-stats-grid .metric-tile-head) {
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+  gap: 8px !important;
+  margin-bottom: 4px !important;
+}
+
+:deep(.shift-stats-grid .metric-tile-head > span:first-child) {
+  width: auto !important;
+}
+
+:deep(.shift-stats-grid .metric-tile-head > .metric-tile-label) {
+  flex-grow: 1 !important;
+  width: auto !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #74788d !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+:deep(.shift-stats-grid .metric-tile-icon) {
+  width: 36px !important;
+  height: 36px !important;
+  font-size: 20px !important;
+  border-radius: 6px !important;
+  background-color: #f8f9fa !important;
+  color: #495057 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+:deep(.shift-stats-grid .metric-tile.is-active .metric-tile-icon) {
+  background-color: #eef1fd !important;
+  color: #556ee6 !important;
+}
+
+/* Number: prominent typography */
+:deep(.shift-stats-grid .metric-tile-value) {
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  color: #2a3042 !important;
+  margin-top: 4px !important;
+  margin-bottom: 4px !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.2 !important;
+}
+
+/* Change / Subtitle: clean font, zero top margin */
+:deep(.shift-stats-grid .metric-tile-change) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 .shift-row:hover {
