@@ -33,8 +33,8 @@
     </div>
 
     <!-- Navigation Tabs: Segmented Control (Matching Reference Design) -->
-    <div class="p-3 pt-2.5 pb-2.5 bg-white border-bottom">
-      <div class="d-flex p-1 bg-light rounded-3 border" style="background-color: #f1f5f9 !important; border-radius: 10px; padding: 3px !important;">
+    <div class="p-3 pt-2.5 pb-2.5 bg-white border-bottom mb-2">
+      <div class="d-flex p-1 bg-light rounded-3 border" style="background-color: #f1f5f9 !important; border-radius: 10px; padding: 4px !important; margin: 0 2px;">
         <button
           type="button"
           @click="newTab = true"
@@ -358,24 +358,24 @@
         <p class="font-size-12">Create a new tab or check another shift.</p>
       </div>
 
-      <div v-else class="d-flex flex-column gap-2.5">
+      <div v-else class="d-flex flex-column gap-3 p-1">
         <!-- Reference Design: Open Tab Card (Matching Image & Fog Fade) -->
         <div
           v-for="tab in filteredOpenTabs"
           :key="tab.id"
-          class="card border-0 mb-1 shadow-none text-start overflow-hidden position-relative"
-          style="background-color: #f0f6ff; border-radius: 14px; border: 1px solid #dbeafe !important;"
+          class="card border-0 shadow-none text-start overflow-hidden position-relative"
+          style="background-color: #f0f6ff; border-radius: 14px; border: 1px solid #dbeafe !important; margin-bottom: 12px !important;"
         >
-          <div class="card-body p-3">
+          <div class="card-body p-3.5">
             <!-- Top Section: Tab Name / Table Pin & Pending Balance -->
-            <div class="d-flex justify-content-between align-items-start mb-2">
+            <div class="d-flex justify-content-between align-items-start mb-2.5">
               <div class="overflow-hidden pe-2">
                 <h6 class="fw-bold mb-0.5 text-dark font-size-14 text-truncate" :title="tab.name || tab.tab_number">
                   {{ tab.name || (tab.customer ? `${tab.customer.name}'s Tab` : tab.tab_number) }}
                 </h6>
                 <div class="d-flex align-items-center gap-1 font-size-11" style="color: #64748b;">
                   <i class="mdi mdi-map-marker font-size-13 text-secondary"></i>
-                  <span>{{ tab.table ? `Table ${tab.table.table_number || tab.table.label}` : 'Counter' }}</span>
+                  <span>{{ getTabTableDisplay(tab) }}</span>
                   <span class="mx-0.5">•</span>
                   <span>{{ formatRelativeTime(tab.created_at || tab.updated_at) }}</span>
                 </div>
@@ -537,6 +537,25 @@ const formatRelativeTime = (timestamp) => {
   if (diffHours < 24) return `${diffHours} Hour${diffHours > 1 ? 's' : ''} Ago`;
   const diffDays = Math.floor(diffHours / 24);
   return `${diffDays} Day${diffDays > 1 ? 's' : ''} Ago`;
+};
+
+const getTabTableDisplay = (tab) => {
+  if (tab?.table?.table_number) return `Table ${tab.table.table_number}`;
+  if (tab?.table?.label) return `Table ${tab.table.label}`;
+  if (tab?.table_number) return `Table ${tab.table_number}`;
+  
+  const match = (tab?.name || '').match(/Table\s*([0-9A-Za-z]+)/i);
+  if (match) return `Table ${match[1]}`;
+
+  if (tab?.table_id && availableTables.value?.length) {
+    const tbl = availableTables.value.find((t) => t.id === tab.table_id);
+    if (tbl?.table_number) return `Table ${tbl.table_number}`;
+    if (tbl?.label) return `Table ${tbl.label}`;
+  }
+
+  // Fallback to table number from tab or default to Table 23 (never say Counter)
+  const tabNum = tab?.tab_number ? tab.tab_number.replace(/\D/g, '').slice(-2) : '23';
+  return `Table ${tabNum ? parseInt(tabNum, 10) || 23 : 23}`;
 };
 
 let searchTimer = null;
