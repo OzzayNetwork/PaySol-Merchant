@@ -139,11 +139,58 @@
 
               <!-- Product Grid Cards Body -->
               <div class="card-body">
-                <div v-if="isLoadingProducts" class="row">
-                  <div class="col-12 text-center py-5">
-                    <div class="spinner-border text-primary spinner-border-sm mb-2" role="status"></div>
-                    <p class="text-muted font-size-13 mb-0">Loading products...</p>
+                <!-- SKELETON LOADERS (Grid View) -->
+                <div v-if="isLoadingProducts && viewMode === 'grid'" class="row">
+                  <div
+                    v-for="(_, i) in skeletonRows"
+                    :key="i"
+                    class="col-6 col-sm-6 col-md-6 col-lg-4 col-xl-3 mb-4 position-relative"
+                  >
+                    <div class="p-3 bg-light rounded border w-100 h-100 d-flex flex-column justify-content-between">
+                      <div>
+                        <div
+                          style="height: 160px;"
+                          class="img-cont d-flex align-items-center justify-content-center overflow-hidden rounded w-100 bg-white"
+                        >
+                          <SkeletonLoader type="text" :lines="1" height="150px" width="100%" class="mx-0" />
+                        </div>
+                      </div>
+                      <div class="pt-3">
+                        <SkeletonLoader type="text" :lines="1" height="14px" width="85%" class="mx-0 mb-2" />
+                        <SkeletonLoader type="text" :lines="1" height="10px" width="55%" class="mx-0 mb-3" />
+                        <div class="d-flex align-items-center justify-content-between">
+                          <SkeletonLoader type="text" :lines="1" height="16px" width="40%" class="mx-0" />
+                          <SkeletonLoader type="text" :lines="1" height="12px" width="35%" class="mx-0" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
+                </div>
+
+                <!-- SKELETON LOADERS (List View) -->
+                <div v-else-if="isLoadingProducts && viewMode === 'list'" class="table-responsive">
+                  <table class="table table-hover align-middle mb-0 font-size-13">
+                    <thead class="table-light">
+                      <tr>
+                        <th style="width: 50px;"></th>
+                        <th>Product</th>
+                        <th>SKU / Barcode</th>
+                        <th>Stock</th>
+                        <th class="text-end">Price</th>
+                        <th class="text-center" style="width: 140px;">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(_, i) in skeletonRows" :key="i">
+                        <td><SkeletonLoader type="text" :lines="1" height="36px" width="36px" class="mx-0 rounded" /></td>
+                        <td><SkeletonLoader type="text" :lines="1" height="14px" width="140px" class="mx-0" /></td>
+                        <td><SkeletonLoader type="text" :lines="1" height="12px" width="90px" class="mx-0" /></td>
+                        <td><SkeletonLoader type="text" :lines="1" height="12px" width="60px" class="mx-0" /></td>
+                        <td class="text-end"><SkeletonLoader type="text" :lines="1" height="14px" width="70px" class="ms-auto" /></td>
+                        <td class="text-center"><SkeletonLoader type="text" :lines="1" height="28px" width="90px" class="mx-auto rounded" /></td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
 
                 <div v-else-if="filteredProducts.length === 0" class="row">
@@ -503,6 +550,7 @@ import ReceiptModal from './components/ReceiptModal.vue';
 import SaveTabAside from './components/SaveTabAside.vue';
 import ShiftActionModal from '@/components/Shifts/ShiftActionModal.vue';
 import HeaderAlertBanner from '@/components/HeaderAlertBanner.vue';
+import SkeletonLoader from '@/components/Loaders/SkeletonLoader.vue';
 import emptyCart from '@/assets/images/icons/POS/empty-cart.svg';
 import emptyImage from '@/assets/images/icons/packaging.svg';
 
@@ -512,6 +560,7 @@ const cartStore = useCartStore();
 const shiftStore = useShiftStore();
 
 const isTabAsideOpen = ref(false);
+const skeletonRows = Array.from({ length: 8 });
 const viewMode = ref('grid'); // 'grid' | 'list'
 const searchQuery = ref('');
 const selectedCategory = ref('');
