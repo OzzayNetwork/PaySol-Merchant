@@ -6,16 +6,16 @@
     :aria-labelledby="`${modalId}Label`"
     aria-hidden="true"
   >
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
       <div class="modal-content rounded-4 border border-light-subtle bg-white shadow-none overflow-hidden" v-if="customerData">
-        <!-- Top Soft Pastel Banner (Inspired by reference images) -->
+        <!-- Top Soft Pastel Banner -->
         <div
-          class="px-3 pt-2.5 pb-4 d-flex align-items-center justify-content-between position-relative"
-          style="height: 84px; background: linear-gradient(135deg, rgba(85, 110, 230, 0.12) 0%, rgba(80, 165, 241, 0.16) 100%);"
+          class="px-4 pt-3 pb-4 d-flex align-items-center justify-content-between position-relative"
+          style="height: 104px; background: linear-gradient(135deg, rgba(85, 110, 230, 0.12) 0%, rgba(80, 165, 241, 0.16) 100%);"
         >
           <!-- Customer Identifier Chip -->
-          <span class="badge rounded-pill bg-white text-muted border font-monospace font-size-11 px-2.5 py-1">
-            <i class="bx bx-id-card me-1 text-primary"></i>{{ customerData.customer_number || 'CUST-PROFILE' }}
+          <span class="badge rounded-pill bg-white text-secondary border font-monospace font-size-11 px-3 py-1.5 shadow-none">
+            <i class="bx bx-id-card me-1.5 text-primary"></i>{{ customerData.customer_number || 'CUST-PROFILE' }}
           </span>
 
           <!-- Close Button -->
@@ -28,18 +28,18 @@
         </div>
 
         <!-- Centered Circular Avatar with Verified Standing Badge -->
-        <div class="position-relative d-inline-block mx-auto text-center" style="margin-top: -38px;">
+        <div class="position-relative d-inline-block mx-auto text-center" style="margin-top: -46px; margin-bottom: 12px;">
           <div
-            class="d-flex align-items-center justify-content-center rounded-circle bg-primary text-white fw-bold font-size-22"
-            style="width: 72px; height: 72px; border: 4px solid #ffffff; background-color: #556ee6;"
+            class="d-flex align-items-center justify-content-center rounded-circle bg-primary text-white fw-bold font-size-24"
+            style="width: 82px; height: 82px; border: 4px solid #ffffff; background-color: #556ee6;"
           >
             {{ getInitials(customerData.name) }}
           </div>
 
-          <!-- Verified / Standing Tick on Avatar (References 1, 2, 3) -->
+          <!-- Verified / Standing Tick on Avatar -->
           <span
             class="position-absolute d-flex align-items-center justify-content-center rounded-circle text-white"
-            style="width: 22px; height: 22px; bottom: 0; right: 0; border: 2.5px solid #ffffff; font-size: 11px;"
+            style="width: 24px; height: 24px; bottom: 2px; right: 2px; border: 2.5px solid #ffffff; font-size: 12px;"
             :class="{
               'bg-secondary': riskTier === 'new',
               'bg-info': riskTier === 'reliable',
@@ -61,63 +61,66 @@
         </div>
 
         <!-- Identity Block -->
-        <div class="px-4 pt-2 pb-1 text-center">
-          <h5 class="fw-bold font-size-17 text-dark mb-1 text-truncate" :id="`${modalId}Label`" :title="customerData.name">
+        <div class="px-4 text-center">
+          <h5 class="fw-bold font-size-19 text-dark mb-1 text-truncate" :id="`${modalId}Label`" :title="customerData.name">
             {{ customerData.name }}
           </h5>
 
-          <!-- Subtitle: Classification Pill & Contact -->
-          <div class="d-flex align-items-center justify-content-center gap-1.5 flex-wrap">
+          <!-- Subtitle: Classification Pill & Entity Type -->
+          <div class="d-flex align-items-center justify-content-center gap-2 mb-2 flex-wrap">
             <span
-              class="badge rounded-pill font-size-11 px-2.5 py-0.5 d-inline-flex align-items-center gap-1"
+              class="badge rounded-pill font-size-11 px-3 py-1 d-inline-flex align-items-center gap-1.5"
               :class="riskBadgeClass"
             >
               <i :class="riskIconClass"></i>
               <span>{{ riskTierLabel }}</span>
             </span>
 
-            <span class="badge rounded-pill bg-light text-secondary border font-size-11 px-2.5 py-0.5 text-capitalize">
+            <span class="badge rounded-pill bg-light text-secondary border font-size-11 px-2.5 py-1 text-capitalize">
               {{ customerData.customer_type || 'individual' }}
             </span>
           </div>
 
-          <div class="text-muted font-size-12 mt-1.5 text-truncate">
+          <!-- Contact Details -->
+          <div class="text-muted font-size-12 d-flex align-items-center justify-content-center gap-3 text-truncate mb-3.5">
             <span v-if="customerData.phone"><i class="bx bx-phone me-1"></i>{{ customerData.phone }}</span>
-            <span v-if="customerData.phone && customerData.email"> • </span>
+            <span v-if="customerData.phone && customerData.email" class="text-black-50">•</span>
             <span v-if="customerData.email"><i class="bx bx-envelope me-1"></i>{{ customerData.email }}</span>
           </div>
         </div>
 
-        <!-- 3-Column Clean Stat Strip (Inspired by References 1, 2, 4) -->
-        <div class="bg-light-subtle border border-light-subtle rounded-3 py-2 px-3 mx-4 my-2.5 d-flex justify-content-around text-center">
-          <div>
-            <div class="font-size-16 fw-bold text-dark lh-1">{{ customerData.bills_issued_count || 0 }}</div>
-            <div class="font-size-11 text-muted mt-1">Total Bills</div>
-          </div>
-          <div class="border-end border-light-subtle"></div>
-          <div>
-            <div class="font-size-16 fw-bold text-success lh-1">{{ promptSettlementRate }}%</div>
-            <div class="font-size-11 text-muted mt-1">Prompt Pay</div>
-          </div>
-          <div class="border-end border-light-subtle"></div>
-          <div>
-            <div class="font-size-16 fw-bold text-primary lh-1">{{ (customerData.loyalty_points || 0).toLocaleString() }}</div>
-            <div class="font-size-11 text-muted mt-1 text-capitalize">{{ customerData.loyalty_tier || 'Bronze' }} Points</div>
+        <!-- 3-Column Clean Stat Strip (Capsule) -->
+        <div class="px-4 mb-3.5">
+          <div class="bg-light rounded-4 py-3 px-3 d-flex justify-content-around text-center border-0">
+            <div class="flex-fill">
+              <div class="font-size-17 fw-bold text-dark lh-1 mb-1.5">{{ customerData.bills_issued_count || 0 }}</div>
+              <div class="font-size-11 text-muted text-uppercase tracking-wider fw-medium">Total Bills</div>
+            </div>
+            <div class="border-end border-light-subtle my-1"></div>
+            <div class="flex-fill">
+              <div class="font-size-17 fw-bold text-success lh-1 mb-1.5">{{ promptSettlementRate }}%</div>
+              <div class="font-size-11 text-muted text-uppercase tracking-wider fw-medium">Prompt Pay</div>
+            </div>
+            <div class="border-end border-light-subtle my-1"></div>
+            <div class="flex-fill">
+              <div class="font-size-17 fw-bold text-primary lh-1 mb-1.5">{{ (customerData.loyalty_points || 0).toLocaleString() }}</div>
+              <div class="font-size-11 text-muted text-uppercase tracking-wider text-capitalize fw-medium">{{ customerData.loyalty_tier || 'Bronze' }} Pts</div>
+            </div>
           </div>
         </div>
 
-        <!-- Milestone Progress Section (Inspired by References 5 & 6) -->
-        <div class="px-4 mb-3 text-start">
-          <div class="d-flex justify-content-between align-items-center mb-1 font-size-12">
-            <span class="fw-semibold text-dark">
-              <i class="mdi mdi-trending-up text-primary me-1"></i>
+        <!-- Milestone Progress Section -->
+        <div class="px-4 mb-3.5 text-start">
+          <div class="d-flex justify-content-between align-items-center mb-1.5 font-size-12">
+            <span class="fw-semibold text-dark d-flex align-items-center gap-1.5">
+              <i class="mdi mdi-trending-up text-primary"></i>
               Milestone: {{ trustMilestone.targetTier }}
             </span>
-            <span class="text-muted font-size-11">
+            <span class="text-muted font-size-11 font-monospace">
               {{ trustMilestone.currentCount }} / {{ trustMilestone.requiredCount }} bills
             </span>
           </div>
-          <div class="progress" style="height: 5px; border-radius: 10px; background-color: #edf2f7;">
+          <div class="progress rounded-pill" style="height: 7px; background-color: #f1f3f5;">
             <div
               class="progress-bar rounded-pill"
               :class="trustMilestone.barClass"
@@ -128,25 +131,25 @@
               aria-valuemax="100"
             ></div>
           </div>
-          <p class="text-muted font-size-11 mt-1 mb-0 lh-sm">
-            <i class="bx bx-info-circle text-primary me-0.5"></i>
-            {{ trustMilestone.advice }}
+          <p class="d-flex align-items-start gap-1.5 text-muted font-size-11 mt-2 mb-0 lh-sm">
+            <i class="bx bx-info-circle text-primary flex-shrink-0 mt-0.5"></i>
+            <span>{{ trustMilestone.advice }}</span>
           </p>
         </div>
 
-        <!-- Account Standing & Specifications Details (Clean Flat Card) -->
-        <div class="px-4 mb-3">
+        <!-- Account Standing & Specifications Details -->
+        <div class="px-4 mb-4">
           <div class="border border-light-subtle rounded-3 p-3 bg-light-subtle font-size-12 text-start">
             <!-- Credit & Outstanding Debt -->
-            <div class="d-flex justify-content-between align-items-center pb-2 mb-2 border-bottom border-light-subtle">
+            <div class="d-flex justify-content-between align-items-center pb-2.5 mb-2.5 border-bottom border-light-subtle">
               <div>
-                <span class="text-muted d-block font-size-11">Approved Credit Limit</span>
-                <span class="fw-bold text-dark font-size-13">{{ formatMoney(customerData.credit_limit || 0) }}</span>
+                <span class="text-muted d-block font-size-11 mb-0.5">Approved Credit Limit</span>
+                <span class="fw-bold text-dark font-size-14">{{ formatMoney(customerData.credit_limit || 0) }}</span>
               </div>
               <div class="text-end">
-                <span class="text-muted d-block font-size-11">Outstanding Balance</span>
+                <span class="text-muted d-block font-size-11 mb-0.5">Outstanding Balance</span>
                 <span
-                  class="fw-bold font-size-13"
+                  class="fw-bold font-size-14"
                   :class="(customerData.outstanding_balance || 0) > 0 ? 'text-danger' : 'text-success'"
                 >
                   {{ formatMoney(customerData.outstanding_balance || 0) }}
@@ -155,34 +158,30 @@
             </div>
 
             <!-- Policy Guidance Strip -->
-            <div class="d-flex align-items-start gap-1.5 mb-2 font-size-11 text-muted">
-              <i class="mdi mdi-shield-outline text-primary mt-0.5 flex-shrink-0"></i>
-              <span><strong>Policy:</strong> {{ riskRecommendation.message }}</span>
-            </div>
-
-            <!-- KRA PIN (relocated here cleanly) -->
-            <div v-if="customerData.tax_pin" class="d-flex align-items-center justify-content-between py-1.5 border-top border-light-subtle font-size-11">
-              <span class="text-muted">KRA Tax PIN:</span>
-              <span class="font-monospace fw-bold text-dark">{{ customerData.tax_pin }}</span>
+            <div class="p-2.5 rounded bg-white border border-light-subtle d-flex align-items-start gap-2 font-size-11 text-muted">
+              <i class="mdi mdi-shield-check-outline text-primary mt-0.5 flex-shrink-0 fs-6"></i>
+              <div class="lh-sm">
+                <strong class="text-dark">Policy:</strong> {{ riskRecommendation.message }}
+              </div>
             </div>
 
             <!-- Delivery Location (if available) -->
-            <div v-if="defaultAddress" class="d-flex align-items-start gap-1.5 pt-1.5 border-top border-light-subtle font-size-11 text-muted">
-              <i class="bx bx-map-pin text-primary mt-0.5 flex-shrink-0"></i>
-              <div>
+            <div v-if="defaultAddress" class="d-flex align-items-start gap-2 pt-2.5 mt-2.5 border-top border-light-subtle font-size-11 text-muted">
+              <i class="bx bx-map-pin text-primary mt-0.5 flex-shrink-0 fs-6"></i>
+              <div class="lh-sm">
                 <strong class="text-dark">{{ defaultAddress.building || defaultAddress.estate_area || 'Delivery Destination' }}:</strong>
                 <span class="ms-1">{{ [defaultAddress.street, defaultAddress.estate_area, defaultAddress.town_city, defaultAddress.county].filter(Boolean).join(', ') }}</span>
-                <span v-if="defaultAddress.additional_directions" class="d-block fst-italic">"{{ defaultAddress.additional_directions }}"</span>
+                <span v-if="defaultAddress.additional_directions" class="d-block fst-italic mt-0.5">"{{ defaultAddress.additional_directions }}"</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Footer Action Button (Inspired by Reference 1) -->
-        <div class="px-4 pb-4 pt-1">
+        <!-- Footer Action Button -->
+        <div class="px-4 pb-4 pt-0">
           <button
             type="button"
-            class="btn btn-outline-secondary btn-sm rounded-pill w-100 py-2 fw-semibold font-size-12"
+            class="btn btn-outline-secondary btn-sm rounded-pill w-100 py-2.5 fw-semibold font-size-13 shadow-none border-light-subtle"
             data-bs-dismiss="modal"
           >
             Close Profile
