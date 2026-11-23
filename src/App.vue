@@ -34,6 +34,9 @@ const authStore = useAuthStore();
     <SideBar />
 
     <div class="main-content">
+      <!-- Direct header alert strip under the fixed header (matching Admin reference on /test-page) -->
+      <div id="main-content-alert-slot" class="main-content-alert-slot"></div>
+
       <div class="page-content">
         <div class="container-fluid">
           <router-view />
@@ -49,3 +52,17 @@ const authStore = useAuthStore();
     <SessionTimeoutModal />
   </div>
 </template>
+
+<style scoped>
+.main-content-alert-slot:empty {
+  display: none;
+}
+
+.main-content-alert-slot:not(:empty) {
+  margin-top: 70px;
+}
+
+.main-content-alert-slot:not(:empty) + .page-content {
+  padding-top: 24px;
+}
+</style>

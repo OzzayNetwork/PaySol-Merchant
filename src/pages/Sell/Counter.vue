@@ -1,9 +1,8 @@
 <template>
-  <div class="container-fluid">
-    <!-- Operational Shift Alert Banner (matching HeaderAlertBanner underneath the header) -->
+  <!-- Operational Shift Alert Banner (Teleported directly underneath the header, matching reference on /test-page) -->
+  <Teleport to="#main-content-alert-slot">
     <HeaderAlertBanner
       v-if="!shiftStore.isOnDuty"
-      class="rounded border my-3"
       tone="warning"
       label="Shift Required"
       icon="mdi:alert-outline"
@@ -16,7 +15,6 @@
 
     <HeaderAlertBanner
       v-else
-      class="rounded border my-3"
       tone="success"
       label="Counter Active"
       icon="mdi:check-circle-outline"
@@ -26,7 +24,9 @@
       action-icon="mdi:cog-outline"
       @action="openShiftModal"
     />
+  </Teleport>
 
+  <div class="container-fluid">
     <!-- Main Layout: Row 8 cols (Products) + 4 cols (Cart) -->
     <div class="row justify-content-center">
       <div class="col-12">
