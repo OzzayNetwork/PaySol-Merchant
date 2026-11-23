@@ -175,115 +175,137 @@
             </div>
           </div>
 
-          <!-- Selected Customer Card (Clickable to view Classification & Progress Modal) -->
+          <!-- Selected Customer Card (Clean Modern Profile Card matching reference design) -->
           <div
             v-if="selectedCustomer"
-            class="border border-dark-subtle bg-light-subtle rounded-3 mb-3 cursor-pointer user-select-none"
-            style="padding: 10px 14px;"
-            role="button"
-            title="Click to view customer classification and progress"
-            @click="openCustomerProfileModal"
+            class="card border border-light-subtle rounded-4 overflow-hidden mb-3 bg-white text-center shadow-none"
           >
-            <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
-              <div class="d-flex align-items-center gap-2 overflow-hidden">
-                <!-- Avatar -->
-                <div class="position-relative flex-shrink-0">
-                  <div
-                    class="d-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary fw-bold font-size-12 border border-primary-subtle"
-                    style="width: 34px; height: 34px;"
-                  >
-                    {{ getInitials(selectedCustomer.name) }}
-                  </div>
-                </div>
-
-                <!-- Info -->
-                <div class="overflow-hidden">
-                  <div class="d-flex align-items-center gap-1.5 flex-nowrap">
-                    <h6 class="text-truncate font-size-13 mb-0 text-dark fw-bold" :title="selectedCustomer.name">
-                      {{ selectedCustomer.name }}
-                    </h6>
-                    <span class="badge bg-white text-primary border font-size-10 px-1 py-0 flex-shrink-0" title="Click to view classification & progress">
-                      <i class="mdi mdi-open-in-new font-size-10 me-0.5"></i>Profile
-                    </span>
-                  </div>
-                  <div class="text-truncate text-muted font-size-11 d-flex align-items-center gap-1 mt-0.5 flex-wrap">
-                    <span>{{ selectedCustomer.phone || 'No phone' }}</span>
-                    <span>•</span>
-                    <span class="text-capitalize">{{ selectedCustomer.loyalty_tier || 'Bronze' }}</span>
-                    <span v-if="selectedCustomer.loyalty_points">({{ selectedCustomer.loyalty_points }} pts)</span>
-                    <template v-if="selectedCustomer.last_visit_at">
-                      <span>•</span>
-                      <span>Seen {{ new Date(selectedCustomer.last_visit_at).toLocaleDateString() }}</span>
-                    </template>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Risk Badge & Clear Button -->
-              <div class="d-flex align-items-center gap-1 flex-shrink-0">
-                <span
-                  class="badge rounded-pill font-size-11 px-2 py-1 d-inline-flex align-items-center gap-1"
+            <!-- Top Subtle Pastel/Gradient Cover Banner -->
+            <div
+              class="px-3 pt-2 pb-3 d-flex align-items-center justify-content-between position-relative"
+              style="height: 48px; background: linear-gradient(135deg, rgba(85, 110, 230, 0.12) 0%, rgba(80, 165, 241, 0.12) 100%);"
+            >
+              <span
+                class="badge rounded-pill font-size-10 px-2 py-0.5 d-inline-flex align-items-center gap-1"
+                :class="{
+                  'bg-secondary text-white': selectedCustomer.risk_tier === 'new',
+                  'bg-info text-white': selectedCustomer.risk_tier === 'reliable',
+                  'bg-success text-white': selectedCustomer.risk_tier === 'trusted',
+                  'bg-warning text-dark': selectedCustomer.risk_tier === 'watch',
+                  'bg-danger text-white': selectedCustomer.risk_tier === 'high_risk',
+                  'bg-secondary text-white': !['new','reliable','trusted','watch','high_risk'].includes(selectedCustomer.risk_tier)
+                }"
+              >
+                <i
                   :class="{
-                    'bg-secondary-subtle text-secondary border': selectedCustomer.risk_tier === 'new',
-                    'bg-success-subtle text-success': selectedCustomer.risk_tier === 'trusted',
-                    'bg-info-subtle text-info': selectedCustomer.risk_tier === 'reliable',
-                    'bg-warning-subtle text-warning-emphasis': selectedCustomer.risk_tier === 'watch',
-                    'bg-danger-subtle text-danger': selectedCustomer.risk_tier === 'high_risk',
-                    'bg-light text-muted border': !['new','trusted','reliable','watch','high_risk'].includes(selectedCustomer.risk_tier)
+                    'mdi mdi-clock-outline': selectedCustomer.risk_tier === 'new',
+                    'mdi mdi-check-circle': selectedCustomer.risk_tier === 'reliable',
+                    'mdi mdi-check-decagram': selectedCustomer.risk_tier === 'trusted',
+                    'mdi mdi-alert-outline': selectedCustomer.risk_tier === 'watch',
+                    'mdi mdi-alert-octagon': selectedCustomer.risk_tier === 'high_risk'
                   }"
-                >
-                  <i
-                    :class="{
-                      'mdi mdi-account-clock-outline': selectedCustomer.risk_tier === 'new',
-                      'mdi mdi-shield-check': selectedCustomer.risk_tier === 'trusted',
-                      'mdi mdi-information-outline': selectedCustomer.risk_tier === 'reliable',
-                      'mdi mdi-alert-outline text-dark opacity-75': selectedCustomer.risk_tier === 'watch',
-                      'mdi mdi-alert-octagon': selectedCustomer.risk_tier === 'high_risk',
-                      'mdi mdi-help-circle-outline': !['new','trusted','reliable','watch','high_risk'].includes(selectedCustomer.risk_tier)
-                    }"
-                  ></i>
-                  <span>
-                    {{
-                      { new: 'New', trusted: 'Trusted', reliable: 'Reliable', watch: 'Watch', high_risk: 'High risk' }[selectedCustomer.risk_tier] || 'New'
-                    }}
-                  </span>
-                </span>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-link text-muted p-0 font-size-16 line-height-1 text-decoration-none ms-1"
-                  title="Remove customer"
-                  @click.stop="clearSelectedCustomer"
-                >
-                  <i class="bx bx-x"></i>
-                </button>
-              </div>
+                ></i>
+                <span>{{ { new: 'New', reliable: 'Reliable', trusted: 'Trusted', watch: 'Watch', high_risk: 'Blocked' }[selectedCustomer.risk_tier] || 'New' }}</span>
+              </span>
+
+              <button
+                type="button"
+                class="btn btn-sm btn-white bg-white rounded-circle p-0 d-flex align-items-center justify-content-center text-muted shadow-sm border"
+                style="width: 24px; height: 24px;"
+                title="Change customer"
+                @click="clearSelectedCustomer"
+              >
+                <i class="bx bx-x fs-5"></i>
+              </button>
             </div>
 
-            <!-- Compact Recommendation Strip -->
-            <div
-              class="d-flex align-items-start gap-1.5 py-1 px-2 rounded border-start border-3 font-size-11"
-              :class="{
-                'border-secondary bg-light text-secondary': selectedCustomer.risk_tier === 'new',
-                'border-success bg-success-subtle text-success': selectedCustomer.risk_tier === 'trusted',
-                'border-info bg-info-subtle text-info': selectedCustomer.risk_tier === 'reliable',
-                'border-warning bg-warning-subtle text-dark': selectedCustomer.risk_tier === 'watch',
-                'border-danger bg-danger-subtle text-danger': selectedCustomer.risk_tier === 'high_risk'
-              }"
-            >
-              <i
-                class="fs-6 mt-0.5 flex-shrink-0"
-                :class="{
-                  'mdi mdi-account-clock-outline': selectedCustomer.risk_tier === 'new',
-                  'mdi mdi-shield-check': selectedCustomer.risk_tier === 'trusted',
-                  'mdi mdi-information-outline': selectedCustomer.risk_tier === 'reliable',
-                  'mdi mdi-alert-outline text-dark opacity-75': selectedCustomer.risk_tier === 'watch',
-                  'mdi mdi-alert-octagon': selectedCustomer.risk_tier === 'high_risk'
-                }"
-              ></i>
-              <div class="lh-sm">
-                <span class="fw-semibold text-dark">{{ getCustomerRecommendation(selectedCustomer).title }}:</span>
-                <span class="text-muted ms-1">{{ getCustomerRecommendation(selectedCustomer).message }}</span>
+            <!-- Overlapping Centered Circular Avatar -->
+            <div class="position-relative d-inline-block mx-auto" style="margin-top: -26px;">
+              <div
+                class="d-flex align-items-center justify-content-center rounded-circle bg-primary text-white fw-bold font-size-16"
+                style="width: 52px; height: 52px; border: 3px solid #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.08);"
+              >
+                {{ getInitials(selectedCustomer.name) }}
               </div>
+              <!-- Verified Standing Tick Badge on Avatar (as seen in references) -->
+              <span
+                class="position-absolute d-flex align-items-center justify-content-center rounded-circle text-white"
+                style="width: 18px; height: 18px; bottom: 0; right: -2px; border: 2px solid #ffffff; font-size: 10px;"
+                :class="{
+                  'bg-secondary': selectedCustomer.risk_tier === 'new',
+                  'bg-info': selectedCustomer.risk_tier === 'reliable',
+                  'bg-success': selectedCustomer.risk_tier === 'trusted',
+                  'bg-warning': selectedCustomer.risk_tier === 'watch',
+                  'bg-danger': selectedCustomer.risk_tier === 'high_risk'
+                }"
+              >
+                <i
+                  :class="{
+                    'bx bx-time-five': selectedCustomer.risk_tier === 'new',
+                    'bx bx-check': ['reliable', 'trusted'].includes(selectedCustomer.risk_tier),
+                    'bx bx-error': selectedCustomer.risk_tier === 'watch',
+                    'bx bx-block': selectedCustomer.risk_tier === 'high_risk'
+                  }"
+                ></i>
+              </span>
+            </div>
+
+            <!-- Name & Subtitle -->
+            <div class="px-3 pt-1.5 pb-3">
+              <h6 class="fw-bold font-size-14 text-dark mb-0 text-truncate" :title="selectedCustomer.name">
+                {{ selectedCustomer.name }}
+              </h6>
+              <p class="text-muted font-size-11 mb-2 text-truncate">
+                <span class="text-capitalize">{{ selectedCustomer.customer_type || 'Individual' }}</span>
+                <span v-if="selectedCustomer.phone"> • {{ selectedCustomer.phone }}</span>
+              </p>
+
+              <!-- 3 Clean Stat Tiles (Reference 1 & 2) -->
+              <div class="bg-light-subtle border border-light-subtle rounded-3 py-1.5 px-2 mb-2.5 d-flex justify-content-around text-center">
+                <div>
+                  <div class="font-size-13 fw-bold text-dark lh-1">{{ selectedCustomer.bills_issued_count || 0 }}</div>
+                  <div class="font-size-10 text-muted mt-0.5">Bills</div>
+                </div>
+                <div class="border-end border-light-subtle"></div>
+                <div>
+                  <div class="font-size-13 fw-bold text-success lh-1">{{ promptSettlementRate }}%</div>
+                  <div class="font-size-10 text-muted mt-0.5">Prompt</div>
+                </div>
+                <div class="border-end border-light-subtle"></div>
+                <div>
+                  <div class="font-size-13 fw-bold text-primary lh-1">{{ selectedCustomer.loyalty_points || 0 }}</div>
+                  <div class="font-size-10 text-muted mt-0.5">Points</div>
+                </div>
+              </div>
+
+              <!-- Sleek Progress Bar to Next Tier (Reference 5 & 6) -->
+              <div class="mb-3 px-1 text-start font-size-11">
+                <div class="d-flex justify-content-between align-items-center mb-1 text-muted" style="font-size: 10px;">
+                  <span>Next: <strong class="text-dark">{{ trustMilestone.targetTier }}</strong></span>
+                  <span>{{ trustMilestone.currentCount }}/{{ trustMilestone.requiredCount }}</span>
+                </div>
+                <div class="progress" style="height: 4px; border-radius: 10px;">
+                  <div
+                    class="progress-bar rounded-pill"
+                    :class="trustMilestone.barClass"
+                    role="progressbar"
+                    :style="{ width: `${trustMilestone.percent}%` }"
+                    :aria-valuenow="trustMilestone.percent"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  ></div>
+                </div>
+              </div>
+
+              <!-- Clean View Profile Pill Button (Reference 1) -->
+              <button
+                type="button"
+                class="btn btn-outline-primary btn-sm rounded-pill w-100 font-size-12 fw-semibold py-1.5 d-flex align-items-center justify-content-center gap-1.5"
+                @click="openCustomerProfileModal"
+              >
+                <i class="bx bx-user-circle font-size-15"></i>
+                <span>View Profile & Progress</span>
+              </button>
             </div>
           </div>
 
@@ -612,6 +634,74 @@ const getCustomerRecommendation = (c) => {
     message: 'Established settlement record. Standard checkout and open tab limits apply.'
   };
 };
+
+const promptSettlementRate = computed(() => {
+  const c = selectedCustomer.value;
+  if (!c) return 0;
+  const issued = c.bills_issued_count || 0;
+  const prompt = c.bills_paid_promptly || 0;
+  if (issued === 0) return 0;
+  return Math.round((prompt / issued) * 100);
+});
+
+const trustMilestone = computed(() => {
+  const c = selectedCustomer.value;
+  if (!c) return { targetTier: 'Reliable Regular', requiredCount: 3, currentCount: 0, percent: 0, barClass: 'bg-info' };
+  const count = c.bills_issued_count || 0;
+  const tier = c.risk_tier || 'new';
+
+  if (tier === 'high_risk') {
+    return {
+      targetTier: 'Good Standing',
+      requiredCount: count || 1,
+      currentCount: 0,
+      percent: 0,
+      barClass: 'bg-danger'
+    };
+  }
+
+  if (tier === 'watch') {
+    return {
+      targetTier: 'Reliable Regular',
+      requiredCount: 3,
+      currentCount: Math.min(count, 3),
+      percent: 33,
+      barClass: 'bg-warning'
+    };
+  }
+
+  if (tier === 'new') {
+    const required = 3;
+    const current = Math.min(count, required);
+    return {
+      targetTier: 'Reliable Regular',
+      requiredCount: required,
+      currentCount: current,
+      percent: Math.round((current / required) * 100),
+      barClass: 'bg-info'
+    };
+  }
+
+  if (tier === 'reliable') {
+    const required = 10;
+    const current = Math.min(count, required);
+    return {
+      targetTier: 'Trusted VIP',
+      requiredCount: required,
+      currentCount: current,
+      percent: Math.round((current / required) * 100),
+      barClass: 'bg-success'
+    };
+  }
+
+  return {
+    targetTier: 'VIP Standing',
+    requiredCount: count,
+    currentCount: count,
+    percent: 100,
+    barClass: 'bg-success'
+  };
+});
 
 const filteredOpenTabs = computed(() => {
   if (!existingTabFilter.value.trim()) return openTabs.value;
