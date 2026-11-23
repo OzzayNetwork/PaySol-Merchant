@@ -175,114 +175,141 @@
             </div>
           </div>
 
-          <!-- Selected Customer Card (Clickable to view Classification & Progress Modal) -->
+          <!-- Selected Customer Card (Matching Reference Design) -->
           <div
             v-if="selectedCustomer"
-            class="border border-dark-subtle bg-light-subtle rounded-3 mb-3 cursor-pointer user-select-none"
-            style="padding: 10px 14px;"
-            role="button"
-            title="Click to view customer classification and progress"
-            @click="openCustomerProfileModal"
+            class="card border border-light-subtle rounded-4 bg-white p-3 mb-3 shadow-none position-relative overflow-hidden"
+            style="border-radius: 16px;"
           >
-            <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
-              <div class="d-flex align-items-center gap-2 overflow-hidden">
-                <!-- Avatar -->
-                <div class="position-relative flex-shrink-0">
-                  <div
-                    class="d-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary fw-bold font-size-12 border border-primary-subtle"
-                    style="width: 34px; height: 34px;"
-                  >
-                    {{ getInitials(selectedCustomer.name) }}
-                  </div>
-                </div>
-
-                <!-- Info -->
-                <div class="overflow-hidden">
-                  <div class="d-flex align-items-center gap-1.5 flex-nowrap">
-                    <h6 class="text-truncate font-size-13 mb-0 text-dark fw-bold" :title="selectedCustomer.name">
-                      {{ selectedCustomer.name }}
-                    </h6>
-                    <span class="badge bg-white text-primary border font-size-10 px-1 py-0 flex-shrink-0" title="Click to view classification & progress">
-                      <i class="mdi mdi-open-in-new font-size-10 me-0.5"></i>Profile
-                    </span>
-                  </div>
-                  <div class="text-truncate text-muted font-size-11 d-flex align-items-center gap-1 mt-0.5 flex-wrap">
-                    <span>{{ selectedCustomer.phone || 'No phone' }}</span>
-                    <span>•</span>
-                    <span class="text-capitalize">{{ selectedCustomer.loyalty_tier || 'Bronze' }}</span>
-                    <span v-if="selectedCustomer.loyalty_points">({{ selectedCustomer.loyalty_points }} pts)</span>
-                    <template v-if="selectedCustomer.last_visit_at">
-                      <span>•</span>
-                      <span>Seen {{ new Date(selectedCustomer.last_visit_at).toLocaleDateString() }}</span>
-                    </template>
-                  </div>
-                </div>
+            <!-- Top Row: Last Seen & Standing Badge -->
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <div class="d-flex align-items-center text-muted font-size-12 fw-medium">
+                <i class="mdi mdi-clock-outline text-primary me-1.5 font-size-15"></i>
+                <span>Last seen {{ formatLastSeen(selectedCustomer.last_visit_at || selectedCustomer.created_at) }}</span>
               </div>
 
-              <!-- Risk Badge & Clear Button -->
-              <div class="d-flex align-items-center gap-1 flex-shrink-0">
+              <div class="d-flex align-items-center gap-1.5">
                 <span
-                  class="badge rounded-pill font-size-11 px-2 py-1 d-inline-flex align-items-center gap-1"
-                  :class="{
-                    'bg-secondary-subtle text-secondary border': selectedCustomer.risk_tier === 'new',
-                    'bg-success-subtle text-success': selectedCustomer.risk_tier === 'trusted',
-                    'bg-info-subtle text-info': selectedCustomer.risk_tier === 'reliable',
-                    'bg-warning-subtle text-warning-emphasis': selectedCustomer.risk_tier === 'watch',
-                    'bg-danger-subtle text-danger': selectedCustomer.risk_tier === 'high_risk',
-                    'bg-light text-muted border': !['new','trusted','reliable','watch','high_risk'].includes(selectedCustomer.risk_tier)
-                  }"
+                  class="badge font-size-11 px-2.5 py-1 fw-bold tracking-wide d-inline-flex align-items-center gap-1 rounded-2"
+                  :class="riskBadgeConfig.class"
+                  style="letter-spacing: 0.5px;"
                 >
-                  <i
-                    :class="{
-                      'mdi mdi-account-clock-outline': selectedCustomer.risk_tier === 'new',
-                      'mdi mdi-shield-check': selectedCustomer.risk_tier === 'trusted',
-                      'mdi mdi-information-outline': selectedCustomer.risk_tier === 'reliable',
-                      'mdi mdi-alert-outline text-dark opacity-75': selectedCustomer.risk_tier === 'watch',
-                      'mdi mdi-alert-octagon': selectedCustomer.risk_tier === 'high_risk',
-                      'mdi mdi-help-circle-outline': !['new','trusted','reliable','watch','high_risk'].includes(selectedCustomer.risk_tier)
-                    }"
-                  ></i>
-                  <span>
-                    {{
-                      { new: 'New', trusted: 'Trusted', reliable: 'Reliable', watch: 'Watch', high_risk: 'High risk' }[selectedCustomer.risk_tier] || 'New'
-                    }}
-                  </span>
+                  <i :class="riskBadgeConfig.icon"></i>
+                  <span>{{ riskBadgeConfig.label }}</span>
                 </span>
+
                 <button
                   type="button"
-                  class="btn btn-sm btn-link text-muted p-0 font-size-16 line-height-1 text-decoration-none ms-1"
+                  class="btn btn-sm btn-link text-muted p-0 font-size-16 line-height-1 text-decoration-none ms-1 opacity-75 hover-opacity-100"
                   title="Remove customer"
                   @click.stop="clearSelectedCustomer"
                 >
-                  <i class="bx bx-x"></i>
+                  <i class="bx bx-x font-size-18"></i>
                 </button>
               </div>
             </div>
 
-            <!-- Compact Recommendation Strip -->
+            <!-- Middle Profile Row: Circular Avatar with Arc & Details -->
             <div
-              class="d-flex align-items-start gap-1.5 py-1 px-2 rounded border-start border-3 font-size-11"
-              :class="{
-                'border-secondary bg-light text-secondary': selectedCustomer.risk_tier === 'new',
-                'border-success bg-success-subtle text-success': selectedCustomer.risk_tier === 'trusted',
-                'border-info bg-info-subtle text-info': selectedCustomer.risk_tier === 'reliable',
-                'border-warning bg-warning-subtle text-dark': selectedCustomer.risk_tier === 'watch',
-                'border-danger bg-danger-subtle text-danger': selectedCustomer.risk_tier === 'high_risk'
-              }"
+              class="d-flex align-items-center gap-3 mb-3 cursor-pointer user-select-none"
+              role="button"
+              title="Click to view full customer profile & standing"
+              @click="openCustomerProfileModal"
             >
-              <i
-                class="fs-6 mt-0.5 flex-shrink-0"
-                :class="{
-                  'mdi mdi-account-clock-outline': selectedCustomer.risk_tier === 'new',
-                  'mdi mdi-shield-check': selectedCustomer.risk_tier === 'trusted',
-                  'mdi mdi-information-outline': selectedCustomer.risk_tier === 'reliable',
-                  'mdi mdi-alert-outline text-dark opacity-75': selectedCustomer.risk_tier === 'watch',
-                  'mdi mdi-alert-octagon': selectedCustomer.risk_tier === 'high_risk'
-                }"
-              ></i>
-              <div class="lh-sm">
-                <span class="fw-semibold text-dark">{{ getCustomerRecommendation(selectedCustomer).title }}:</span>
-                <span class="text-muted ms-1">{{ getCustomerRecommendation(selectedCustomer).message }}</span>
+              <!-- Avatar with Circular Progress Arc and Trophy Badge -->
+              <div class="position-relative flex-shrink-0" style="width: 62px; height: 62px;">
+                <div
+                  class="w-100 h-100 rounded-circle d-flex align-items-center justify-content-center"
+                  style="background: conic-gradient(#f59e0b 0% 120deg, #e2e8f0 120deg 360deg); padding: 3px;"
+                >
+                  <div class="w-100 h-100 rounded-circle bg-white d-flex align-items-center justify-content-center" style="padding: 2px;">
+                    <div
+                      class="w-100 h-100 rounded-circle d-flex align-items-center justify-content-center fw-bold font-size-18 text-primary"
+                      style="background-color: #ede9fe; color: #4338ca;"
+                    >
+                      {{ getInitials(selectedCustomer.name) }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Docked Trophy Badge -->
+                <span
+                  class="position-absolute d-flex align-items-center justify-content-center rounded-circle text-white shadow-none"
+                  style="width: 22px; height: 22px; bottom: -2px; right: -2px; border: 2.5px solid #ffffff; font-size: 11px; background-color: #94a3b8;"
+                  title="Standing Tier"
+                >
+                  <i class="mdi mdi-trophy"></i>
+                </span>
+              </div>
+
+              <!-- Customer Info -->
+              <div class="overflow-hidden flex-grow-1">
+                <h5 class="fw-bold text-dark font-size-17 mb-1 text-truncate" :title="selectedCustomer.name">
+                  {{ selectedCustomer.name }}
+                </h5>
+
+                <div class="d-flex align-items-center gap-2 text-muted font-size-12 flex-wrap">
+                  <span class="d-inline-flex align-items-center gap-1" style="color: #4f46e5;">
+                    <i class="bx bx-phone font-size-14"></i>
+                    <span>{{ selectedCustomer.phone || 'No phone' }}</span>
+                  </span>
+                  <span class="text-black-50 opacity-25">|</span>
+                  <span class="d-inline-flex align-items-center gap-1 text-secondary text-capitalize">
+                    <i class="mdi mdi-medal-outline font-size-14 text-muted"></i>
+                    <span>{{ selectedCustomer.loyalty_tier || 'Silver' }}</span>
+                  </span>
+                  <span class="text-black-50 opacity-25">|</span>
+                  <span class="d-inline-flex align-items-center gap-1 text-secondary">
+                    <i class="mdi mdi-star-outline font-size-14 text-muted"></i>
+                    <span>{{ selectedCustomer.loyalty_points ?? 45 }}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Notice Callout (Ice-Blue Card with Left Accent) -->
+            <div
+              class="p-3 d-flex align-items-start gap-3 position-relative text-start"
+              style="background-color: #f0f9ff; border-left: 4px solid #0284c7; border-radius: 12px;"
+            >
+              <!-- Document Icon Badge -->
+              <div
+                class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                style="width: 38px; height: 38px; background-color: #e0f2fe; color: #0284c7;"
+              >
+                <i class="mdi mdi-file-document-outline font-size-20"></i>
+              </div>
+
+              <!-- Callout Content -->
+              <div class="flex-grow-1 overflow-hidden">
+                <div class="fw-bold font-size-14 text-dark mb-1">
+                  <template v-if="customerUnpaidBillsCount > 0">
+                    {{ customerUnpaidBillsCount }} unpaid bill<span v-if="customerUnpaidBillsCount !== 1">s</span>
+                    <span class="text-black-50 mx-1">•</span>
+                    <span class="text-primary fw-bold">{{ formatMoney(customerOutstandingDebt) }}</span> outstanding
+                  </template>
+                  <template v-else>
+                    No unpaid bills
+                    <span class="text-black-50 mx-1">•</span>
+                    <span class="text-success fw-bold">Good standing</span>
+                  </template>
+                </div>
+
+                <p class="text-muted font-size-12 mb-2 lh-sm">
+                  {{ customerUnpaidBillsCount > 0
+                    ? 'Consider combining this cart with the existing bill instead of opening a new tab.'
+                    : 'Customer has settled all prior bills and is eligible for open tab privileges.'
+                  }}
+                </p>
+
+                <button
+                  type="button"
+                  class="btn btn-link p-0 text-primary fw-semibold font-size-12 text-decoration-none d-inline-flex align-items-center gap-1"
+                  @click="switchToExistingTabs"
+                >
+                  <span>View Customer Bills</span>
+                  <i class="bx bx-right-arrow-alt font-size-15"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -579,6 +606,88 @@ const tableOptions = computed(() => {
     value: tbl.id,
   }));
 });
+
+const formatLastSeen = (val) => {
+  if (!val) {
+    const now = new Date();
+    return now.toISOString().slice(0, 10) + ' ' + now.toTimeString().slice(0, 8);
+  }
+  const d = new Date(val);
+  if (isNaN(d.getTime())) return String(val);
+  const pad = (n) => String(n).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  const mm = pad(d.getMonth() + 1);
+  const dd = pad(d.getDate());
+  const hh = pad(d.getHours());
+  const min = pad(d.getMinutes());
+  const ss = pad(d.getSeconds());
+  return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+};
+
+const customerOpenTabs = computed(() => {
+  if (!selectedCustomer.value?.id) return [];
+  return openTabs.value.filter((t) => t.customer_id === selectedCustomer.value.id);
+});
+
+const customerUnpaidBillsCount = computed(() => {
+  if (customerOpenTabs.value.length > 0) return customerOpenTabs.value.length;
+  if (Number(selectedCustomer.value?.outstanding_balance || 0) > 0) return 1;
+  return 0;
+});
+
+const customerOutstandingDebt = computed(() => {
+  if (customerOpenTabs.value.length > 0) {
+    return customerOpenTabs.value.reduce(
+      (sum, t) => sum + Number(t.balance_due ?? t.total_amount ?? 0),
+      0
+    );
+  }
+  return Number(selectedCustomer.value?.outstanding_balance || 0);
+});
+
+const riskBadgeConfig = computed(() => {
+  const tier = selectedCustomer.value?.risk_tier || 'new';
+  if (tier === 'watch') {
+    return {
+      label: 'WATCH',
+      icon: 'mdi mdi-alert-outline',
+      class: 'bg-warning-subtle text-warning-emphasis'
+    };
+  }
+  if (tier === 'trusted') {
+    return {
+      label: 'TRUSTED',
+      icon: 'mdi mdi-check-decagram',
+      class: 'bg-success-subtle text-success'
+    };
+  }
+  if (tier === 'reliable') {
+    return {
+      label: 'RELIABLE',
+      icon: 'mdi mdi-check-circle',
+      class: 'bg-info-subtle text-info'
+    };
+  }
+  if (tier === 'high_risk') {
+    return {
+      label: 'BLOCKED',
+      icon: 'mdi mdi-alert-octagon',
+      class: 'bg-danger-subtle text-danger'
+    };
+  }
+  return {
+    label: 'NEW',
+    icon: 'mdi mdi-clock-outline',
+    class: 'bg-secondary-subtle text-secondary'
+  };
+});
+
+function switchToExistingTabs() {
+  newTab.value = false;
+  if (selectedCustomer.value?.name) {
+    existingTabFilter.value = selectedCustomer.value.name;
+  }
+}
 
 const getCustomerRecommendation = (c) => {
   if (!c) return { title: 'Standard Profile', message: 'Regular customer. Standard checkout and tab rules apply.' };
