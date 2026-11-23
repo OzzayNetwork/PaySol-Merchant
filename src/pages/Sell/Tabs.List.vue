@@ -457,11 +457,13 @@
 import { ref, computed, onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { useCartStore } from "@/stores/cart";
+import { useShiftStore } from "@/stores/shift";
 import tabsApi from "@/api/tabs";
 import shiftsApi from "@/api/shifts";
 
 const router = useRouter();
 const cartStore = useCartStore();
+const shiftStore = useShiftStore();
 
 const tabs = ref([]);
 const isLoading = ref(false);

@@ -411,7 +411,7 @@
           <!-- Save as Tab — primary action -->
           <button
             type="submit"
-            :disabled="!isDirty || saving"
+            :disabled="!canSave || saving"
             class="btn btn-primary waves-effect btn-lg fw-bold flex-grow-1"
           >
             <span v-if="saving" class="spinner-border spinner-border-sm me-2" role="status"></span>
@@ -783,6 +783,8 @@ async function saveTab() {
     const res = await tabsApi.open(payload);
     const openedTab = res.data?.data || res.data;
 
+    await loadOpenTabs();
+
     // Close offcanvas
     closeOffcanvas();
 
@@ -858,15 +860,36 @@ watch(
   }
 );
 
+function handleOffcanvasShow() {
+  loadCustomers();
+  loadTables();
+  loadOpenTabs();
+  if (cartStore.customer) {
+    selectCustomer(cartStore.customer);
+  }
+  if (cartStore.table) {
+    form.value.table_id = cartStore.table.id;
+  }
+}
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
   loadCustomers();
   loadTables();
   loadOpenTabs();
+
+  const asideEl = document.getElementById('saveTabAside');
+  if (asideEl) {
+    asideEl.addEventListener('show.bs.offcanvas', handleOffcanvasShow);
+  }
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside);
+  const asideEl = document.getElementById('saveTabAside');
+  if (asideEl) {
+    asideEl.removeEventListener('show.bs.offcanvas', handleOffcanvasShow);
+  }
 });
 </script>
 
