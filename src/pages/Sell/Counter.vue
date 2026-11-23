@@ -658,6 +658,7 @@ import SelectedCustomerCard from './components/SelectedCustomerCard.vue';
 import PaymentModal from './components/PaymentModal.vue';
 import ReceiptModal from './components/ReceiptModal.vue';
 import SaveTabAside from './components/SaveTabAside.vue';
+import SellingAside from './components/SellingAside.vue';
 import HeaderAlertBanner from '@/components/HeaderAlertBanner.vue';
 import SkeletonLoader from '@/components/Loaders/SkeletonLoader.vue';
 import emptyCart from '@/assets/images/icons/POS/empty-cart.svg';

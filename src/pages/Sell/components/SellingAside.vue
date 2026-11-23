@@ -553,7 +553,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useShiftStore } from '@/stores/shift';
 import salesApi from '@/api/sales';
 import paymentMethodsApi from '@/api/paymentMethods';
-import GoogleLocationInput from '@/components/inputs/GoogleLocationInput.vue';
+import GoogleLocationInput from '@/components/GoogleLocationInput.vue';
 import GoogleMapPreview from '@/components/GoogleMapPreview.vue';
 import SelectedCustomerCard from './SelectedCustomerCard.vue';
 import CustomerProfileModal from './CustomerProfileModal.vue';

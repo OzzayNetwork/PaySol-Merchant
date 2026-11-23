@@ -38,28 +38,30 @@
       <button type="button" class="btn-close text-reset d-none" data-bs-dismiss="offcanvas"></button>
     </div>
 
-    <!-- Navigation Tabs: New vs Existing Tab -->
-    <div class="offcanvas-header border-bottom p-0">
-      <ul class="nav nav-tabs nav-tabs-custom nav-justified w-100" role="tablist">
-        <li @click="newTab = true" class="nav-item cursor-pointer" role="presentation">
-          <a
-            class="nav-link py-3 cursor-pointer"
-            :class="newTab ? 'active bg-primary-muted fw-bold' : ''"
-          >
-            <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
-            <span class="d-none d-sm-block">New Tab/Bill</span>
-          </a>
-        </li>
-        <li @click="newTab = false" class="nav-item cursor-pointer" role="presentation">
-          <a
-            class="nav-link py-3 cursor-pointer"
-            :class="!newTab ? 'active bg-primary-muted fw-bold' : ''"
-          >
-            <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
-            <span class="d-none d-sm-block">Existing Tab/Bill ({{ openTabs.length }})</span>
-          </a>
-        </li>
-      </ul>
+    <!-- Navigation Tabs: New vs Existing Tab (1:1 Reference Design) -->
+    <div class="offcanvas-header border-bottom p-0 bg-white">
+      <div class="d-flex w-100" role="tablist">
+        <button
+          type="button"
+          @click="newTab = true"
+          class="btn py-3 flex-fill text-center rounded-0 font-size-13 fw-semibold border-0 transition-all shadow-none"
+          :style="newTab
+            ? 'background-color: #dbeafe; color: #1d4ed8; border-bottom: 3px solid #2563eb !important; font-weight: 700;'
+            : 'background-color: #ffffff; color: #475569;'"
+        >
+          New Tab/Bill
+        </button>
+        <button
+          type="button"
+          @click="newTab = false"
+          class="btn py-3 flex-fill text-center rounded-0 font-size-13 fw-semibold border-0 transition-all shadow-none"
+          :style="!newTab
+            ? 'background-color: #dbeafe; color: #1d4ed8; border-bottom: 3px solid #2563eb !important; font-weight: 700;'
+            : 'background-color: #ffffff; color: #475569;'"
+        >
+          Existing Tab/Bill ({{ openTabs.length }})
+        </button>
+      </div>
     </div>
 
     <!-- Offcanvas Body: NEW TAB -->
@@ -356,37 +358,99 @@
         <p class="font-size-13">Create a new tab or check another shift.</p>
       </div>
 
-      <div v-else class="d-flex flex-column gap-2">
+      <div v-else class="d-flex flex-column gap-3">
+        <!-- Reference Design: Open Tab Card (100% Match) -->
         <div
           v-for="tab in filteredOpenTabs"
           :key="tab.id"
-          class="card border mb-2 shadow-none"
+          class="card border-0 mb-2 shadow-none text-start overflow-hidden"
+          style="background-color: #f0f7ff; border-radius: 14px; border: 1px solid #e0effe !important;"
         >
           <div class="card-body p-3">
+            <!-- Top Section: Tab Name/Table & Pending Amount -->
             <div class="d-flex justify-content-between align-items-start mb-2">
-              <div>
-                <h6 class="fw-bold mb-0 text-dark">{{ tab.name || tab.tab_number }}</h6>
-                <small class="text-muted font-size-12">
-                  {{ tab.table ? `Table ${tab.table.table_number}` : 'No Table' }} ·
-                  {{ tab.customer ? tab.customer.name : 'Walk-in' }}
-                </small>
+              <div class="overflow-hidden pe-2">
+                <h6 class="fw-bold mb-0.5 text-dark font-size-15 text-truncate" :title="tab.name || tab.tab_number">
+                  {{ tab.name || (tab.customer ? `${tab.customer.name}'s Tab` : tab.tab_number) }}
+                </h6>
+                <div class="font-size-12" style="color: #64748b;">
+                  {{ tab.table ? `Table Number ${tab.table.table_number || tab.table.label}` : (tab.customer?.name || 'Walk-in') }}
+                </div>
               </div>
-              <span class="badge bg-warning font-size-11">OPEN</span>
+              <div class="text-end flex-shrink-0">
+                <div class="fw-bold font-size-15" style="color: #10b981;">
+                  KES {{ Number(tab.total_amount || tab.pending_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) }}
+                </div>
+                <div class="font-size-11" style="color: #64748b;">Pending Amount</div>
+              </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <span class="text-muted font-size-12">{{ tab.active_items_count || (tab.items ? tab.items.length : 0) }} items</span>
-              <span class="fw-bold font-size-14 text-dark">{{ formatMoney(tab.total_amount) }}</span>
-            </div>
-
-            <button
-              type="button"
-              class="btn btn-sm btn-outline-primary w-100 fw-bold"
-              :disabled="saving || cartItemsCount === 0"
-              @click="appendToExistingTab(tab)"
+            <!-- Middle Section: Itemized List with Dot Leaders -->
+            <div
+              v-if="tab.items && tab.items.length > 0"
+              class="d-flex flex-column gap-1.5 my-3 font-size-12"
+              style="color: #334155;"
             >
-              <i class="bx bx-plus me-1"></i> Append Cart ({{ cartItemsCount }} items) to this Tab
-            </button>
+              <div
+                v-for="(item, idx) in (expandedTabs[tab.id] ? tab.items : tab.items.slice(0, 3))"
+                :key="item.id || idx"
+                class="d-flex align-items-baseline"
+              >
+                <span class="text-nowrap me-1">
+                  {{ idx + 1 }}. {{ item.item_name || item.name || 'Item' }}
+                  <span v-if="item.quantity" class="text-muted">({{ Number(item.quantity) }})</span>
+                </span>
+                <!-- Dot leader connecting item name and price -->
+                <span
+                  class="flex-grow-1 border-bottom border-dotted mx-1 mb-1"
+                  style="border-style: dotted !important; border-color: #cbd5e1 !important; border-bottom-width: 1.5px !important;"
+                ></span>
+                <span class="text-nowrap fw-semibold text-end" style="color: #0f172a; min-width: 48px;">
+                  {{ Number(item.total_amount ?? (Number(item.unit_price || 0) * Number(item.quantity || 1))).toFixed(2) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Fallback if no item details loaded -->
+            <div
+              v-else
+              class="my-2.5 py-1 text-muted font-size-12 fst-italic"
+            >
+              <span>{{ tab.active_items_count || 0 }} item(s) on tab</span>
+            </div>
+
+            <!-- Action Button: Append Cart to this Tab -->
+            <div class="my-3">
+              <button
+                type="button"
+                class="btn w-100 fw-semibold font-size-13 py-2 text-dark bg-white shadow-none"
+                style="border: 1.5px solid #0f172a; border-radius: 8px;"
+                :disabled="saving || cartItemsCount === 0"
+                @click="appendToExistingTab(tab)"
+              >
+                Append Cart ({{ cartItemsCount }} items) to this Tab
+              </button>
+            </div>
+
+            <!-- Bottom Row: Show More ⌵ & Relative Time -->
+            <div class="d-flex justify-content-between align-items-center font-size-12 pt-1" style="color: #64748b;">
+              <div>
+                <button
+                  v-if="tab.items && tab.items.length > 3"
+                  type="button"
+                  class="btn btn-link p-0 fw-semibold font-size-12 text-decoration-none text-dark d-inline-flex align-items-center gap-1 shadow-none"
+                  @click="toggleExpandTab(tab.id)"
+                >
+                  <span>{{ expandedTabs[tab.id] ? 'Show Less ⌃' : 'Show More ⌵' }}</span>
+                </button>
+                <span v-else class="fw-semibold text-dark cursor-pointer" role="button" @click="toggleExpandTab(tab.id)">
+                  Show More ⌵
+                </span>
+              </div>
+              <div>
+                {{ formatRelativeTime(tab.created_at || tab.updated_at) }}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -447,6 +511,26 @@ const existingTabFilter = ref('');
 const showCustomerDropdown = ref(false);
 const loadingCustomers = ref(false);
 const loadingOpenTabs = ref(false);
+const expandedTabs = ref({});
+
+const toggleExpandTab = (tabId) => {
+  expandedTabs.value[tabId] = !expandedTabs.value[tabId];
+};
+
+const formatRelativeTime = (timestamp) => {
+  if (!timestamp) return 'Just now';
+  const now = new Date();
+  const date = new Date(timestamp);
+  if (isNaN(date.getTime())) return 'Recently';
+  const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (diffSec < 60) return 'Just now';
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin} Min Ago`;
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `${diffHours} Hour${diffHours > 1 ? 's' : ''} Ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays} Day${diffDays > 1 ? 's' : ''} Ago`;
+};
 
 let searchTimer = null;
 
