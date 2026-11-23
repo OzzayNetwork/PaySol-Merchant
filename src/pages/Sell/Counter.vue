@@ -110,6 +110,15 @@
                         </button>
                       </div>
 
+                      <router-link
+                        to="/sell/tabs"
+                        class="btn btn-outline-primary waves-effect d-flex align-items-center gap-1.5 fw-semibold font-size-13"
+                        title="View Open Tabs & Bills"
+                      >
+                        <i class="mdi mdi-receipt-text-outline fs-5"></i>
+                        <span class="d-none d-md-inline">Open Tabs</span>
+                      </router-link>
+
                       <button
                         type="button"
                         class="btn btn-light waves-effect"

@@ -544,13 +544,18 @@ async function fetchTabs() {
       currentShift.value = shiftRes.data.shift;
       branchId.value = currentShift.value.branch_id;
     } else {
-      branchId.value = 4; // Cleo's Kitchen default fallback
+      branchId.value =
+        shiftStore.selectedBranchId ||
+        (shiftStore.branches?.length ? (shiftStore.branches.find((b) => b.is_main)?.id || shiftStore.branches[0].id) : null) ||
+        null;
     }
 
     const params = {
-      branch_id: branchId.value,
       status: statusFilter.value,
     };
+    if (branchId.value) {
+      params.branch_id = branchId.value;
+    }
     if (searchQuery.value) {
       params.search = searchQuery.value;
     }

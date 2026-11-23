@@ -661,7 +661,14 @@ async function loadTables() {
 async function loadOpenTabs() {
   try {
     loadingOpenTabs.value = true;
-    const res = await tabsApi.list({ status: 'open' });
+    const branchId =
+      shiftStore.activeShift?.branch_id ||
+      shiftStore.selectedBranchId ||
+      (shiftStore.branches?.length ? (shiftStore.branches.find((b) => b.is_main)?.id || shiftStore.branches[0].id) : null) ||
+      null;
+    const params = { status: 'open' };
+    if (branchId) params.branch_id = branchId;
+    const res = await tabsApi.list(params);
     openTabs.value = res.data?.data || [];
   } catch (err) {
     console.error('Failed to load open tabs:', err);
