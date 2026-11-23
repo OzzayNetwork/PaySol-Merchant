@@ -502,6 +502,8 @@ import { Icon } from "@iconify/vue";
 import { useShiftStore } from "@/stores/shift";
 import currency from "@/utils/currency";
 
+const emit = defineEmits(["shift-updated", "shift-opened", "shift-joined"]);
+
 const shiftStore = useShiftStore();
 
 const submitting = ref(false);
@@ -637,7 +639,10 @@ async function handleOpenShift() {
   const result = await shiftStore.openShift(payload);
   submitting.value = false;
 
-  if (!result.success) {
+  if (result.success) {
+    emit("shift-updated", result.data);
+    emit("shift-opened", result.data);
+  } else {
     errorMessage.value = result.error;
   }
 }
@@ -648,7 +653,10 @@ async function handleJoinShift() {
   const result = await shiftStore.joinActiveShift();
   submitting.value = false;
 
-  if (!result.success) {
+  if (result.success) {
+    emit("shift-updated", result.data);
+    emit("shift-joined", result.data);
+  } else {
     errorMessage.value = result.error;
   }
 }

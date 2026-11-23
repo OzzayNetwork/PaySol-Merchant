@@ -81,7 +81,13 @@ export const useShiftStore = defineStore("shift", {
         this.isJoined = true;
         this.isLead = true;
         this.myRole = "lead";
+        if (payload.branch_id) {
+          this.selectedBranchId = payload.branch_id;
+        } else if (data.shift?.branch?.id) {
+          this.selectedBranchId = data.shift.branch.id;
+        }
         this.isModalOpen = false;
+        await this.checkCurrentShift(this.selectedBranchId);
         return { success: true, data };
       } catch (err) {
         const msg =
@@ -105,7 +111,11 @@ export const useShiftStore = defineStore("shift", {
         this.hasActiveShift = true;
         this.isJoined = true;
         this.myRole = "member";
+        if (this.activeShift?.branch?.id) {
+          this.selectedBranchId = this.activeShift.branch.id;
+        }
         this.isModalOpen = false;
+        await this.checkCurrentShift(this.selectedBranchId);
         return { success: true, data };
       } catch (err) {
         const msg =

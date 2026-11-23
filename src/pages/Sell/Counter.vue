@@ -1,8 +1,38 @@
 <template>
   <!-- Operational Shift Alert Banner (Teleported directly underneath the header, matching reference on /test-page) -->
   <Teleport to="#main-content-alert-slot">
+    <!-- State 1: Active Shift & Cashier On Duty -->
     <HeaderAlertBanner
-      v-if="!shiftStore.isOnDuty"
+      v-if="shiftStore.isOnDuty"
+      tone="success"
+      label="Counter Active"
+      icon="mdi:check-circle-outline"
+      :title="`Active Shift ${shiftStore.activeShiftNumber}`"
+      :message="`Branch: ${currentBranchName} · Float: ${formatMoney(shiftStore.openingFloat)} · ${shiftStore.activeMembersCount} cashier${shiftStore.activeMembersCount === 1 ? '' : 's'} on duty`"
+      action-label="Shift Details"
+      action-icon="mdi:cog-outline"
+      @action="openShiftModal"
+    />
+
+    <!-- State 2: Active Shift Running in Branch, Cashier can Join -->
+    <HeaderAlertBanner
+      v-else-if="shiftStore.hasActiveShift"
+      tone="info"
+      label="Counter Open"
+      icon="mdi:account-arrow-right-outline"
+      :title="`Shift ${shiftStore.activeShiftNumber} Active`"
+      :message="`Shift is currently open for ${currentBranchName} (Float: ${formatMoney(shiftStore.openingFloat)} · ${shiftStore.activeMembersCount} staff active). Join this shift to ring up sales under your name.`"
+      action-label="Join Counter Shift"
+      action-icon="mdi:login"
+      :busy="isJoiningShift"
+      @action="handleDirectJoinShift"
+      details-label="Shift Details"
+      @details="openShiftModal"
+    />
+
+    <!-- State 3: No Active Shift Running -->
+    <HeaderAlertBanner
+      v-else
       tone="warning"
       label="Shift Required"
       icon="mdi:alert-outline"
@@ -10,18 +40,6 @@
       message="You can browse products and prepare your cart, but an active shift is required before completing checkout."
       action-label="Open Counter Shift"
       action-icon="mdi:key-outline"
-      @action="openShiftModal"
-    />
-
-    <HeaderAlertBanner
-      v-else
-      tone="success"
-      label="Counter Active"
-      icon="mdi:check-circle-outline"
-      :title="`Active Shift ${shiftStore.activeShiftNumber}`"
-      :message="`Branch: ${currentBranchName} · Float: KES ${Number(shiftStore.openingFloat).toLocaleString()} · ${shiftStore.activeMembersCount} cashier${shiftStore.activeMembersCount === 1 ? '' : 's'} on duty`"
-      action-label="Shift Details"
-      action-icon="mdi:cog-outline"
       @action="openShiftModal"
     />
   </Teleport>
@@ -528,9 +546,6 @@
       :is-tab-aside-open="isTabAsideOpen"
       @saved="onTabSaved"
     />
-
-    <!-- Shift Action Modal (reused from Shifts system) -->
-    <ShiftActionModal @shift-updated="onShiftUpdated" />
   </div>
 </template>
 
@@ -548,7 +563,6 @@ import CustomerQuickModal from './components/CustomerQuickModal.vue';
 import PaymentModal from './components/PaymentModal.vue';
 import ReceiptModal from './components/ReceiptModal.vue';
 import SaveTabAside from './components/SaveTabAside.vue';
-import ShiftActionModal from '@/components/Shifts/ShiftActionModal.vue';
 import HeaderAlertBanner from '@/components/HeaderAlertBanner.vue';
 import SkeletonLoader from '@/components/Loaders/SkeletonLoader.vue';
 import emptyCart from '@/assets/images/icons/POS/empty-cart.svg';
@@ -715,14 +729,41 @@ const onCustomerCreated = (customer) => {
 };
 
 // Shift Interception Gate
+const isJoiningShift = ref(false);
+
 const openShiftModal = () => {
   shiftStore.openModal();
 };
 
-const handleProceedToCheckout = () => {
+const handleDirectJoinShift = async () => {
+  isJoiningShift.value = true;
+  try {
+    const res = await shiftStore.joinActiveShift();
+    if (!res.success) {
+      shiftStore.openModal();
+    }
+  } finally {
+    isJoiningShift.value = false;
+  }
+};
+
+const handleProceedToCheckout = async () => {
   if (!shiftStore.isOnDuty) {
-    shiftStore.openModal();
-    return;
+    if (shiftStore.hasActiveShift && !shiftStore.isJoined) {
+      isJoiningShift.value = true;
+      try {
+        const res = await shiftStore.joinActiveShift();
+        if (!res.success) {
+          shiftStore.openModal();
+          return;
+        }
+      } finally {
+        isJoiningShift.value = false;
+      }
+    } else {
+      shiftStore.openModal();
+      return;
+    }
   }
 
   if (window.bootstrap) {
@@ -763,7 +804,10 @@ const onSaleCompleted = (order) => {
 };
 
 onMounted(async () => {
-  shiftStore.checkCurrentShift();
+  await shiftStore.checkCurrentShift();
+  if (shiftStore.hasActiveShift && !shiftStore.isJoined) {
+    await shiftStore.joinActiveShift();
+  }
   fetchProducts();
 
   if (route.query.tab_id) {

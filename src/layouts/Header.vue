@@ -114,7 +114,7 @@
         </div>
 
         <!-- Live Shift Modal -->
-        <ShiftActionModal v-if="auth.isAuthenticated" />
+        <ShiftActionModal v-if="auth.isAuthenticated" @shift-updated="onShiftUpdated" />
     </header>
 
     <ScrollUp />
@@ -149,14 +149,20 @@ import GlobalSearch from "@/components/search/GlobalSearch.vue";
 
 // Utils
 import { useAuthStore } from "@/stores/auth";
+import { useShiftStore } from "@/stores/shift";
 import { useSessionStart } from "@/composables/useSessionStart";
 import errorImage from "@/assets/images/icons/error.png";
 import HeaderShiftWidget from "@/components/Shifts/HeaderShiftWidget.vue";
 import ShiftActionModal from "@/components/Shifts/ShiftActionModal.vue";
 
 const auth = useAuthStore();
+const shiftStore = useShiftStore();
 const router = useRouter();
 const { startSession } = useSessionStart();
+
+function onShiftUpdated() {
+  shiftStore.checkCurrentShift();
+}
 
 // Page state
 const switching = ref(null);   // tenant_id being switched to
