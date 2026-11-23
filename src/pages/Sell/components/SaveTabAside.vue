@@ -189,26 +189,28 @@
                     class="badge-alt2 w-auto px-3"
                     style="font-size: 13px;"
                     :class="{
-                      'bg-success-soft text-success': (selectedCustomer.risk_tier || 'reliable') === 'trusted',
-                      'bg-info-soft text-info': (selectedCustomer.risk_tier || 'reliable') === 'reliable',
+                      'bg-secondary-soft text-secondary border': selectedCustomer.risk_tier === 'new',
+                      'bg-success-soft text-success': selectedCustomer.risk_tier === 'trusted',
+                      'bg-info-soft text-info': selectedCustomer.risk_tier === 'reliable',
                       'bg-warning-soft text-warning': selectedCustomer.risk_tier === 'watch',
                       'bg-danger-soft text-danger': selectedCustomer.risk_tier === 'high_risk',
-                      'bg-light text-muted': !['trusted','reliable','watch','high_risk'].includes(selectedCustomer.risk_tier)
+                      'bg-light text-muted': !['new','trusted','reliable','watch','high_risk'].includes(selectedCustomer.risk_tier)
                     }"
                   >
                     <i
                       class="me-1 fs-5 align-middle"
                       :class="{
-                        'mdi mdi-shield-check': (selectedCustomer.risk_tier || 'reliable') === 'trusted',
-                        'mdi mdi-information-outline': (selectedCustomer.risk_tier || 'reliable') === 'reliable',
+                        'mdi mdi-account-clock-outline': selectedCustomer.risk_tier === 'new',
+                        'mdi mdi-shield-check': selectedCustomer.risk_tier === 'trusted',
+                        'mdi mdi-information-outline': selectedCustomer.risk_tier === 'reliable',
                         'mdi mdi-alert-outline text-dark opacity-75': selectedCustomer.risk_tier === 'watch',
                         'mdi mdi-alert-octagon': selectedCustomer.risk_tier === 'high_risk',
-                        'mdi mdi-help-circle-outline': !['trusted','reliable','watch','high_risk'].includes(selectedCustomer.risk_tier)
+                        'mdi mdi-help-circle-outline': !['new','trusted','reliable','watch','high_risk'].includes(selectedCustomer.risk_tier)
                       }"
                     ></i>
                     <span :class="{'text-dark opacity-75': selectedCustomer.risk_tier === 'watch'}">
                       {{
-                        { trusted: 'Trusted', reliable: 'Reliable', watch: 'Watch', high_risk: 'High risk' }[selectedCustomer.risk_tier] || 'Reliable'
+                        { new: 'New Customer', trusted: 'Trusted', reliable: 'Reliable', watch: 'Watch', high_risk: 'High risk' }[selectedCustomer.risk_tier] || 'New Customer'
                       }}
                     </span>
                   </span>
@@ -279,8 +281,9 @@
                 class="d-flex gap-3 align-items-center mt-3"
                 style="padding: 12px; border-left: 6px solid;"
                 :class="{
-                  'border-success bg-success-subtle': (selectedCustomer.risk_tier || 'reliable') === 'trusted',
-                  'border-info bg-info-subtle': (selectedCustomer.risk_tier || 'reliable') === 'reliable',
+                  'border-secondary bg-light': selectedCustomer.risk_tier === 'new',
+                  'border-success bg-success-subtle': selectedCustomer.risk_tier === 'trusted',
+                  'border-info bg-info-subtle': selectedCustomer.risk_tier === 'reliable',
                   'border-warning bg-warning-subtle': selectedCustomer.risk_tier === 'watch',
                   'border-danger bg-danger-subtle': selectedCustomer.risk_tier === 'high_risk'
                 }"
@@ -587,16 +590,22 @@ const tableOptions = computed(() => {
 
 const getCustomerRecommendation = (c) => {
   if (!c) return { title: 'Standard Profile', message: 'Regular customer. Standard checkout and tab rules apply.' };
+  if (c.risk_tier === 'new' || (!c.bills_issued_count && c.risk_tier !== 'high_risk')) {
+    return {
+      title: 'New Customer (Unverified)',
+      message: 'First-time patron with no prior settlement record. Cash or mobile payment upon order is recommended; manager verification required for open tabs.'
+    };
+  }
   if (c.risk_tier === 'high_risk') {
     return {
-      title: 'High Risk Notice',
-      message: 'This customer has unpaid bills or delayed settlements. Limit open tabs or take full prepayment.'
+      title: 'Credit Blocked',
+      message: 'This customer has unpaid bills or default history. Running tabs are disabled; full upfront payment required.'
     };
   }
   if (c.risk_tier === 'watch') {
     return {
       title: 'Watch List',
-      message: 'Active credit exposure exists. Keep open tab within conservative credit limits.'
+      message: 'Active credit exposure or delayed settlement history. Keep tab within conservative limits or take partial deposit.'
     };
   }
   if (c.risk_tier === 'trusted') {
@@ -606,8 +615,8 @@ const getCustomerRecommendation = (c) => {
     };
   }
   return {
-    title: 'Standard Profile',
-    message: 'Regular customer. Standard checkout and tab rules apply.'
+    title: 'Regular Patron',
+    message: 'Established settlement record. Standard checkout and open tab limits apply.'
   };
 };
 
