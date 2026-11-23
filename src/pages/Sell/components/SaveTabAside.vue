@@ -188,7 +188,7 @@
                 <span>Last seen {{ formatLastSeen(selectedCustomer.last_visit_at || selectedCustomer.created_at) }}</span>
               </div>
 
-              <div class="d-flex align-items-center gap-1.5">
+              <div class="d-flex align-items-center">
                 <span
                   class="badge font-size-11 px-2.5 py-1 fw-bold tracking-wide d-inline-flex align-items-center gap-1 rounded-2"
                   :class="riskBadgeConfig.class"
@@ -197,15 +197,6 @@
                   <i :class="riskBadgeConfig.icon"></i>
                   <span>{{ riskBadgeConfig.label }}</span>
                 </span>
-
-                <button
-                  type="button"
-                  class="btn btn-sm btn-link text-muted p-0 font-size-16 line-height-1 text-decoration-none ms-1 opacity-75 hover-opacity-100"
-                  title="Remove customer"
-                  @click.stop="clearSelectedCustomer"
-                >
-                  <i class="bx bx-x font-size-18"></i>
-                </button>
               </div>
             </div>
 
