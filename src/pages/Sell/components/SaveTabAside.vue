@@ -324,16 +324,15 @@
             <!-- Tab Name -->
             <div class="col-12 mb-3">
               <label class="form-label fw-bold font-size-13 text-dark">
-                Bill Name/Label (Optional) <span class="text-danger fw-bold">*</span>
+                Bill Name/Label (Optional)
               </label>
               <input
                 type="text"
                 class="form-control"
                 placeholder="e.g. John-Table 4 (Optional)"
                 v-model="form.tab_name"
-                required
               />
-              <small class="text-muted font-size-12">This helps you Identify the bill easily</small>
+              <small class="text-muted font-size-12">Leave blank to auto-generate from customer or table</small>
             </div>
 
             <!-- Guest Count -->
@@ -571,7 +570,7 @@ const isDirty = computed(() => {
 });
 
 const canSave = computed(() => {
-  return form.value.tab_name.trim() !== '' && props.cart.length > 0;
+  return props.cart.length > 0;
 });
 
 const tableOptions = computed(() => {
@@ -725,7 +724,12 @@ function resetForm() {
 }
 
 async function saveTab() {
-  if (!canSave.value) return;
+  if (!canSave.value) {
+    if (props.cart.length === 0) {
+      alert('Please add at least one item to the cart before saving a tab.');
+    }
+    return;
+  }
   saving.value = true;
 
   try {
@@ -734,13 +738,27 @@ async function saveTab() {
     );
     const tableNumber = pickedTable?.table_number ?? null;
 
+    // Sensible fallback name if cashier left it blank
+    const fallbackName = selectedCustomer.value
+      ? `${selectedCustomer.value.name}'s Tab`
+      : pickedTable
+      ? `Table ${pickedTable.table_number}`
+      : 'Open Tab';
+    const finalName = form.value.tab_name.trim() || fallbackName;
+
+    const branchId =
+      shiftStore.activeShift?.branch_id ||
+      shiftStore.selectedBranchId ||
+      (shiftStore.branches?.length ? (shiftStore.branches.find((b) => b.is_main)?.id || shiftStore.branches[0].id) : null) ||
+      6;
+
     const payload = {
-      branch_id: shiftStore.activeShift?.branch_id || shiftStore.selectedBranchId || 1,
-      shift_id: shiftStore.activeShiftId,
-      customer_id: form.value.customer_id,
-      table_id: form.value.table_id,
+      branch_id: Number(branchId),
+      shift_id: shiftStore.activeShiftId || shiftStore.activeShift?.id || null,
+      customer_id: form.value.customer_id || null,
+      table_id: form.value.table_id || null,
       table_number: tableNumber,
-      name: form.value.tab_name.trim(),
+      name: finalName,
       guest_count: parseInt(form.value.guest_count) || 1,
       notes: form.value.notes || '',
       discount_amount: cartStore.discountAmount || 0,

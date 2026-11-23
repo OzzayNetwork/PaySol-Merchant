@@ -116,7 +116,7 @@
                         title="Refresh catalogue"
                         @click="fetchProducts"
                       >
-                        <i class="bx bx-refresh fs-4" :class="{ 'bx-spin': isLoadingProducts }"></i>
+                        <i class="mdi mdi-refresh fs-4" :class="{ 'mdi-spin': isLoadingProducts }"></i>
                       </button>
                     </div>
                   </div>

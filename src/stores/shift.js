@@ -21,6 +21,7 @@ export const useShiftStore = defineStore("shift", {
 
   getters: {
     isOnDuty: (state) => state.hasActiveShift && state.isJoined,
+    activeShiftId: (state) => state.activeShift?.id ?? null,
     activeShiftNumber: (state) => state.activeShift?.shift_number ?? "",
     openingFloat: (state) => state.activeShift?.opening_float ?? 0,
     activeMembersCount: (state) => state.activeShift?.active_members_count ?? 0,
