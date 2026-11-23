@@ -175,8 +175,15 @@
             </div>
           </div>
 
-          <!-- Selected Customer Card -->
-          <div v-if="selectedCustomer" class="border border-dark-subtle bg-light-subtle rounded-3 mb-3" style="padding: 10px 14px;">
+          <!-- Selected Customer Card (Clickable to view Classification & Progress Modal) -->
+          <div
+            v-if="selectedCustomer"
+            class="border border-dark-subtle bg-light-subtle rounded-3 mb-3 cursor-pointer user-select-none"
+            style="padding: 10px 14px;"
+            role="button"
+            title="Click to view customer classification and progress"
+            @click="openCustomerProfileModal"
+          >
             <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
               <div class="d-flex align-items-center gap-2 overflow-hidden">
                 <!-- Avatar -->
@@ -191,12 +198,12 @@
 
                 <!-- Info -->
                 <div class="overflow-hidden">
-                  <div class="d-flex align-items-center gap-1 flex-nowrap">
+                  <div class="d-flex align-items-center gap-1.5 flex-nowrap">
                     <h6 class="text-truncate font-size-13 mb-0 text-dark fw-bold" :title="selectedCustomer.name">
                       {{ selectedCustomer.name }}
                     </h6>
-                    <span v-if="selectedCustomer.tax_pin" class="badge bg-light text-dark border font-monospace font-size-10 px-1 py-0 flex-shrink-0" title="KRA Tax PIN">
-                      PIN: {{ selectedCustomer.tax_pin }}
+                    <span class="badge bg-white text-primary border font-size-10 px-1 py-0 flex-shrink-0" title="Click to view classification & progress">
+                      <i class="mdi mdi-open-in-new font-size-10 me-0.5"></i>Profile
                     </span>
                   </div>
                   <div class="text-truncate text-muted font-size-11 d-flex align-items-center gap-1 mt-0.5 flex-wrap">
@@ -245,7 +252,7 @@
                   type="button"
                   class="btn btn-sm btn-link text-muted p-0 font-size-16 line-height-1 text-decoration-none ms-1"
                   title="Remove customer"
-                  @click="clearSelectedCustomer"
+                  @click.stop="clearSelectedCustomer"
                 >
                   <i class="bx bx-x"></i>
                 </button>
@@ -488,6 +495,12 @@
       </div>
     </div>
   </div>
+
+  <!-- Customer Profile, Classification & Progress Modal -->
+  <CustomerProfileModal
+    modal-id="saveTabCustomerProfileModal"
+    :customer="selectedCustomer"
+  />
 </template>
 
 <script setup>
@@ -496,6 +509,7 @@ import customersApi from '@/api/customers';
 import tablesApi from '@/api/tables';
 import tabsApi from '@/api/tabs';
 import SelectSearchBox from '@/components/SelectSearchBox.vue';
+import CustomerProfileModal from './CustomerProfileModal.vue';
 import { useCartStore } from '@/stores/cart';
 import { useShiftStore } from '@/stores/shift';
 
@@ -675,6 +689,15 @@ function clearSelectedCustomer() {
   selectedCustomer.value = null;
   searchQuery.value = '';
   cartStore.clearCustomer();
+}
+
+function openCustomerProfileModal() {
+  if (!selectedCustomer.value) return;
+  const el = document.getElementById('saveTabCustomerProfileModal');
+  if (el && window.bootstrap?.Modal) {
+    const modal = window.bootstrap.Modal.getOrCreateInstance(el);
+    modal.show();
+  }
 }
 
 function onTableChange() {
