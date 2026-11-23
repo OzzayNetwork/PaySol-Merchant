@@ -1,9 +1,9 @@
 <template>
   <div
     class="modal fade"
-    id="quickCustomerModal"
+    id="addCustomerModal"
     tabindex="-1"
-    aria-labelledby="quickCustomerModalLabel"
+    aria-labelledby="addCustomerModalLabel"
     aria-hidden="true"
     ref="modalRef"
   >
@@ -15,7 +15,7 @@
               <i class="bx bx-user-plus fs-5"></i>
             </div>
             <div>
-              <h5 class="modal-title font-size-16 fw-bold mb-0" id="quickCustomerModalLabel">Register Customer</h5>
+              <h5 class="modal-title font-size-16 fw-bold mb-0" id="addCustomerModalLabel">Register Customer</h5>
               <small class="text-muted">Quick add without losing the prepared cart</small>
             </div>
           </div>

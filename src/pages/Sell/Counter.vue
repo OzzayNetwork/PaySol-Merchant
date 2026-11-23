@@ -424,8 +424,10 @@
               <div class="card-footer pt-0 bg-white p-3 gap-3 d-flex justify-content-between align-items-center">
                 <div class="gap-2 d-flex w-100">
                   <button
+                    data-bs-target="#saveTabAside"
                     :disabled="cartStore.isEmpty"
-                    @click="openSaveTabModal"
+                    data-bs-toggle="offcanvas"
+                    @click="isTabAsideOpen = true"
                     type="button"
                     class="btn btn-light waves-effect fw-bold flex-nowrap d-flex align-items-center justify-content-center btn-lg"
                   >
@@ -472,9 +474,12 @@
       @new-sale="cartStore.clearCart"
     />
 
-    <SaveTabModal
-      ref="saveTabModalRef"
-      @tab-saved="onTabSaved"
+    <SaveTabAside
+      :cart="cartStore.items"
+      :cart-items-count="cartStore.itemCount"
+      :cart-total="cartStore.totalAmount"
+      :is-tab-aside-open="isTabAsideOpen"
+      @saved="onTabSaved"
     />
 
     <!-- Shift Action Modal (reused from Shifts system) -->
@@ -495,7 +500,7 @@ import { useShiftStore } from '@/stores/shift';
 import CustomerQuickModal from './components/CustomerQuickModal.vue';
 import PaymentModal from './components/PaymentModal.vue';
 import ReceiptModal from './components/ReceiptModal.vue';
-import SaveTabModal from './components/SaveTabModal.vue';
+import SaveTabAside from './components/SaveTabAside.vue';
 import ShiftActionModal from '@/components/Shifts/ShiftActionModal.vue';
 import HeaderAlertBanner from '@/components/HeaderAlertBanner.vue';
 import emptyCart from '@/assets/images/icons/POS/empty-cart.svg';
@@ -506,7 +511,7 @@ const router = useRouter();
 const cartStore = useCartStore();
 const shiftStore = useShiftStore();
 
-const saveTabModalRef = ref(null);
+const isTabAsideOpen = ref(false);
 const viewMode = ref('grid'); // 'grid' | 'list'
 const searchQuery = ref('');
 const selectedCategory = ref('');
@@ -684,15 +689,14 @@ const onShiftUpdated = () => {
   shiftStore.checkCurrentShift();
 };
 
-const openSaveTabModal = () => {
-  saveTabModalRef.value?.open({
-    branchId: shiftStore.selectedBranchId || shiftStore.activeShift?.branch_id || 4,
-    shiftId: shiftStore.activeShift?.id || null,
-  });
-};
-
 const onTabSaved = (savedTab) => {
-  const viewTabs = confirm(`Tab ${savedTab.tab_number} (${savedTab.name}) saved successfully!\n\nWould you like to open the Open Tabs & Bills list?`);
+  const asideEl = document.getElementById('saveTabAside');
+  if (asideEl && window.bootstrap?.Offcanvas) {
+    window.bootstrap.Offcanvas.getInstance(asideEl)?.hide();
+  }
+  const tabNum = savedTab.tab_number || '';
+  const tabName = savedTab.name || savedTab.tab_name || 'Open Bill';
+  const viewTabs = confirm(`Tab ${tabNum} (${tabName}) saved successfully!\n\nWould you like to open the Open Tabs & Bills list?`);
   if (viewTabs) {
     router.push('/sell/tabs');
   }
