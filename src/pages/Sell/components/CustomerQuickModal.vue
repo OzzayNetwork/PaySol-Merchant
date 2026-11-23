@@ -215,31 +215,14 @@
                   />
                 </div>
 
-                <!-- 🗺️ Map Preview (Non-zoomable map matching gallery.add.vue) -->
-                <div v-if="mapUrl" class="position-relative mb-3">
-                  <!-- Loader Overlay -->
-                  <div
-                    v-if="mapLoading"
-                    class="d-flex align-items-center justify-content-center"
-                    style="position: absolute; inset: 0; background: rgba(255,255,255,0.7); z-index: 10; border-radius: 8px;"
-                  >
-                    <div class="spinner-border text-primary spinner-border-sm" role="status">
-                      <span class="visually-hidden">Loading map...</span>
-                    </div>
-                  </div>
-
-                  <!-- Map iframe (pointer-events: none prevents scroll-zooming) -->
-                  <iframe
-                    :src="mapUrl"
-                    width="100%"
-                    height="180"
-                    style="border: 2px solid rgb(229 231 235); border-radius: 8px; overflow: hidden; pointer-events: none; display: block;"
-                    allowfullscreen=""
-                    loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"
-                    @load="mapLoaded"
-                  ></iframe>
-                </div>
+                <!-- 🗺️ Esri Map Preview (Non-zoomable clean Light Gray Canvas with Pin) -->
+                <EsriMapPreview
+                  v-if="form.address.latitude && form.address.longitude"
+                  :latitude="form.address.latitude"
+                  :longitude="form.address.longitude"
+                  :label="form.address.estate_area || form.address.town_city || form.address.building || ''"
+                  height="180px"
+                />
 
                 <div class="row g-2 mb-2">
                   <div class="col-6">
@@ -310,9 +293,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive } from 'vue';
 import customersApi from '@/api/customers';
 import GoogleLocationInput from '@/components/GoogleLocationInput.vue';
+import EsriMapPreview from '@/components/EsriMapPreview.vue';
 
 const emit = defineEmits(['customer-created']);
 
@@ -322,21 +306,6 @@ const existingCustomer = ref(null);
 const showAddressFields = ref(false);
 const mapSearchQuery = ref('');
 const modalRef = ref(null);
-
-// 🌍 Map state (referenced from gallery.add.vue)
-const selectedLocation = ref(null);
-const mapLoading = ref(false);
-
-const mapLoaded = () => {
-  mapLoading.value = false;
-};
-
-const mapUrl = computed(() => {
-  const lat = selectedLocation.value?.latitude || form.address.latitude;
-  const lng = selectedLocation.value?.longitude || form.address.longitude;
-  if (!lat || !lng) return '';
-  return `https://www.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
-});
 
 let phoneSearchTimeout = null;
 
@@ -396,8 +365,6 @@ const useExistingCustomer = (customer) => {
 
 const onLocationSelected = (data) => {
   if (!data) return;
-  mapLoading.value = true;
-  selectedLocation.value = data;
   const comps = data.address_components || [];
   let city = '';
   let estate = '';
@@ -434,8 +401,6 @@ const onLocationSelected = (data) => {
 };
 
 const onLocationCleared = () => {
-  selectedLocation.value = null;
-  mapLoading.value = false;
   form.address.latitude = null;
   form.address.longitude = null;
 };
@@ -459,8 +424,6 @@ const resetForm = () => {
   mapSearchQuery.value = '';
   showAddressFields.value = false;
   existingCustomer.value = null;
-  selectedLocation.value = null;
-  mapLoading.value = false;
 };
 
 const closeModal = () => {

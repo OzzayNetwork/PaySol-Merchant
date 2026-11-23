@@ -103,31 +103,14 @@
                 @location-cleared="onDeliveryLocationCleared"
               />
 
-              <!-- 🗺️ Map Preview (Non-zoomable map matching gallery.add.vue) -->
-              <div v-if="deliveryMapUrl" class="position-relative my-2">
-                <!-- Loader Overlay -->
-                <div
-                  v-if="deliveryMapLoading"
-                  class="d-flex align-items-center justify-content-center"
-                  style="position: absolute; inset: 0; background: rgba(255,255,255,0.7); z-index: 10; border-radius: 8px;"
-                >
-                  <div class="spinner-border text-primary spinner-border-sm" role="status">
-                    <span class="visually-hidden">Loading map...</span>
-                  </div>
-                </div>
-
-                <!-- Map iframe (pointer-events: none prevents scroll-zooming) -->
-                <iframe
-                  :src="deliveryMapUrl"
-                  width="100%"
-                  height="160"
-                  style="border: 2px solid rgb(229 231 235); border-radius: 8px; overflow: hidden; pointer-events: none; display: block;"
-                  allowfullscreen=""
-                  loading="lazy"
-                  referrerpolicy="no-referrer-when-downgrade"
-                  @load="deliveryMapLoaded"
-                ></iframe>
-              </div>
+              <!-- 🗺️ Esri Map Preview (Non-zoomable clean Light Gray Canvas with Pin) -->
+              <EsriMapPreview
+                v-if="deliveryLocation?.latitude && deliveryLocation?.longitude"
+                :latitude="deliveryLocation.latitude"
+                :longitude="deliveryLocation.longitude"
+                :label="deliveryAddress || 'Delivery Destination'"
+                height="160px"
+              />
               <div class="row g-2 mt-1">
                 <div class="col-sm-6">
                   <label class="form-label font-size-11 text-muted mb-0">Delivery Fee (KES)</label>
@@ -408,6 +391,7 @@
 import { ref, computed, watch } from 'vue';
 import salesApi from '@/api/sales';
 import GoogleLocationInput from '@/components/GoogleLocationInput.vue';
+import EsriMapPreview from '@/components/EsriMapPreview.vue';
 import { useShiftStore } from '@/stores/shift';
 
 const props = defineProps({
@@ -438,20 +422,7 @@ const deliveryDirections = ref('');
 const deliveryFeeInput = ref(props.deliveryFee || 0);
 const kraPin = ref(props.customer?.tax_pin || '');
 
-// 🌍 Map state (referenced from gallery.add.vue)
 const deliveryLocation = ref(null);
-const deliveryMapLoading = ref(false);
-
-const deliveryMapLoaded = () => {
-  deliveryMapLoading.value = false;
-};
-
-const deliveryMapUrl = computed(() => {
-  const lat = deliveryLocation.value?.latitude;
-  const lng = deliveryLocation.value?.longitude;
-  if (!lat || !lng) return '';
-  return `https://www.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
-});
 
 const cashTendered = ref(0);
 const mpesaReference = ref('');
@@ -497,7 +468,6 @@ watch(
           deliveryDirections.value = a.additional_directions;
         }
         if (a.latitude && a.longitude) {
-          deliveryMapLoading.value = true;
           deliveryLocation.value = { latitude: a.latitude, longitude: a.longitude };
         }
       }
@@ -513,14 +483,12 @@ const onDeliveryLocationSelected = (data) => {
     deliveryAddress.value = data.formatted_address;
   }
   if (data?.latitude && data?.longitude) {
-    deliveryMapLoading.value = true;
     deliveryLocation.value = data;
   }
 };
 
 const onDeliveryLocationCleared = () => {
   deliveryLocation.value = null;
-  deliveryMapLoading.value = false;
 };
 
 const cashChange = computed(() => {
