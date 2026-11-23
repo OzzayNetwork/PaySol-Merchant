@@ -176,127 +176,106 @@
           </div>
 
           <!-- Selected Customer Card -->
-          <div v-if="selectedCustomer" class="p-3 border border-1 border-dark-subtle mb-3 rounded">
-            <div class="d-flex flex-column">
-              <!-- Top Row: Last seen & Risk Tier -->
-              <div class="d-flex gap-2 mb-3 align-items-center justify-content-between">
-                <div class="small text-muted d-flex align-items-center gap-1 font-size-12">
-                  <i class="mdi mdi-clock-outline fs-5"></i>
-                  <span>Last seen {{ selectedCustomer.last_visit_at ? new Date(selectedCustomer.last_visit_at).toLocaleDateString() : 'Never' }}</span>
-                </div>
-                <div class="text-uppercase">
-                  <span
-                    class="badge-alt2 w-auto px-3"
-                    style="font-size: 13px;"
-                    :class="{
-                      'bg-secondary-soft text-secondary border': selectedCustomer.risk_tier === 'new',
-                      'bg-success-soft text-success': selectedCustomer.risk_tier === 'trusted',
-                      'bg-info-soft text-info': selectedCustomer.risk_tier === 'reliable',
-                      'bg-warning-soft text-warning': selectedCustomer.risk_tier === 'watch',
-                      'bg-danger-soft text-danger': selectedCustomer.risk_tier === 'high_risk',
-                      'bg-light text-muted': !['new','trusted','reliable','watch','high_risk'].includes(selectedCustomer.risk_tier)
-                    }"
-                  >
-                    <i
-                      class="me-1 fs-5 align-middle"
-                      :class="{
-                        'mdi mdi-account-clock-outline': selectedCustomer.risk_tier === 'new',
-                        'mdi mdi-shield-check': selectedCustomer.risk_tier === 'trusted',
-                        'mdi mdi-information-outline': selectedCustomer.risk_tier === 'reliable',
-                        'mdi mdi-alert-outline text-dark opacity-75': selectedCustomer.risk_tier === 'watch',
-                        'mdi mdi-alert-octagon': selectedCustomer.risk_tier === 'high_risk',
-                        'mdi mdi-help-circle-outline': !['new','trusted','reliable','watch','high_risk'].includes(selectedCustomer.risk_tier)
-                      }"
-                    ></i>
-                    <span :class="{'text-dark opacity-75': selectedCustomer.risk_tier === 'watch'}">
-                      {{
-                        { new: 'New Customer', trusted: 'Trusted', reliable: 'Reliable', watch: 'Watch', high_risk: 'High risk' }[selectedCustomer.risk_tier] || 'New Customer'
-                      }}
-                    </span>
-                  </span>
-                </div>
-              </div>
-
-              <!-- Customer Info Row -->
-              <div class="d-flex align-items-center">
-                <div class="flex-shrink-0 align-self-center me-3 position-relative customer-avatar-wrapper">
+          <div v-if="selectedCustomer" class="border border-dark-subtle bg-light-subtle rounded-3 mb-3" style="padding: 10px 14px;">
+            <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+              <div class="d-flex align-items-center gap-2 overflow-hidden">
+                <!-- Avatar -->
+                <div class="position-relative flex-shrink-0">
                   <div
-                    class="progress-ring"
-                    :style="{ '--progress': (selectedCustomer.loyalty_points ? Math.min(selectedCustomer.loyalty_points, 100) : 15) + '%' }"
+                    class="d-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary fw-bold font-size-12 border border-primary-subtle"
+                    style="width: 34px; height: 34px;"
                   >
-                    <div class="avatar-md position-relative">
-                      <span class="avatar-title rounded-circle bg-primary bg-soft text-primary fs-4 fw-bold">
-                        {{ getInitials(selectedCustomer.name) }}
-                      </span>
-                      <div class="loyalty-budge avatar-xs">
-                        <span
-                          class="avatar-title rounded-circle"
-                          :class="{
-                            'badge-gold': selectedCustomer.loyalty_tier === 'gold',
-                            'badge-silver': selectedCustomer.loyalty_tier === 'silver',
-                            'badge-bronze': selectedCustomer.loyalty_tier === 'bronze',
-                            'badge-platinum': selectedCustomer.loyalty_tier === 'platinum',
-                          }"
-                        >
-                          <i
-                            class="fs-4"
-                            :class="{
-                              'fas fa-crown fs-5 text-black opacity-50': selectedCustomer.loyalty_tier === 'gold',
-                              'fas fa-trophy': selectedCustomer.loyalty_tier === 'silver',
-                              'bx bxs-star': selectedCustomer.loyalty_tier === 'bronze',
-                              'mdi mdi-diamond-stone': selectedCustomer.loyalty_tier === 'platinum',
-                            }"
-                          ></i>
-                        </span>
-                      </div>
-                    </div>
+                    {{ getInitials(selectedCustomer.name) }}
                   </div>
                 </div>
 
-                <div class="flex-grow-1 overflow-hidden">
-                  <h5 class="text-truncate font-size-14 mb-1 text-black fw-bold">{{ selectedCustomer.name }}</h5>
-                  <div class="text-truncate mb-0 d-flex gap-2 align-items-center text-muted font-size-12">
-                    <span>{{ selectedCustomer.phone || 'Not Provided' }}</span>
-                    <span>|</span>
-                    <div class="d-flex gap-1 align-items-center">
-                      <i class="mdi mdi-medal fs-5"></i>
-                      <span class="text-capitalize">{{ selectedCustomer.loyalty_tier || 'Standard' }}</span>
-                    </div>
-                    <span>|</span>
-                    <div class="d-flex gap-1 align-items-center">
-                      <i class="mdi mdi-star fs-5"></i>
-                      <span>{{ selectedCustomer.loyalty_points || 0 }} pts</span>
-                    </div>
-                  </div>
-                  <div v-if="selectedCustomer.tax_pin" class="mt-1">
-                    <span class="badge bg-light text-dark border font-monospace font-size-11">
-                      <i class="bx bx-receipt text-primary me-1"></i>KRA PIN: {{ selectedCustomer.tax_pin }}
+                <!-- Info -->
+                <div class="overflow-hidden">
+                  <div class="d-flex align-items-center gap-1 flex-nowrap">
+                    <h6 class="text-truncate font-size-13 mb-0 text-dark fw-bold" :title="selectedCustomer.name">
+                      {{ selectedCustomer.name }}
+                    </h6>
+                    <span v-if="selectedCustomer.tax_pin" class="badge bg-light text-dark border font-monospace font-size-10 px-1 py-0 flex-shrink-0" title="KRA Tax PIN">
+                      PIN: {{ selectedCustomer.tax_pin }}
                     </span>
+                  </div>
+                  <div class="text-truncate text-muted font-size-11 d-flex align-items-center gap-1 mt-0.5 flex-wrap">
+                    <span>{{ selectedCustomer.phone || 'No phone' }}</span>
+                    <span>•</span>
+                    <span class="text-capitalize">{{ selectedCustomer.loyalty_tier || 'Bronze' }}</span>
+                    <span v-if="selectedCustomer.loyalty_points">({{ selectedCustomer.loyalty_points }} pts)</span>
+                    <template v-if="selectedCustomer.last_visit_at">
+                      <span>•</span>
+                      <span>Seen {{ new Date(selectedCustomer.last_visit_at).toLocaleDateString() }}</span>
+                    </template>
                   </div>
                 </div>
               </div>
 
-              <!-- Recommendation / Credit Warning Callout -->
-              <div
-                class="d-flex gap-3 align-items-center mt-3"
-                style="padding: 12px; border-left: 6px solid;"
+              <!-- Risk Badge & Clear Button -->
+              <div class="d-flex align-items-center gap-1 flex-shrink-0">
+                <span
+                  class="badge rounded-pill font-size-11 px-2 py-1 d-inline-flex align-items-center gap-1"
+                  :class="{
+                    'bg-secondary-subtle text-secondary border': selectedCustomer.risk_tier === 'new',
+                    'bg-success-subtle text-success': selectedCustomer.risk_tier === 'trusted',
+                    'bg-info-subtle text-info': selectedCustomer.risk_tier === 'reliable',
+                    'bg-warning-subtle text-warning-emphasis': selectedCustomer.risk_tier === 'watch',
+                    'bg-danger-subtle text-danger': selectedCustomer.risk_tier === 'high_risk',
+                    'bg-light text-muted border': !['new','trusted','reliable','watch','high_risk'].includes(selectedCustomer.risk_tier)
+                  }"
+                >
+                  <i
+                    :class="{
+                      'mdi mdi-account-clock-outline': selectedCustomer.risk_tier === 'new',
+                      'mdi mdi-shield-check': selectedCustomer.risk_tier === 'trusted',
+                      'mdi mdi-information-outline': selectedCustomer.risk_tier === 'reliable',
+                      'mdi mdi-alert-outline text-dark opacity-75': selectedCustomer.risk_tier === 'watch',
+                      'mdi mdi-alert-octagon': selectedCustomer.risk_tier === 'high_risk',
+                      'mdi mdi-help-circle-outline': !['new','trusted','reliable','watch','high_risk'].includes(selectedCustomer.risk_tier)
+                    }"
+                  ></i>
+                  <span>
+                    {{
+                      { new: 'New', trusted: 'Trusted', reliable: 'Reliable', watch: 'Watch', high_risk: 'High risk' }[selectedCustomer.risk_tier] || 'New'
+                    }}
+                  </span>
+                </span>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-link text-muted p-0 font-size-16 line-height-1 text-decoration-none ms-1"
+                  title="Remove customer"
+                  @click="clearSelectedCustomer"
+                >
+                  <i class="bx bx-x"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Compact Recommendation Strip -->
+            <div
+              class="d-flex align-items-start gap-1.5 py-1 px-2 rounded border-start border-3 font-size-11"
+              :class="{
+                'border-secondary bg-light text-secondary': selectedCustomer.risk_tier === 'new',
+                'border-success bg-success-subtle text-success': selectedCustomer.risk_tier === 'trusted',
+                'border-info bg-info-subtle text-info': selectedCustomer.risk_tier === 'reliable',
+                'border-warning bg-warning-subtle text-dark': selectedCustomer.risk_tier === 'watch',
+                'border-danger bg-danger-subtle text-danger': selectedCustomer.risk_tier === 'high_risk'
+              }"
+            >
+              <i
+                class="fs-6 mt-0.5 flex-shrink-0"
                 :class="{
-                  'border-secondary bg-light': selectedCustomer.risk_tier === 'new',
-                  'border-success bg-success-subtle': selectedCustomer.risk_tier === 'trusted',
-                  'border-info bg-info-subtle': selectedCustomer.risk_tier === 'reliable',
-                  'border-warning bg-warning-subtle': selectedCustomer.risk_tier === 'watch',
-                  'border-danger bg-danger-subtle': selectedCustomer.risk_tier === 'high_risk'
+                  'mdi mdi-account-clock-outline': selectedCustomer.risk_tier === 'new',
+                  'mdi mdi-shield-check': selectedCustomer.risk_tier === 'trusted',
+                  'mdi mdi-information-outline': selectedCustomer.risk_tier === 'reliable',
+                  'mdi mdi-alert-outline text-dark opacity-75': selectedCustomer.risk_tier === 'watch',
+                  'mdi mdi-alert-octagon': selectedCustomer.risk_tier === 'high_risk'
                 }"
-              >
-                <div>
-                  <h4 class="text-truncate font-size-14 mb-1 text-black fw-bold text-capitalize align-items-center d-flex gap-2">
-                    <span>{{ getCustomerRecommendation(selectedCustomer).title }}</span>
-                    <span class="fs-5 text-muted"><i class="mdi mdi-information-outline"></i></span>
-                  </h4>
-                  <p class="text-muted mb-0 font-size-12">
-                    {{ getCustomerRecommendation(selectedCustomer).message }}
-                  </p>
-                </div>
+              ></i>
+              <div class="lh-sm">
+                <span class="fw-semibold text-dark">{{ getCustomerRecommendation(selectedCustomer).title }}:</span>
+                <span class="text-muted ms-1">{{ getCustomerRecommendation(selectedCustomer).message }}</span>
               </div>
             </div>
           </div>
