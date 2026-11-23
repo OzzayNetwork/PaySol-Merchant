@@ -378,6 +378,81 @@
                 </div>
               </div>
 
+              <!-- Customer Assignment & Selected Customer Card (100% Reference Design) -->
+              <div class="px-3 pt-2.5 pb-2 border-bottom bg-light-subtle">
+                <!-- If Customer Selected: Show SelectedCustomerCard -->
+                <div v-if="cartStore.customer">
+                  <SelectedCustomerCard
+                    :customer="cartStore.customer"
+                    :allow-change="true"
+                    @change-customer="cartStore.clearCustomer()"
+                    @open-profile="openCustomerProfileModal"
+                    @view-bills="handleViewCustomerBills"
+                  />
+                </div>
+
+                <!-- If No Customer Selected: Fast Customer Search Bar -->
+                <div v-else class="position-relative">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="input-group input-group-sm flex-grow-1">
+                      <span class="input-group-text bg-white border-end-0 text-muted">
+                        <i class="mdi mdi-account-search-outline font-size-14 text-primary"></i>
+                      </span>
+                      <input
+                        type="text"
+                        v-model="customerSearch"
+                        @input="searchCustomers"
+                        @focus="showCustomerDropdown = true"
+                        class="form-control form-control-sm border-start-0"
+                        placeholder="Assign customer (name, phone)..."
+                      />
+                      <button
+                        v-if="customerSearch"
+                        class="btn btn-outline-light text-muted border border-start-0"
+                        type="button"
+                        @click="customerSearch = ''; customersList = []; showCustomerDropdown = false"
+                      >
+                        <i class="bx bx-x"></i>
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-primary text-nowrap d-flex align-items-center gap-1 fw-medium"
+                      @click="openCustomerModal"
+                      title="Register New Customer"
+                    >
+                      <i class="bx bx-plus font-size-13"></i> New
+                    </button>
+                  </div>
+
+                  <!-- Dropdown Search Results -->
+                  <div
+                    v-if="showCustomerDropdown && (customersList.length > 0 || isSearchingCustomers)"
+                    class="position-absolute bg-white rounded-3 shadow-lg border p-1 w-100 mt-1"
+                    style="z-index: 1060; max-height: 220px; overflow-y: auto; left: 0; right: 0;"
+                  >
+                    <div v-if="isSearchingCustomers" class="p-2 text-center text-muted font-size-12">
+                      <span class="spinner-border spinner-border-sm me-1 text-primary"></span> Searching customers...
+                    </div>
+                    <div
+                      v-for="c in customersList"
+                      :key="c.id"
+                      class="p-2 cursor-pointer rounded-2 hover-bg-light d-flex align-items-center justify-content-between"
+                      @click="selectCustomer(c)"
+                    >
+                      <div class="overflow-hidden">
+                        <p class="m-0 fw-bold font-size-12 text-dark text-truncate">{{ c.name }}</p>
+                        <small class="text-muted font-size-11">{{ c.phone || 'No phone' }}</small>
+                      </div>
+                      <span class="badge bg-light text-secondary font-size-10 text-capitalize">
+                        {{ c.loyalty_tier || 'Silver' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div class="card-body cart-container pt-1" style="height: 50vh;">
                 <h4 class="card-title text-black d-none">Cart Items</h4>
 
@@ -509,8 +584,11 @@
                     Save as Open Bill
                   </button>
                   <button
+                    data-bs-target="#sellingAside"
                     :disabled="cartStore.isEmpty"
+                    data-bs-toggle="offcanvas"
                     @click="handleProceedToCheckout"
+                    type="button"
                     class="btn btn-primary waves-effect btn-lg fw-bold flex-grow-1"
                   >
                     <i class="mdi mdi-check-all fs-4 align-middle me-2"></i>
@@ -524,11 +602,11 @@
       </div>
     </div>
 
-    <!-- Modals -->
+    <!-- Modals & Asides -->
     <CustomerQuickModal ref="customerModalRef" @customer-created="onCustomerCreated" />
 
-    <PaymentModal
-      ref="paymentModalRef"
+    <SellingAside
+      ref="sellingAsideRef"
       :cart-items="cartStore.items"
       :total-amount="cartStore.totalAmount"
       :subtotal="cartStore.subtotal"
@@ -555,6 +633,12 @@
       :is-tab-aside-open="isTabAsideOpen"
       @saved="onTabSaved"
     />
+
+    <CustomerProfileModal
+      v-if="cartStore.customer"
+      modal-id="counterCustomerProfileModal"
+      :customer="cartStore.customer"
+    />
   </div>
 </template>
 
@@ -569,6 +653,8 @@ import { useCartStore } from '@/stores/cart';
 import { useShiftStore } from '@/stores/shift';
 
 import CustomerQuickModal from './components/CustomerQuickModal.vue';
+import CustomerProfileModal from './components/CustomerProfileModal.vue';
+import SelectedCustomerCard from './components/SelectedCustomerCard.vue';
 import PaymentModal from './components/PaymentModal.vue';
 import ReceiptModal from './components/ReceiptModal.vue';
 import SaveTabAside from './components/SaveTabAside.vue';
@@ -737,6 +823,27 @@ const onCustomerCreated = (customer) => {
   cartStore.setCustomer(customer);
 };
 
+const openCustomerProfileModal = () => {
+  if (window.bootstrap) {
+    const el = document.getElementById('counterCustomerProfileModal');
+    if (el) {
+      const m = window.bootstrap.Modal.getOrCreateInstance(el);
+      m.show();
+    }
+  }
+};
+
+const handleViewCustomerBills = () => {
+  isTabAsideOpen.value = true;
+  if (window.bootstrap) {
+    const el = document.getElementById('saveTabAside');
+    if (el) {
+      const offcanvas = window.bootstrap.Offcanvas.getOrCreateInstance(el);
+      offcanvas.show();
+    }
+  }
+};
+
 // Shift Interception Gate
 const isJoiningShift = ref(false);
 
@@ -766,21 +873,21 @@ const handleProceedToCheckout = async () => {
           shiftStore.openModal();
           return;
         }
+      } catch (err) {
+        console.warn('Could not auto-join shift:', err);
       } finally {
         isJoiningShift.value = false;
       }
-    } else {
+    } else if (!shiftStore.hasActiveShift) {
       shiftStore.openModal();
       return;
     }
   }
 
-  if (window.bootstrap) {
-    const el = document.getElementById('paymentModal');
-    if (el) {
-      const m = new window.bootstrap.Modal(el);
-      m.show();
-    }
+  const asideEl = document.getElementById('sellingAside');
+  if (asideEl && window.bootstrap?.Offcanvas) {
+    const oc = window.bootstrap.Offcanvas.getOrCreateInstance(asideEl);
+    oc.show();
   }
 };
 

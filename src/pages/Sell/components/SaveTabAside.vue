@@ -176,136 +176,14 @@
           </div>
 
           <!-- Selected Customer Card (Matching Reference Design) -->
-          <div
+          <SelectedCustomerCard
             v-if="selectedCustomer"
-            class="card border border-light-subtle rounded-4 bg-white p-3 mb-3 shadow-sm position-relative overflow-hidden"
-            style="border-radius: 16px; border-color: #e2e8f0 !important;"
-          >
-            <!-- Top Row: Last Seen & Standing Badge -->
-            <div class="d-flex align-items-center justify-content-between mb-3">
-              <div class="d-flex align-items-center font-size-12 fw-medium" style="color: #475569;">
-                <i class="mdi mdi-clock-outline me-1.5 font-size-16" style="color: #2563eb;"></i>
-                <span>Last seen {{ formatLastSeen(selectedCustomer.last_visit_at || selectedCustomer.created_at) }}</span>
-              </div>
-
-              <div class="d-flex align-items-center">
-                <span
-                  class="badge font-size-11 px-2.5 py-1 fw-bold tracking-wide d-inline-flex align-items-center gap-1 rounded-2"
-                  :style="riskBadgeConfig.label === 'WATCH' ? 'background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a;' : ''"
-                  :class="riskBadgeConfig.label !== 'WATCH' ? riskBadgeConfig.class : ''"
-                  style="letter-spacing: 0.5px;"
-                >
-                  <i :class="riskBadgeConfig.icon"></i>
-                  <span>{{ riskBadgeConfig.label }}</span>
-                </span>
-              </div>
-            </div>
-
-            <!-- Middle Profile Row: Circular Avatar with Arc & Details -->
-            <div
-              class="d-flex align-items-center gap-3 mb-3 cursor-pointer user-select-none"
-              role="button"
-              title="Click to view full customer profile & standing"
-              @click="openCustomerProfileModal"
-            >
-              <!-- Avatar with Circular Progress Arc and Trophy Badge -->
-              <div class="position-relative flex-shrink-0" style="width: 66px; height: 66px;">
-                <div
-                  class="w-100 h-100 rounded-circle d-flex align-items-center justify-content-center"
-                  style="background: conic-gradient(#f59e0b 0% 115deg, #e2e8f0 115deg 360deg); padding: 3px;"
-                >
-                  <div class="w-100 h-100 rounded-circle bg-white d-flex align-items-center justify-content-center" style="padding: 2.5px;">
-                    <div
-                      class="w-100 h-100 rounded-circle d-flex align-items-center justify-content-center fw-bold font-size-19"
-                      style="background-color: #ede9fe; color: #3730a3;"
-                    >
-                      {{ getInitials(selectedCustomer.name) }}
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Docked Trophy Badge -->
-                <span
-                  class="position-absolute d-flex align-items-center justify-content-center rounded-circle text-white shadow-none"
-                  style="width: 22px; height: 22px; bottom: -2px; right: -2px; border: 2.5px solid #ffffff; font-size: 11px; background-color: #94a3b8;"
-                  title="Standing Tier"
-                >
-                  <i class="mdi mdi-trophy"></i>
-                </span>
-              </div>
-
-              <!-- Customer Info -->
-              <div class="overflow-hidden flex-grow-1">
-                <h5 class="fw-bold font-size-18 mb-1 text-truncate" style="color: #0f172a;" :title="selectedCustomer.name">
-                  {{ selectedCustomer.name }}
-                </h5>
-
-                <div class="d-flex align-items-center gap-2 font-size-12 flex-wrap" style="color: #64748b;">
-                  <span class="d-inline-flex align-items-center gap-1">
-                    <i class="mdi mdi-phone-outline font-size-14" style="color: #2563eb;"></i>
-                    <span>{{ selectedCustomer.phone || 'No phone' }}</span>
-                  </span>
-                  <span style="color: #cbd5e1;">|</span>
-                  <span class="d-inline-flex align-items-center gap-1 text-capitalize">
-                    <i class="mdi mdi-medal-outline font-size-14" style="color: #64748b;"></i>
-                    <span>{{ selectedCustomer.loyalty_tier || 'Silver' }}</span>
-                  </span>
-                  <span style="color: #cbd5e1;">|</span>
-                  <span class="d-inline-flex align-items-center gap-1">
-                    <i class="mdi mdi-star-outline font-size-14" style="color: #64748b;"></i>
-                    <span>{{ selectedCustomer.loyalty_points ?? 45 }}</span>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Bottom Notice Callout (Ice-Blue Card with Left Accent) -->
-            <div
-              class="p-3 d-flex align-items-start gap-3 position-relative text-start"
-              style="background-color: #f0f9ff; border-left: 4px solid #0284c7; border-radius: 8px;"
-            >
-              <!-- Document Icon Badge -->
-              <div
-                class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
-                style="width: 38px; height: 38px; background-color: #e0f2fe; color: #0284c7;"
-              >
-                <i class="mdi mdi-file-document-outline font-size-20"></i>
-              </div>
-
-              <!-- Callout Content -->
-              <div class="flex-grow-1 overflow-hidden">
-                <div class="fw-bold font-size-14 mb-1" style="color: #0f172a;">
-                  <template v-if="customerUnpaidBillsCount > 0">
-                    {{ customerUnpaidBillsCount }} unpaid bill<span v-if="customerUnpaidBillsCount !== 1">s</span>
-                    <span style="color: #94a3b8; margin: 0 4px;">•</span>
-                    <span style="color: #2563eb; font-weight: 700;">{{ formatMoney(customerOutstandingDebt) }}</span> outstanding
-                  </template>
-                  <template v-else>
-                    No unpaid bills
-                    <span style="color: #94a3b8; margin: 0 4px;">•</span>
-                    <span class="text-success fw-bold">Good standing</span>
-                  </template>
-                </div>
-
-                <p class="font-size-12 mb-2 lh-sm" style="color: #64748b; line-height: 1.45;">
-                  {{ customerUnpaidBillsCount > 0
-                    ? 'Consider combining this cart with the existing bill instead of opening a new tab.'
-                    : 'Customer has settled all prior bills and is eligible for open tab privileges.'
-                  }}
-                </p>
-
-                <button
-                  type="button"
-                  class="btn btn-link p-0 fw-semibold font-size-12 text-decoration-none d-inline-flex align-items-center gap-1"
-                  style="color: #2563eb;"
-                  @click="switchToExistingTabs"
-                >
-                  <span>View Customer Bills</span>
-                  <i class="bx bx-right-arrow-alt font-size-15"></i>
-                </button>
-              </div>
-            </div>
-          </div>
+            :customer="selectedCustomer"
+            :unpaid-bills-count="customerUnpaidBillsCount"
+            :outstanding-amount="customerOutstandingDebt"
+            @view-bills="switchToExistingTabs"
+            @open-profile="openCustomerProfileModal"
+          />
 
           <!-- Empty Customer Notice -->
           <div v-else class="mb-3">
@@ -529,6 +407,7 @@ import tablesApi from '@/api/tables';
 import tabsApi from '@/api/tabs';
 import SelectSearchBox from '@/components/SelectSearchBox.vue';
 import CustomerProfileModal from './CustomerProfileModal.vue';
+import SelectedCustomerCard from './SelectedCustomerCard.vue';
 import { useCartStore } from '@/stores/cart';
 import { useShiftStore } from '@/stores/shift';
 
