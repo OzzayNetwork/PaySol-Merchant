@@ -154,21 +154,21 @@
                   </div>
                 </div>
 
-                <!-- GRID VIEW (Direct match to POS Make a sale) -->
+                <!-- GRID VIEW (Clean card design, no custom shadows, equal height) -->
                 <div v-else-if="viewMode === 'grid'" class="row">
                   <div
                     v-for="product in filteredProducts"
                     :key="product.id"
                     @click="handleProductClick(product)"
-                    class="col-3 col-md-6 col-lg-4 col-xl-3 mb-4 position-relative"
+                    class="col-6 col-sm-6 col-md-6 col-lg-4 col-xl-3 mb-4 position-relative"
                   >
                     <!-- Quantity Badge -->
                     <div v-if="cartStore.getItemQuantity(product.id) > 0">
                       <div
-                        class="avatar-xs mx-auto position-absolute right-0"
+                        class="avatar-xs mx-auto position-absolute"
                         style="z-index: 30; right: 0px; top: -15px;"
                       >
-                        <span class="avatar-title rounded-circle bg-success-muted font-size-16 fw-boldx">
+                        <span class="avatar-title rounded-circle bg-success font-size-14 fw-bold text-white shadow-none">
                           {{ cartStore.getItemQuantity(product.id) }}
                         </span>
                       </div>
@@ -176,42 +176,49 @@
 
                     <!-- Card Body -->
                     <div
-                      class="p-3 bg-light rounded border cursor-pointer waves-effect w-100"
+                      class="p-3 bg-light rounded border cursor-pointer waves-effect w-100 h-100 d-flex flex-column justify-content-between"
                       :class="[
-                        cartStore.getItemQuantity(product.id) > 0 ? 'border-success-muted border-2' : ''
+                        cartStore.getItemQuantity(product.id) > 0 ? 'border-success border-2' : ''
                       ]"
                     >
                       <div>
                         <div
                           style="height: 160px;"
-                          class="img-cont d-flex align-items-center overflow-hidden rounded w-100"
-                          :class="[product.image_url ? 'bg-dark-muted' : 'bg-transparent']"
+                          class="img-cont d-flex align-items-center justify-content-center overflow-hidden rounded w-100 bg-white"
                         >
                           <img
+                            v-if="product.image_url"
                             class="img h-auto"
-                            style="width: 100%;"
-                            :src="product.image_url || emptyImage"
+                            style="width: 100%; max-height: 150px; object-fit: contain;"
+                            :src="product.image_url"
+                            :alt="product.name"
+                          />
+                          <img
+                            v-else
+                            class="img h-auto"
+                            style="width: 100%; max-height: 120px; object-fit: contain; opacity: 0.6;"
+                            :src="emptyImage"
                             :alt="product.name"
                           />
                         </div>
                       </div>
 
                       <div class="pt-4">
-                        <h5 class="text-capitalize truncate-singleLine mb-0" :title="product.name">
+                        <h5 class="text-capitalize text-truncate mb-0 font-size-14 fw-semibold text-dark" :title="product.name">
                           {{ product.name || "Unknown" }}
                         </h5>
                         <p class="mb-2">
-                          <small class="text-muted">{{ product.size_label || product.sku || '' }}</small>
+                          <small class="text-muted">{{ product.size_label || product.sku || product.barcode || '' }}</small>
                         </p>
-                        <div class="d-flex gap-2 align-items-center justify-content-between">
+                        <div class="d-flex gap-1 align-items-center justify-content-between">
                           <div>
-                            <h5 class="my-0">
+                            <h5 class="my-0 font-size-13 font-size-md-14 fw-bold text-dark text-nowrap">
                               {{ formatMoney(product.selling_price) }}
                             </h5>
                           </div>
-                          <span class="text-right">
-                            <span class="text-muted me-2">
-                              {{ (product.stock_on_hand || 0) - cartStore.getItemQuantity(product.id) }} <small>In stock</small>
+                          <span class="text-end font-size-11 text-nowrap">
+                            <span :class="product.stock_on_hand > 0 ? 'text-muted' : 'text-danger fw-semibold'">
+                              {{ product.stock_on_hand > 0 ? `${product.stock_on_hand - cartStore.getItemQuantity(product.id)} In stock` : 'Out of stock' }}
                             </span>
                           </span>
                         </div>
