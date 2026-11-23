@@ -178,20 +178,21 @@
           <!-- Selected Customer Card (Matching Reference Design) -->
           <div
             v-if="selectedCustomer"
-            class="card border border-light-subtle rounded-4 bg-white p-3 mb-3 shadow-none position-relative overflow-hidden"
-            style="border-radius: 16px;"
+            class="card border border-light-subtle rounded-4 bg-white p-3 mb-3 shadow-sm position-relative overflow-hidden"
+            style="border-radius: 16px; border-color: #e2e8f0 !important;"
           >
             <!-- Top Row: Last Seen & Standing Badge -->
             <div class="d-flex align-items-center justify-content-between mb-3">
-              <div class="d-flex align-items-center text-muted font-size-12 fw-medium">
-                <i class="mdi mdi-clock-outline text-primary me-1.5 font-size-15"></i>
+              <div class="d-flex align-items-center font-size-12 fw-medium" style="color: #475569;">
+                <i class="mdi mdi-clock-outline me-1.5 font-size-16" style="color: #2563eb;"></i>
                 <span>Last seen {{ formatLastSeen(selectedCustomer.last_visit_at || selectedCustomer.created_at) }}</span>
               </div>
 
               <div class="d-flex align-items-center">
                 <span
                   class="badge font-size-11 px-2.5 py-1 fw-bold tracking-wide d-inline-flex align-items-center gap-1 rounded-2"
-                  :class="riskBadgeConfig.class"
+                  :style="riskBadgeConfig.label === 'WATCH' ? 'background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a;' : ''"
+                  :class="riskBadgeConfig.label !== 'WATCH' ? riskBadgeConfig.class : ''"
                   style="letter-spacing: 0.5px;"
                 >
                   <i :class="riskBadgeConfig.icon"></i>
@@ -208,15 +209,15 @@
               @click="openCustomerProfileModal"
             >
               <!-- Avatar with Circular Progress Arc and Trophy Badge -->
-              <div class="position-relative flex-shrink-0" style="width: 62px; height: 62px;">
+              <div class="position-relative flex-shrink-0" style="width: 66px; height: 66px;">
                 <div
                   class="w-100 h-100 rounded-circle d-flex align-items-center justify-content-center"
-                  style="background: conic-gradient(#f59e0b 0% 120deg, #e2e8f0 120deg 360deg); padding: 3px;"
+                  style="background: conic-gradient(#f59e0b 0% 115deg, #e2e8f0 115deg 360deg); padding: 3px;"
                 >
-                  <div class="w-100 h-100 rounded-circle bg-white d-flex align-items-center justify-content-center" style="padding: 2px;">
+                  <div class="w-100 h-100 rounded-circle bg-white d-flex align-items-center justify-content-center" style="padding: 2.5px;">
                     <div
-                      class="w-100 h-100 rounded-circle d-flex align-items-center justify-content-center fw-bold font-size-18 text-primary"
-                      style="background-color: #ede9fe; color: #4338ca;"
+                      class="w-100 h-100 rounded-circle d-flex align-items-center justify-content-center fw-bold font-size-19"
+                      style="background-color: #ede9fe; color: #3730a3;"
                     >
                       {{ getInitials(selectedCustomer.name) }}
                     </div>
@@ -235,23 +236,23 @@
 
               <!-- Customer Info -->
               <div class="overflow-hidden flex-grow-1">
-                <h5 class="fw-bold text-dark font-size-17 mb-1 text-truncate" :title="selectedCustomer.name">
+                <h5 class="fw-bold font-size-18 mb-1 text-truncate" style="color: #0f172a;" :title="selectedCustomer.name">
                   {{ selectedCustomer.name }}
                 </h5>
 
-                <div class="d-flex align-items-center gap-2 text-muted font-size-12 flex-wrap">
-                  <span class="d-inline-flex align-items-center gap-1" style="color: #4f46e5;">
-                    <i class="bx bx-phone font-size-14"></i>
+                <div class="d-flex align-items-center gap-2 font-size-12 flex-wrap" style="color: #64748b;">
+                  <span class="d-inline-flex align-items-center gap-1">
+                    <i class="mdi mdi-phone-outline font-size-14" style="color: #2563eb;"></i>
                     <span>{{ selectedCustomer.phone || 'No phone' }}</span>
                   </span>
-                  <span class="text-black-50 opacity-25">|</span>
-                  <span class="d-inline-flex align-items-center gap-1 text-secondary text-capitalize">
-                    <i class="mdi mdi-medal-outline font-size-14 text-muted"></i>
+                  <span style="color: #cbd5e1;">|</span>
+                  <span class="d-inline-flex align-items-center gap-1 text-capitalize">
+                    <i class="mdi mdi-medal-outline font-size-14" style="color: #64748b;"></i>
                     <span>{{ selectedCustomer.loyalty_tier || 'Silver' }}</span>
                   </span>
-                  <span class="text-black-50 opacity-25">|</span>
-                  <span class="d-inline-flex align-items-center gap-1 text-secondary">
-                    <i class="mdi mdi-star-outline font-size-14 text-muted"></i>
+                  <span style="color: #cbd5e1;">|</span>
+                  <span class="d-inline-flex align-items-center gap-1">
+                    <i class="mdi mdi-star-outline font-size-14" style="color: #64748b;"></i>
                     <span>{{ selectedCustomer.loyalty_points ?? 45 }}</span>
                   </span>
                 </div>
@@ -261,7 +262,7 @@
             <!-- Bottom Notice Callout (Ice-Blue Card with Left Accent) -->
             <div
               class="p-3 d-flex align-items-start gap-3 position-relative text-start"
-              style="background-color: #f0f9ff; border-left: 4px solid #0284c7; border-radius: 12px;"
+              style="background-color: #f0f9ff; border-left: 4px solid #0284c7; border-radius: 8px;"
             >
               <!-- Document Icon Badge -->
               <div
@@ -273,20 +274,20 @@
 
               <!-- Callout Content -->
               <div class="flex-grow-1 overflow-hidden">
-                <div class="fw-bold font-size-14 text-dark mb-1">
+                <div class="fw-bold font-size-14 mb-1" style="color: #0f172a;">
                   <template v-if="customerUnpaidBillsCount > 0">
                     {{ customerUnpaidBillsCount }} unpaid bill<span v-if="customerUnpaidBillsCount !== 1">s</span>
-                    <span class="text-black-50 mx-1">•</span>
-                    <span class="text-primary fw-bold">{{ formatMoney(customerOutstandingDebt) }}</span> outstanding
+                    <span style="color: #94a3b8; margin: 0 4px;">•</span>
+                    <span style="color: #2563eb; font-weight: 700;">{{ formatMoney(customerOutstandingDebt) }}</span> outstanding
                   </template>
                   <template v-else>
                     No unpaid bills
-                    <span class="text-black-50 mx-1">•</span>
+                    <span style="color: #94a3b8; margin: 0 4px;">•</span>
                     <span class="text-success fw-bold">Good standing</span>
                   </template>
                 </div>
 
-                <p class="text-muted font-size-12 mb-2 lh-sm">
+                <p class="font-size-12 mb-2 lh-sm" style="color: #64748b; line-height: 1.45;">
                   {{ customerUnpaidBillsCount > 0
                     ? 'Consider combining this cart with the existing bill instead of opening a new tab.'
                     : 'Customer has settled all prior bills and is eligible for open tab privileges.'
@@ -295,7 +296,8 @@
 
                 <button
                   type="button"
-                  class="btn btn-link p-0 text-primary fw-semibold font-size-12 text-decoration-none d-inline-flex align-items-center gap-1"
+                  class="btn btn-link p-0 fw-semibold font-size-12 text-decoration-none d-inline-flex align-items-center gap-1"
+                  style="color: #2563eb;"
                   @click="switchToExistingTabs"
                 >
                   <span>View Customer Bills</span>

@@ -1217,6 +1217,206 @@
                     </div>
                 </div>
 
+                <!-- Tab: Tab & Credit Security Rules -->
+                <div v-show="activeTab === 'tabs_rules'" class="col-12">
+                    <div class="card border rounded-2 bg-white p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <Icon icon="ri:shield-check-line" class="fs-4 text-primary" />
+                                <div>
+                                    <h5 class="fw-bold text-dark mb-0 font-size-15">Tab &amp; Open Bill Security Rules</h5>
+                                    <p class="text-muted font-size-12 mb-0">Control running bar bills, unpaid exposure limits, cashier quotas, and sensible hospitality timing.</p>
+                                </div>
+                            </div>
+                            <div class="form-check form-switch form-switch-md">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    id="tabsEnabledSwitch"
+                                    v-model="form.tabs_enabled"
+                                />
+                                <label class="form-check-label fw-bold font-size-12 ms-1" for="tabsEnabledSwitch">
+                                    {{ form.tabs_enabled ? 'Open Tabs Enabled' : 'Open Tabs Disabled' }}
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Hospitality Context Banner -->
+                        <div class="alert alert-info border-0 rounded-2 p-3 mb-4 d-flex align-items-start gap-3" style="background-color: #f0f9ff; border-left: 4px solid #0284c7 !important;">
+                            <div class="flex-shrink-0 mt-0.5">
+                                <Icon icon="ri:beer-line" class="fs-4 text-primary" />
+                            </div>
+                            <div class="flex-grow-1 font-size-12" style="color: #0369a1;">
+                                <strong class="d-block mb-1 font-size-13">Sensible Hospitality &amp; Bar Timing</strong>
+                                In bars, lounges, and restaurants, patrons often run up orders over an entire evening. The <strong>Settlement Window</strong> is configured in hours (e.g. 12 hours) so tabs stay smoothly open across night shifts without prematurely expiring or locking staff out.
+                            </div>
+                        </div>
+
+                        <div class="row g-4" :class="{ 'opacity-50 pe-none': !form.tabs_enabled }">
+                            <!-- Tab Payment Window (Settlement Window) -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold font-size-12">
+                                    Tab Settlement Window (Hours)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><Icon icon="ri:time-line" /></span>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="72"
+                                        v-model.number="form.tab_payment_window_hours"
+                                        class="form-control"
+                                        placeholder="12"
+                                    />
+                                    <span class="input-group-text bg-light font-size-12">Hours</span>
+                                </div>
+                                <div class="d-flex gap-2 mt-1.5 flex-wrap">
+                                    <button type="button" class="btn btn-xs btn-outline-secondary font-size-11 py-0 px-2" @click="form.tab_payment_window_hours = 6">6h (Short shift)</button>
+                                    <button type="button" class="btn btn-xs btn-outline-primary font-size-11 py-0 px-2 fw-semibold" @click="form.tab_payment_window_hours = 12">12h (Bar / Night shift)</button>
+                                    <button type="button" class="btn btn-xs btn-outline-secondary font-size-11 py-0 px-2" @click="form.tab_payment_window_hours = 24">24h (Full day)</button>
+                                    <button type="button" class="btn btn-xs btn-outline-secondary font-size-11 py-0 px-2" @click="form.tab_payment_window_hours = 48">48h (Weekend)</button>
+                                </div>
+                                <small class="text-muted font-size-11 d-block mt-1">
+                                    How long a tab remains active before it is flagged as overdue.
+                                </small>
+                            </div>
+
+                            <!-- Maximum Tab Balance Limit -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold font-size-12">
+                                    Default Tab Balance Limit (KES)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light fw-bold font-size-12">KES</span>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="500"
+                                        v-model.number="form.tab_limit"
+                                        class="form-control"
+                                        placeholder="10000"
+                                    />
+                                </div>
+                                <div class="d-flex gap-2 mt-1.5 flex-wrap">
+                                    <button type="button" class="btn btn-xs btn-outline-secondary font-size-11 py-0 px-2" @click="form.tab_limit = 5000">5,000</button>
+                                    <button type="button" class="btn btn-xs btn-outline-primary font-size-11 py-0 px-2 fw-semibold" @click="form.tab_limit = 10000">10,000 (Default)</button>
+                                    <button type="button" class="btn btn-xs btn-outline-secondary font-size-11 py-0 px-2" @click="form.tab_limit = 25000">25,000</button>
+                                    <button type="button" class="btn btn-xs btn-outline-secondary font-size-11 py-0 px-2" @click="form.tab_limit = 50000">50,000</button>
+                                </div>
+                                <small class="text-muted font-size-11 d-block mt-1">
+                                    Highest unpaid total allowed on a tab before requiring partial or full settlement. Individual customers can have customized credit limits.
+                                </small>
+                            </div>
+
+                            <!-- Max Open Tabs per Customer -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold font-size-12">
+                                    Max Open Tabs per Customer
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><Icon icon="ri:user-shared-line" /></span>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="20"
+                                        v-model.number="form.max_open_tabs_per_customer"
+                                        class="form-control"
+                                        placeholder="2"
+                                    />
+                                    <span class="input-group-text bg-light font-size-12">Tabs</span>
+                                </div>
+                                <small class="text-muted font-size-11 d-block mt-1">
+                                    Allows a patron to run a personal tab and a group/table tab without opening endless unpaid bills.
+                                </small>
+                            </div>
+
+                            <!-- Max Unpaid Tabs per Cashier -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold font-size-12">
+                                    Max Open Tabs per Cashier / Shift
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><Icon icon="ri:user-star-line" /></span>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="100"
+                                        v-model.number="form.max_unpaid_tabs_per_cashier"
+                                        class="form-control"
+                                        placeholder="15"
+                                    />
+                                    <span class="input-group-text bg-light font-size-12">Tabs</span>
+                                </div>
+                                <small class="text-muted font-size-11 d-block mt-1">
+                                    Prevents a cashier or bartender from leaving dozens of abandoned open tabs across a single shift.
+                                </small>
+                            </div>
+
+                            <!-- Enforcement Policy Action -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold font-size-12 mb-2">Limit Enforcement Action</label>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div
+                                            class="card border p-3 rounded-2 cursor-pointer h-100 transition-all"
+                                            :class="form.tab_limit_action === 'warn' ? 'border-primary bg-primary-subtle' : 'bg-light'"
+                                            @click="form.tab_limit_action = 'warn'"
+                                        >
+                                            <div class="form-check mb-1">
+                                                <input class="form-check-input" type="radio" value="warn" v-model="form.tab_limit_action" id="actionWarn">
+                                                <label class="form-check-label fw-bold font-size-13 text-dark" for="actionWarn">
+                                                    Warn Cashier Only (Default)
+                                                </label>
+                                            </div>
+                                            <p class="text-muted font-size-11 mb-0 ps-3">
+                                                Shows a soft warning on the POS counter but allows the cashier to proceed during busy rush hours.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div
+                                            class="card border p-3 rounded-2 cursor-pointer h-100 transition-all"
+                                            :class="form.tab_limit_action === 'require_manager_pin' ? 'border-primary bg-primary-subtle' : 'bg-light'"
+                                            @click="form.tab_limit_action = 'require_manager_pin'"
+                                        >
+                                            <div class="form-check mb-1">
+                                                <input class="form-check-input" type="radio" value="require_manager_pin" v-model="form.tab_limit_action" id="actionPin">
+                                                <label class="form-check-label fw-bold font-size-13 text-dark" for="actionPin">
+                                                    Require Manager PIN
+                                                </label>
+                                            </div>
+                                            <p class="text-muted font-size-11 mb-0 ps-3">
+                                                Cashier cannot exceed tab balance or open extra tabs unless an active manager or owner enters their PIN.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div
+                                            class="card border p-3 rounded-2 cursor-pointer h-100 transition-all"
+                                            :class="form.tab_limit_action === 'block' ? 'border-danger bg-danger-subtle' : 'bg-light'"
+                                            @click="form.tab_limit_action = 'block'"
+                                        >
+                                            <div class="form-check mb-1">
+                                                <input class="form-check-input" type="radio" value="block" v-model="form.tab_limit_action" id="actionBlock">
+                                                <label class="form-check-label fw-bold font-size-13 text-dark" for="actionBlock">
+                                                    Strict Block
+                                                </label>
+                                            </div>
+                                            <p class="text-muted font-size-11 mb-0 ps-3">
+                                                Completely stops further tab opening or item additions until prior open bills are settled.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Tab 5: Localization & Regional -->
                 <div v-show="activeTab === 'locale'" class="col-12">
                     <div class="card border rounded-2 bg-white p-4">
@@ -1424,6 +1624,7 @@ const tabs = [
     { key: "contact", label: "Contact & Headquarters", icon: "ri:map-pin-2-line" },
     { key: "branding", label: "Branding & Colors", icon: "ri:palette-line" },
     { key: "documents", label: "Documents & Printing", icon: "ri:file-list-3-line" },
+    { key: "tabs_rules", label: "Tabs & Credit Rules", icon: "ri:shield-check-line" },
     { key: "locale", label: "Localization & Regional", icon: "ri:global-line" },
 ];
 
@@ -1597,6 +1798,14 @@ const form = reactive({
     timezone: "Africa/Nairobi",
     date_format: "d M Y",
     time_format: "12h",
+
+    // Tab & Credit Security Rules
+    tabs_enabled: true,
+    tab_limit: 10000,
+    tab_payment_window_hours: 12,
+    max_open_tabs_per_customer: 2,
+    max_unpaid_tabs_per_cashier: 15,
+    tab_limit_action: "warn",
 });
 
 // Snapshot for dirty checking
@@ -1705,6 +1914,14 @@ async function fetchBusinessDetails() {
         form.timezone = data.locale?.timezone || "Africa/Nairobi";
         form.date_format = data.locale?.date_format || "d M Y";
         form.time_format = data.locale?.time_format || "12h";
+
+        // Tab & Credit Security Rules
+        form.tabs_enabled = data.tab_settings?.tabs_enabled ?? true;
+        form.tab_limit = data.tab_settings?.tab_limit ?? 10000;
+        form.tab_payment_window_hours = data.tab_settings?.tab_payment_window_hours ?? 12;
+        form.max_open_tabs_per_customer = data.tab_settings?.max_open_tabs_per_customer ?? 2;
+        form.max_unpaid_tabs_per_cashier = data.tab_settings?.max_unpaid_tabs_per_cashier ?? 15;
+        form.tab_limit_action = data.tab_settings?.tab_limit_action || "warn";
 
         originalFormSnapshot.value = JSON.stringify(form);
 
