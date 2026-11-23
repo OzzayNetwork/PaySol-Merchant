@@ -87,6 +87,27 @@
               </div>
             </div>
 
+            <!-- KRA PIN -->
+            <div class="mb-3">
+              <label class="form-label font-size-13 fw-semibold text-dark">
+                KRA PIN <span class="text-muted fw-normal">(Optional — for tax & ETR invoices)</span>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted font-size-12">
+                  <i class="bx bx-receipt"></i>
+                </span>
+                <input
+                  v-model="form.tax_pin"
+                  type="text"
+                  class="form-control text-uppercase font-monospace"
+                  placeholder="e.g. A012345678B / P051234567X"
+                  maxlength="11"
+                  @input="form.tax_pin = form.tax_pin.toUpperCase()"
+                />
+              </div>
+              <small class="text-muted font-size-11">Buyer PIN for Kenya Revenue Authority VAT compliance and corporate receipts</small>
+            </div>
+
             <!-- Optional Delivery Address Toggle -->
             <div class="mb-2">
               <div class="form-check form-switch">
@@ -102,7 +123,23 @@
               </div>
             </div>
 
+            <!-- Delivery Address Details -->
             <div v-if="showAddressFields" class="p-3 bg-light rounded border mb-3">
+              <!-- Google Maps Address Search -->
+              <div class="mb-3">
+                <label class="form-label font-size-12 fw-semibold text-dark d-flex align-items-center gap-1">
+                  <i class="bx bx-map text-primary fs-5"></i>
+                  <span>Search Address or Landmark (Google Maps)</span>
+                </label>
+                <GoogleLocationInput
+                  v-model="mapSearchQuery"
+                  placeholder="Search for address, building, or area in Kenya..."
+                  @location-selected="onLocationSelected"
+                  @location-cleared="onLocationCleared"
+                />
+                <small class="text-muted font-size-11">Auto-fills town, estate/area, and captures GPS coordinates</small>
+              </div>
+
               <div class="row g-2 mb-2">
                 <div class="col-6">
                   <label class="form-label font-size-12 text-muted">Town / City</label>
@@ -157,11 +194,13 @@
 <script setup>
 import { ref, reactive } from 'vue';
 import customersApi from '@/api/customers';
+import GoogleLocationInput from '@/components/GoogleLocationInput.vue';
 
 const emit = defineEmits(['customer-created']);
 
 const isSubmitting = ref(false);
 const showAddressFields = ref(false);
+const mapSearchQuery = ref('');
 const modalRef = ref(null);
 
 const form = reactive({
@@ -169,25 +208,78 @@ const form = reactive({
   phone: '',
   email: '',
   customer_type: 'individual',
+  tax_pin: '',
   notes: '',
   address: {
     town_city: '',
     estate_area: '',
+    county: '',
+    street: '',
     building: '',
     additional_directions: '',
+    latitude: null,
+    longitude: null,
   },
 });
+
+const onLocationSelected = (data) => {
+  if (!data) return;
+  const comps = data.address_components || [];
+  let city = '';
+  let estate = '';
+  let street = '';
+  let county = '';
+
+  for (const c of comps) {
+    const types = c.types || [];
+    if (types.includes('locality')) {
+      city = c.long_name;
+    } else if (types.includes('administrative_area_level_2') && !city) {
+      city = c.long_name;
+    }
+    if (types.includes('administrative_area_level_1')) {
+      county = c.long_name;
+    }
+    if (types.includes('sublocality') || types.includes('neighborhood')) {
+      estate = c.long_name;
+    }
+    if (types.includes('route')) {
+      street = c.long_name;
+    }
+  }
+
+  form.address.town_city = city || form.address.town_city || 'Nairobi';
+  form.address.estate_area = estate || data.name || form.address.estate_area;
+  form.address.county = county || form.address.county;
+  form.address.street = street || form.address.street;
+  if (!form.address.building && data.name && data.name !== data.formatted_address) {
+    form.address.building = data.name;
+  }
+  form.address.latitude = data.latitude || null;
+  form.address.longitude = data.longitude || null;
+};
+
+const onLocationCleared = () => {
+  form.address.latitude = null;
+  form.address.longitude = null;
+};
 
 const resetForm = () => {
   form.name = '';
   form.phone = '';
   form.email = '';
   form.customer_type = 'individual';
+  form.tax_pin = '';
   form.notes = '';
   form.address.town_city = '';
   form.address.estate_area = '';
+  form.address.county = '';
+  form.address.street = '';
   form.address.building = '';
   form.address.additional_directions = '';
+  form.address.latitude = null;
+  form.address.longitude = null;
+  mapSearchQuery.value = '';
   showAddressFields.value = false;
 };
 
@@ -201,11 +293,15 @@ const handleSubmit = async () => {
       phone: form.phone.trim() ? (form.phone.startsWith('0') ? form.phone : `0${form.phone}`) : null,
       email: form.email.trim() || null,
       customer_type: form.customer_type,
+      tax_pin: form.tax_pin.trim() ? form.tax_pin.trim().toUpperCase() : null,
       notes: form.notes.trim() || null,
     };
 
-    if (showAddressFields.value && (form.address.town_city || form.address.building)) {
-      payload.address = { ...form.address };
+    if (showAddressFields.value && (form.address.town_city || form.address.building || form.address.estate_area || mapSearchQuery.value)) {
+      payload.address = {
+        ...form.address,
+        building: form.address.building || mapSearchQuery.value || null,
+      };
     }
 
     const res = await customersApi.create(payload);

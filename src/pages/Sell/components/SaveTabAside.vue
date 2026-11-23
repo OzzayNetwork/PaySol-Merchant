@@ -266,6 +266,11 @@
                       <span>{{ selectedCustomer.loyalty_points || 0 }} pts</span>
                     </div>
                   </div>
+                  <div v-if="selectedCustomer.tax_pin" class="mt-1">
+                    <span class="badge bg-light text-dark border font-monospace font-size-11">
+                      <i class="bx bx-receipt text-primary me-1"></i>KRA PIN: {{ selectedCustomer.tax_pin }}
+                    </span>
+                  </div>
                 </div>
               </div>
 

@@ -44,6 +44,19 @@
                 <span>Customer: {{ order?.customer?.name }}</span>
                 <span>Pts: {{ order?.customer?.loyalty_points }}</span>
               </div>
+              <div v-if="order?.tax_pin || order?.customer?.tax_pin" class="d-flex justify-content-between mt-1 text-dark">
+                <span>KRA PIN:</span>
+                <span class="fw-bold font-monospace">{{ order?.tax_pin || order?.customer?.tax_pin }}</span>
+              </div>
+              <div v-if="order?.fulfilment_method === 'delivery'" class="mt-1 pt-1 border-top border-dark-subtle">
+                <div class="d-flex justify-content-between text-dark fw-bold">
+                  <span>Fulfilment:</span>
+                  <span class="text-uppercase">DELIVERY</span>
+                </div>
+                <div v-if="order?.delivery_address" class="text-muted font-size-10 mt-1">
+                  <span>Drop-off: {{ order?.delivery_address }}</span>
+                </div>
+              </div>
             </div>
 
             <!-- Items -->
@@ -70,6 +83,10 @@
               <div v-if="order?.tax_amount > 0" class="d-flex justify-content-between mb-1">
                 <span>VAT / Tax</span>
                 <span>{{ formatMoney(order?.tax_amount) }}</span>
+              </div>
+              <div v-if="order?.delivery_fee > 0" class="d-flex justify-content-between mb-1">
+                <span>Delivery Fee</span>
+                <span>{{ formatMoney(order?.delivery_fee) }}</span>
               </div>
               <div class="d-flex justify-content-between fw-bold font-size-15 mt-2 pt-1 border-top border-dark-subtle">
                 <span>TOTAL</span>

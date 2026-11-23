@@ -29,7 +29,7 @@
             <div>
               <span class="text-muted font-size-12 text-uppercase fw-semibold">Amount Due</span>
               <h3 class="mb-0 fw-bold text-dark font-size-24">
-                {{ formatMoney(totalAmount) }}
+                {{ formatMoney(effectiveTotal) }}
               </h3>
             </div>
             <div class="text-end">
@@ -38,6 +38,90 @@
               </span>
               <div v-if="customer" class="text-muted font-size-12 mt-1">
                 Customer: <strong class="text-dark">{{ customer.name }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fulfilment & Tax/KRA PIN Section -->
+          <div class="p-3 bg-light rounded border mb-3">
+            <div class="row g-2 align-items-center">
+              <div class="col-sm-6">
+                <label class="form-label font-size-12 fw-semibold text-dark mb-1">Fulfilment Type</label>
+                <div class="btn-group btn-group-sm w-100" role="group">
+                  <button
+                    type="button"
+                    class="btn"
+                    :class="selectedFulfilment === 'takeaway' ? 'btn-primary' : 'btn-white'"
+                    @click="selectedFulfilment = 'takeaway'"
+                  >
+                    Takeaway
+                  </button>
+                  <button
+                    type="button"
+                    class="btn"
+                    :class="selectedFulfilment === 'dine_in' ? 'btn-primary' : 'btn-white'"
+                    @click="selectedFulfilment = 'dine_in'"
+                  >
+                    Dine In
+                  </button>
+                  <button
+                    type="button"
+                    class="btn"
+                    :class="selectedFulfilment === 'delivery' ? 'btn-primary' : 'btn-white'"
+                    @click="selectedFulfilment = 'delivery'"
+                  >
+                    Delivery
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-sm-6">
+                <label class="form-label font-size-12 fw-semibold text-dark mb-1">
+                  KRA PIN <span class="text-muted fw-normal">(Optional)</span>
+                </label>
+                <input
+                  v-model="kraPin"
+                  type="text"
+                  class="form-control form-control-sm text-uppercase font-monospace"
+                  placeholder="e.g. P051234567X"
+                  maxlength="11"
+                  @input="kraPin = kraPin.toUpperCase()"
+                />
+              </div>
+            </div>
+
+            <!-- Delivery Address via Google Maps -->
+            <div v-if="selectedFulfilment === 'delivery'" class="mt-3 pt-2 border-top">
+              <label class="form-label font-size-12 fw-semibold text-dark d-flex align-items-center gap-1 mb-1">
+                <i class="bx bx-map text-primary fs-5"></i>
+                <span>Delivery Address (Google Maps)</span>
+              </label>
+              <GoogleLocationInput
+                v-model="deliveryAddress"
+                placeholder="Search delivery address or landmark in Kenya..."
+                @location-selected="onDeliveryLocationSelected"
+              />
+              <div class="row g-2 mt-1">
+                <div class="col-sm-6">
+                  <label class="form-label font-size-11 text-muted mb-0">Delivery Fee (KES)</label>
+                  <input
+                    v-model.number="deliveryFeeInput"
+                    type="number"
+                    min="0"
+                    step="any"
+                    class="form-control form-control-sm"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label font-size-11 text-muted mb-0">Building / Apt / Door Details</label>
+                  <input
+                    v-model="deliveryDirections"
+                    type="text"
+                    class="form-control form-control-sm"
+                    placeholder="e.g. Apt 4B, 3rd Floor"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -129,67 +213,92 @@
 
               <!-- Quick cash buttons -->
               <div class="d-flex flex-wrap gap-2">
-                <button type="button" class="btn btn-sm btn-white" @click="cashTendered = totalAmount">
-                  Exact ({{ formatPlainMoney(totalAmount) }})
+                <button type="button" class="btn btn-sm btn-white flex-fill" @click="cashTendered = effectiveTotal">
+                  Exact ({{ formatPlainMoney(effectiveTotal) }})
                 </button>
-                <button type="button" class="btn btn-sm btn-white" @click="addCash(100)">+100</button>
-                <button type="button" class="btn btn-sm btn-white" @click="addCash(200)">+200</button>
-                <button type="button" class="btn btn-sm btn-white" @click="addCash(500)">+500</button>
-                <button type="button" class="btn btn-sm btn-white" @click="addCash(1000)">+1,000</button>
-                <button type="button" class="btn btn-sm btn-white" @click="roundToNearest(100)">Round 100</button>
-                <button type="button" class="btn btn-sm btn-white" @click="roundToNearest(500)">Round 500</button>
+                <button type="button" class="btn btn-sm btn-white flex-fill" @click="roundToNearest(50)">
+                  Nearest 50
+                </button>
+                <button type="button" class="btn btn-sm btn-white flex-fill" @click="roundToNearest(100)">
+                  Nearest 100
+                </button>
+                <button type="button" class="btn btn-sm btn-white flex-fill" @click="roundToNearest(500)">
+                  Nearest 500
+                </button>
+                <button type="button" class="btn btn-sm btn-white flex-fill" @click="roundToNearest(1000)">
+                  Nearest 1,000
+                </button>
+                <button type="button" class="btn btn-sm btn-white flex-fill" @click="addCash(500)">
+                  +500
+                </button>
+                <button type="button" class="btn btn-sm btn-white flex-fill" @click="addCash(1000)">
+                  +1,000
+                </button>
               </div>
             </div>
 
             <!-- M-PESA TAB -->
-            <div v-if="activeMethod === 'mpesa'" class="p-3 bg-light rounded border mb-3">
-              <div class="mb-3">
-                <label class="form-label font-size-12 fw-semibold text-dark">
-                  M-Pesa Transaction Code <span class="text-danger">*</span>
-                </label>
+            <div v-else-if="activeMethod === 'mpesa'" class="p-3 bg-light rounded border mb-3">
+              <label class="form-label font-size-12 fw-semibold text-dark">
+                M-Pesa Transaction Code / Confirmation Ref <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-white text-muted">
+                  <i class="bx bx-barcode"></i>
+                </span>
                 <input
                   v-model="mpesaReference"
                   type="text"
-                  class="form-control text-uppercase fw-bold"
-                  placeholder="e.g. QK876XYZ21"
+                  class="form-control form-control-lg text-uppercase fw-bold font-monospace"
+                  placeholder="e.g. QK83DF91A2"
                   maxlength="20"
                 />
-                <small class="text-muted font-size-11">
-                  Enter the 10-character alphanumeric Safaricom confirmation code.
-                </small>
               </div>
+              <small class="text-muted mt-1 d-block font-size-11">
+                Enter the customer M-Pesa receipt code received on your till or phone.
+              </small>
             </div>
 
             <!-- CARD / BANK TAB -->
-            <div v-if="activeMethod === 'bank'" class="p-3 bg-light rounded border mb-3">
-              <div class="mb-3">
-                <label class="form-label font-size-12 fw-semibold text-dark">
-                  Bank Reference / Card Terminal Slip #
-                </label>
-                <input
-                  v-model="bankReference"
-                  type="text"
-                  class="form-control"
-                  placeholder="e.g. STANBIC-POS-4482"
-                />
-              </div>
+            <div v-else-if="activeMethod === 'bank'" class="p-3 bg-light rounded border mb-3">
+              <label class="form-label font-size-12 fw-semibold text-dark">
+                POS Terminal Auth / Trace Number (Optional)
+              </label>
+              <input
+                v-model="bankReference"
+                type="text"
+                class="form-control"
+                placeholder="e.g. AUTH-482910"
+              />
+              <small class="text-muted mt-1 d-block font-size-11">
+                Card terminal trace code, cheque number, or bank transfer reference.
+              </small>
             </div>
           </div>
 
           <!-- Split Payment Mode -->
-          <div v-else class="mb-3">
-            <div class="p-2 mb-2 bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded font-size-12 d-flex align-items-center justify-content-between">
-              <span>Allocate the remaining amount across multiple payment methods:</span>
-              <strong class="font-size-13">{{ formatMoney(remainingSplitBalance) }} remaining</strong>
+          <div v-else class="p-3 bg-light rounded border mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="font-size-12 fw-semibold text-dark">Split Rows</span>
+              <span
+                class="font-size-12 fw-bold"
+                :class="remainingSplitBalance === 0 ? 'text-success' : 'text-danger'"
+              >
+                Remaining: {{ formatMoney(remainingSplitBalance) }}
+              </span>
             </div>
 
-            <div v-for="(split, idx) in splitTenders" :key="idx" class="p-2 rounded border bg-light mb-2">
-              <div class="row g-2 align-items-center">
+            <div class="d-flex flex-column gap-2">
+              <div
+                v-for="(split, idx) in splitTenders"
+                :key="idx"
+                class="row g-2 align-items-center bg-white p-2 rounded border"
+              >
                 <div class="col-4">
                   <select v-model="split.method" class="form-select form-select-sm">
                     <option value="cash">Cash</option>
                     <option value="mpesa">M-Pesa</option>
-                    <option value="bank">Bank / Card</option>
+                    <option value="bank">Card / Bank</option>
                   </select>
                 </div>
                 <div class="col-4">
@@ -207,7 +316,7 @@
                     v-if="split.method === 'mpesa'"
                     v-model="split.external_reference"
                     type="text"
-                    class="form-control form-control-sm text-uppercase"
+                    class="form-control form-control-sm text-uppercase font-monospace"
                     placeholder="Ref code"
                   />
                   <input
@@ -246,7 +355,7 @@
           <!-- Checkout Notes -->
           <div class="mb-2">
             <label class="form-label font-size-12 text-muted">Receipt / Sale Notes (Optional)</label>
-            <input v-model="saleNotes" type="text" class="form-control form-control-sm" placeholder="e.g. Takeaway packaging requested" />
+            <input v-model="saleNotes" type="text" class="form-control form-control-sm" placeholder="e.g. Delivery drop-off packaging requested" />
           </div>
         </div>
 
@@ -271,6 +380,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import salesApi from '@/api/sales';
+import GoogleLocationInput from '@/components/GoogleLocationInput.vue';
 import { useShiftStore } from '@/stores/shift';
 
 const props = defineProps({
@@ -295,6 +405,12 @@ const isSubmitting = ref(false);
 const activeMethod = ref('cash');
 const isSplitPayment = ref(false);
 
+const selectedFulfilment = ref(props.fulfilmentMethod || 'takeaway');
+const deliveryAddress = ref('');
+const deliveryDirections = ref('');
+const deliveryFeeInput = ref(props.deliveryFee || 0);
+const kraPin = ref(props.customer?.tax_pin || '');
+
 const cashTendered = ref(0);
 const mpesaReference = ref('');
 const bankReference = ref('');
@@ -305,9 +421,15 @@ const splitTenders = ref([
   { method: 'mpesa', amount: 0, external_reference: '' },
 ]);
 
-// Initialize cashTendered whenever totalAmount updates
+const effectiveTotal = computed(() => {
+  const base = props.subtotal - props.discountAmount + props.taxAmount;
+  const delivery = selectedFulfilment.value === 'delivery' ? (Number(deliveryFeeInput.value) || 0) : 0;
+  return Math.max(0, Math.round((base + delivery) * 100) / 100);
+});
+
+// Watch effectiveTotal to update default tendered amounts
 watch(
-  () => props.totalAmount,
+  effectiveTotal,
   (val) => {
     cashTendered.value = val;
     if (splitTenders.value.length > 0) {
@@ -318,26 +440,52 @@ watch(
   { immediate: true }
 );
 
+// Watch customer changes to populate saved KRA PIN or address
+watch(
+  () => props.customer,
+  (cust) => {
+    if (cust) {
+      if (cust.tax_pin) {
+        kraPin.value = cust.tax_pin;
+      }
+      if (cust.addresses && cust.addresses.length > 0) {
+        const a = cust.addresses.find((addr) => addr.is_default) || cust.addresses[0];
+        deliveryAddress.value = [a.building, a.estate_area, a.town_city].filter(Boolean).join(', ');
+        if (a.additional_directions) {
+          deliveryDirections.value = a.additional_directions;
+        }
+      }
+    }
+  },
+  { immediate: true }
+);
+
+const onDeliveryLocationSelected = (data) => {
+  if (data?.formatted_address) {
+    deliveryAddress.value = data.formatted_address;
+  }
+};
+
 const cashChange = computed(() => {
   if (activeMethod.value !== 'cash') return 0;
-  return Math.max(0, Math.round((cashTendered.value - props.totalAmount) * 100) / 100);
+  return Math.max(0, Math.round((cashTendered.value - effectiveTotal.value) * 100) / 100);
 });
 
 const remainingSplitBalance = computed(() => {
   const sum = splitTenders.value.reduce((s, r) => s + (Number(r.amount) || 0), 0);
-  return Math.max(0, Math.round((props.totalAmount - sum) * 100) / 100);
+  return Math.max(0, Math.round((effectiveTotal.value - sum) * 100) / 100);
 });
 
 const isFormValid = computed(() => {
-  if (props.totalAmount <= 0) return true;
+  if (effectiveTotal.value <= 0) return true;
 
   if (isSplitPayment.value) {
     const sum = splitTenders.value.reduce((s, r) => s + (Number(r.amount) || 0), 0);
-    return Math.abs(sum - props.totalAmount) < 0.01;
+    return Math.abs(sum - effectiveTotal.value) < 0.01;
   }
 
   if (activeMethod.value === 'cash') {
-    return cashTendered.value >= props.totalAmount;
+    return cashTendered.value >= effectiveTotal.value;
   }
 
   if (activeMethod.value === 'mpesa') {
@@ -352,14 +500,14 @@ const addCash = (amount) => {
 };
 
 const roundToNearest = (nearest) => {
-  cashTendered.value = Math.ceil(props.totalAmount / nearest) * nearest;
+  cashTendered.value = Math.ceil(effectiveTotal.value / nearest) * nearest;
 };
 
 const handleSplitToggle = () => {
   if (isSplitPayment.value) {
     splitTenders.value = [
-      { method: 'cash', amount: Math.floor(props.totalAmount / 2), tendered_amount: Math.floor(props.totalAmount / 2), external_reference: '' },
-      { method: 'mpesa', amount: Math.ceil(props.totalAmount / 2), external_reference: '' },
+      { method: 'cash', amount: Math.floor(effectiveTotal.value / 2), tendered_amount: Math.floor(effectiveTotal.value / 2), external_reference: '' },
+      { method: 'mpesa', amount: Math.ceil(effectiveTotal.value / 2), external_reference: '' },
     ];
   }
 };
@@ -412,8 +560,8 @@ const handleCompleteSale = async () => {
       payments = [
         {
           method: activeMethod.value,
-          amount: props.totalAmount,
-          tendered_amount: activeMethod.value === 'cash' ? cashTendered.value : props.totalAmount,
+          amount: effectiveTotal.value,
+          tendered_amount: activeMethod.value === 'cash' ? cashTendered.value : effectiveTotal.value,
           external_reference:
             activeMethod.value === 'mpesa'
               ? mpesaReference.value.trim().toUpperCase()
@@ -424,13 +572,19 @@ const handleCompleteSale = async () => {
       ];
     }
 
+    const finalDeliveryAddress = selectedFulfilment.value === 'delivery'
+      ? [deliveryAddress.value, deliveryDirections.value].filter(Boolean).join(', ')
+      : null;
+
     const payload = {
       branch_id: branchId,
       customer_id: props.customer?.id || null,
-      channel: props.channel || 'counter',
-      fulfilment_method: props.fulfilmentMethod || 'takeaway',
+      channel: selectedFulfilment.value === 'delivery' ? 'delivery' : (props.channel || 'counter'),
+      fulfilment_method: selectedFulfilment.value,
+      tax_pin: kraPin.value?.trim() ? kraPin.value.trim().toUpperCase() : null,
+      delivery_address: finalDeliveryAddress,
       discount_amount: props.discountAmount || 0,
-      delivery_fee: props.deliveryFee || 0,
+      delivery_fee: selectedFulfilment.value === 'delivery' ? (Number(deliveryFeeInput.value) || 0) : 0,
       idempotency_key: `pos-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       notes: saleNotes.value.trim() || null,
       items,
