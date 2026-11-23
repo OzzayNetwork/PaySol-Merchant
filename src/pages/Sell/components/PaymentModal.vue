@@ -103,13 +103,13 @@
                 @location-cleared="onDeliveryLocationCleared"
               />
 
-              <!-- 🗺️ Esri Map Preview (Non-zoomable clean Light Gray Canvas with Pin) -->
-              <EsriMapPreview
+              <!-- 🗺️ Google Maps Pin Preview (Non-zoomable matching gallery.add.vue) -->
+              <GoogleMapPreview
                 v-if="deliveryLocation?.latitude && deliveryLocation?.longitude"
                 :latitude="deliveryLocation.latitude"
                 :longitude="deliveryLocation.longitude"
                 :label="deliveryAddress || 'Delivery Destination'"
-                height="160px"
+                height="160"
               />
               <div class="row g-2 mt-1">
                 <div class="col-sm-6">
@@ -391,7 +391,7 @@
 import { ref, computed, watch } from 'vue';
 import salesApi from '@/api/sales';
 import GoogleLocationInput from '@/components/GoogleLocationInput.vue';
-import EsriMapPreview from '@/components/EsriMapPreview.vue';
+import GoogleMapPreview from '@/components/GoogleMapPreview.vue';
 import { useShiftStore } from '@/stores/shift';
 
 const props = defineProps({

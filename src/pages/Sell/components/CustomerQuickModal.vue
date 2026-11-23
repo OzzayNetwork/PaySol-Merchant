@@ -215,13 +215,13 @@
                   />
                 </div>
 
-                <!-- 🗺️ Esri Map Preview (Non-zoomable clean Light Gray Canvas with Pin) -->
-                <EsriMapPreview
+                <!-- 🗺️ Google Maps Pin Preview (Non-zoomable matching gallery.add.vue) -->
+                <GoogleMapPreview
                   v-if="form.address.latitude && form.address.longitude"
                   :latitude="form.address.latitude"
                   :longitude="form.address.longitude"
                   :label="form.address.estate_area || form.address.town_city || form.address.building || ''"
-                  height="180px"
+                  height="180"
                 />
 
                 <div class="row g-2 mb-2">
@@ -296,7 +296,7 @@
 import { ref, reactive } from 'vue';
 import customersApi from '@/api/customers';
 import GoogleLocationInput from '@/components/GoogleLocationInput.vue';
-import EsriMapPreview from '@/components/EsriMapPreview.vue';
+import GoogleMapPreview from '@/components/GoogleMapPreview.vue';
 
 const emit = defineEmits(['customer-created']);
 
