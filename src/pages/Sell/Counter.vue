@@ -1,47 +1,31 @@
 <template>
   <div class="container-fluid">
-    <!-- Non-blocking Counter Shift Notice (if not currently on duty) -->
-    <div
+    <!-- Operational Shift Alert Banner (matching HeaderAlertBanner underneath the header) -->
+    <HeaderAlertBanner
       v-if="!shiftStore.isOnDuty"
-      class="alert alert-warning border border-warning-subtle d-flex align-items-center justify-content-between flex-wrap gap-2 p-3 my-3"
-      role="alert"
-    >
-      <div class="d-flex align-items-center gap-2">
-        <i class="bx bx-info-circle fs-4 text-warning"></i>
-        <div>
-          <strong class="font-size-14 text-dark">Your counter isn't open yet.</strong>
-          <span class="text-muted font-size-13 ms-1 d-none d-md-inline">
-            You can browse products and prepare your cart, but you'll need an active shift before completing checkout.
-          </span>
-        </div>
-      </div>
-      <button
-        type="button"
-        class="btn btn-sm btn-primary text-nowrap d-inline-flex align-items-center gap-1 font-size-13 px-3 py-2"
-        @click="openShiftModal"
-      >
-        <i class="bx bx-key font-size-16"></i>
-        <span>Open Counter Shift</span>
-      </button>
-    </div>
+      class="rounded border my-3"
+      tone="warning"
+      label="Shift Required"
+      icon="mdi:alert-outline"
+      title="Your counter isn't open yet"
+      message="You can browse products and prepare your cart, but an active shift is required before completing checkout."
+      action-label="Open Counter Shift"
+      action-icon="mdi:key-outline"
+      @action="openShiftModal"
+    />
 
-    <!-- Active Shift Status Bar (if on duty) -->
-    <div
+    <HeaderAlertBanner
       v-else
-      class="d-flex align-items-center justify-content-between my-2 px-3 py-2 bg-light border rounded font-size-12"
-    >
-      <div class="d-flex align-items-center gap-2">
-        <span class="badge bg-success font-size-12 px-2 py-1">
-          <i class="bx bx-check-circle me-1"></i> Active Shift: {{ shiftStore.activeShiftNumber }}
-        </span>
-        <span class="text-muted">Branch: <strong>{{ currentBranchName }}</strong></span>
-      </div>
-      <div class="d-flex align-items-center gap-2 text-muted">
-        <span>Float: <strong>KES {{ Number(shiftStore.openingFloat).toLocaleString() }}</strong></span>
-        <span>•</span>
-        <span>{{ shiftStore.activeMembersCount }} cashier{{ shiftStore.activeMembersCount === 1 ? '' : 's' }} on duty</span>
-      </div>
-    </div>
+      class="rounded border my-3"
+      tone="success"
+      label="Counter Active"
+      icon="mdi:check-circle-outline"
+      :title="`Active Shift ${shiftStore.activeShiftNumber}`"
+      :message="`Branch: ${currentBranchName} · Float: KES ${Number(shiftStore.openingFloat).toLocaleString()} · ${shiftStore.activeMembersCount} cashier${shiftStore.activeMembersCount === 1 ? '' : 's'} on duty`"
+      action-label="Shift Details"
+      action-icon="mdi:cog-outline"
+      @action="openShiftModal"
+    />
 
     <!-- Main Layout: Row 8 cols (Products) + 4 cols (Cart) -->
     <div class="row justify-content-center">
@@ -506,6 +490,7 @@ import PaymentModal from './components/PaymentModal.vue';
 import ReceiptModal from './components/ReceiptModal.vue';
 import SaveTabModal from './components/SaveTabModal.vue';
 import ShiftActionModal from '@/components/Shifts/ShiftActionModal.vue';
+import HeaderAlertBanner from '@/components/HeaderAlertBanner.vue';
 import emptyCart from '@/assets/images/icons/POS/empty-cart.svg';
 import emptyImage from '@/assets/images/icons/packaging.svg';
 

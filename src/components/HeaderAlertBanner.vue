@@ -77,6 +77,10 @@ const toneColor = computed(() => toneColors[safeTone.value])
     font-size: 12px;
 }
 
+.header-alert-banner.border {
+    border: 1px solid color-mix(in srgb, var(--header-alert-tone) 32%, transparent) !important;
+}
+
 .header-alert-pulse {
     width: 8px;
     height: 8px;
