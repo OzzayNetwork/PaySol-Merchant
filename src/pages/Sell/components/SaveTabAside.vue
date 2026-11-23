@@ -12,52 +12,46 @@
 
   <!-- Save Tab Offcanvas Sidebar (Matching reference SaveTabAside.vue) -->
   <div
-    class="offcanvas offcanvas-end w-25"
+    class="offcanvas offcanvas-end"
+    style="width: 430px; max-width: 95vw;"
     tabindex="-1"
     id="saveTabAside"
     ref="offcanvasRef"
   >
-    <!-- Header -->
-    <div class="offcanvas-header border-bottom py-0 pr-0">
+    <!-- Header (Matching Reference Design) -->
+    <div class="offcanvas-header border-bottom py-2.5 px-3.5 d-flex align-items-center justify-content-between bg-white">
       <div class="d-flex align-items-center gap-2">
-        <button
-          type="button"
-          class="btn btn-white position-relative p-0 avatar-sm rounded-circle"
-          data-bs-dismiss="offcanvas"
-          aria-label="Close"
-        >
-          <span class="avatar-title bg-transparent text-reset">
-            <i class="bx bx-arrow-back font-size-22"></i>
-          </span>
-        </button>
-        <div class="d-flex flex-column py-3">
-          <h5 class="mb-0 fw-bold">Save As open bill</h5>
-          <p class="m-0 text-muted"><small>Save this sale as a tab for your customer.</small></p>
+        <div class="d-flex align-items-center justify-content-center rounded-3 bg-light border p-1.5 flex-shrink-0" style="width: 36px; height: 36px;">
+          <i class="mdi mdi-receipt-text-outline font-size-18 text-dark"></i>
+        </div>
+        <div>
+          <h5 class="mb-0 fw-bold font-size-15 text-dark">Open Tabs</h5>
+          <p class="m-0 text-muted font-size-11">Select an existing tab or create a new one.</p>
         </div>
       </div>
-      <button type="button" class="btn-close text-reset d-none" data-bs-dismiss="offcanvas"></button>
+      <button type="button" class="btn-close text-reset shadow-none font-size-11" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
 
-    <!-- Navigation Tabs: New vs Existing Tab (1:1 Reference Design) -->
-    <div class="offcanvas-header border-bottom p-0 bg-white">
-      <div class="d-flex w-100" role="tablist">
+    <!-- Navigation Tabs: Segmented Control (Matching Reference Design) -->
+    <div class="p-3 pt-2.5 pb-2.5 bg-white border-bottom">
+      <div class="d-flex p-1 bg-light rounded-3 border" style="background-color: #f1f5f9 !important; border-radius: 10px; padding: 3px !important;">
         <button
           type="button"
           @click="newTab = true"
-          class="btn py-3 flex-fill text-center rounded-0 font-size-13 fw-semibold border-0 transition-all shadow-none"
+          class="btn flex-fill py-1.5 font-size-12 fw-semibold border-0 transition-all rounded-2 shadow-none"
           :style="newTab
-            ? 'background-color: #dbeafe; color: #1d4ed8; border-bottom: 3px solid #2563eb !important; font-weight: 700;'
-            : 'background-color: #ffffff; color: #475569;'"
+            ? 'background-color: #ffffff; color: #0f172a; box-shadow: 0 1px 2px rgba(0,0,0,0.06); font-weight: 600;'
+            : 'background-color: transparent; color: #64748b; font-weight: 500;'"
         >
           New Tab/Bill
         </button>
         <button
           type="button"
           @click="newTab = false"
-          class="btn py-3 flex-fill text-center rounded-0 font-size-13 fw-semibold border-0 transition-all shadow-none"
+          class="btn flex-fill py-1.5 font-size-12 fw-semibold border-0 transition-all rounded-2 shadow-none"
           :style="!newTab
-            ? 'background-color: #dbeafe; color: #1d4ed8; border-bottom: 3px solid #2563eb !important; font-weight: 700;'
-            : 'background-color: #ffffff; color: #475569;'"
+            ? 'background-color: #dbeafe; color: #1d4ed8; box-shadow: 0 1px 2px rgba(29, 78, 216, 0.12); font-weight: 600;'
+            : 'background-color: transparent; color: #64748b; font-weight: 500;'"
         >
           Existing Tab/Bill ({{ openTabs.length }})
         </button>
@@ -222,50 +216,50 @@
             </div>
 
             <!-- Tab Name -->
-            <div class="col-12 mb-3">
-              <label class="form-label fw-bold font-size-13 text-dark">
+            <div class="col-12 mb-2.5">
+              <label class="form-label fw-bold font-size-12 text-dark mb-1">
                 Bill Name/Label (Optional)
               </label>
               <input
                 type="text"
-                class="form-control"
+                class="form-control font-size-12 py-1.5"
                 placeholder="e.g. John-Table 4 (Optional)"
                 v-model="form.tab_name"
               />
-              <small class="text-muted font-size-12">Leave blank to auto-generate from customer or table</small>
+              <small class="text-muted font-size-11">Leave blank to auto-generate from customer or table</small>
             </div>
 
             <!-- Guest Count -->
-            <div class="col-12 mb-3">
-              <label class="form-label fw-bold font-size-13 text-dark">
+            <div class="col-12 mb-2.5">
+              <label class="form-label fw-bold font-size-12 text-dark mb-1">
                 Number of Guests <span class="text-danger fw-bold">*</span>
               </label>
               <input
                 type="text"
-                class="form-control"
+                class="form-control font-size-12 py-1.5"
                 placeholder="e.g. 4"
                 v-model="form.guest_count"
                 pattern="^[0-9]+$"
                 required
               />
-              <small class="text-muted font-size-12">Enter the number of guests for this table</small>
+              <small class="text-muted font-size-11">Enter the number of guests for this table</small>
             </div>
 
             <!-- Notes -->
-            <div class="col-12 mb-3">
-              <label class="form-label fw-bold font-size-13 text-dark">Notes (Optional)</label>
+            <div class="col-12 mb-2.5">
+              <label class="form-label fw-bold font-size-12 text-dark mb-1">Notes (Optional)</label>
               <textarea
-                class="form-control"
-                rows="3"
+                class="form-control font-size-12"
+                rows="2"
                 placeholder="Start typing..."
                 v-model="form.notes"
               ></textarea>
             </div>
 
             <!-- Dine-In badge -->
-            <div class="col-12 mt-3">
-              <div class="p-3 text-muted text-center border border-1 fw-bold border-dark-subtle bg-light rounded d-flex gap-2 justify-content-center align-items-center">
-                <span class="bx bx-info-circle fs-3"></span>
+            <div class="col-12 mt-2">
+              <div class="p-2 text-muted text-center border border-1 fw-medium border-dark-subtle bg-light rounded d-flex gap-2 justify-content-center align-items-center font-size-12">
+                <span class="bx bx-info-circle font-size-16"></span>
                 <div>This tab will be created as Dine-In</div>
               </div>
             </div>
@@ -273,13 +267,13 @@
         </div>
 
         <!-- Section: Billing Summary -->
-        <div class="p-3">
-          <div class="p-3 pb-1 bg-success-muted rounded border border-2 border-success-subtle">
-            <h4 class="card-title d-flex gap-2 align-items-center">
-              <i class="dripicons-tags fs-5"></i>
-              <span>Billing Summary</span>
-            </h4>
-            <table class="table text-uppercase fs-6 table-sm border-success m-0">
+        <div class="p-3 pt-2">
+          <div class="p-2.5 pb-1 bg-success-muted rounded border border-2 border-success-subtle">
+            <h5 class="card-title d-flex gap-1.5 align-items-center font-size-13 mb-2">
+              <i class="dripicons-tags font-size-14"></i>
+              <span class="fw-bold">Billing Summary</span>
+            </h5>
+            <table class="table text-uppercase font-size-12 table-sm border-success m-0">
               <tbody>
                 <tr class="border-success">
                   <td>Total Items</td>
@@ -297,7 +291,7 @@
                   <td>Tax</td>
                   <th class="text-right">KES 0.00</th>
                 </tr>
-                <tr class="fs-4 text-black">
+                <tr class="font-size-13 text-black">
                   <th>Sub Total</th>
                   <th class="text-right">{{ formatMoney(cartTotal) }}</th>
                 </tr>
@@ -307,17 +301,17 @@
         </div>
 
         <!-- Actions -->
-        <div class="p-3 d-flex flex-column gap-3">
+        <div class="p-3 pt-2 d-flex flex-column gap-2">
           <!-- Save as Tab — primary action -->
           <button
             type="submit"
             :disabled="!canSave || saving"
-            class="btn btn-primary waves-effect btn-lg fw-bold flex-grow-1"
+            class="btn btn-primary waves-effect fw-bold font-size-13 py-2.5 rounded-2"
           >
             <span v-if="saving" class="spinner-border spinner-border-sm me-2" role="status"></span>
             <template v-if="saving">Saving...</template>
             <template v-if="!saving">
-              <i class="mdi mdi-bookmark-outline fs-3 align-middle me-2"></i>
+              <i class="mdi mdi-bookmark-outline font-size-16 align-middle me-1.5"></i>
               Save As Tab
             </template>
           </button>
@@ -326,10 +320,10 @@
           <button
             type="button"
             data-bs-dismiss="offcanvas"
-            class="btn btn-light waves-effect fw-bold flex-nowrap d-flex align-items-center justify-content-center btn-lg"
+            class="btn btn-light waves-effect fw-semibold font-size-12 py-2 rounded-2 d-flex align-items-center justify-content-center"
             @click="resetForm"
           >
-            <i class="mdi mdi-close fs-4 align-middle me-2"></i>
+            <i class="mdi mdi-close font-size-15 align-middle me-1.5"></i>
             Cancel
           </button>
         </div>
@@ -338,119 +332,132 @@
 
     <!-- Offcanvas Body: EXISTING TABS -->
     <div v-else class="offcanvas-body p-3">
-      <div class="mb-3">
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Filter open tabs by name, customer, table..."
-          v-model="existingTabFilter"
-        />
+      <!-- Search Input with Search Icon (Matching Reference Design) -->
+      <div class="mb-3 position-relative">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0 pe-1 text-muted rounded-start-3 py-1">
+            <i class="bx bx-search font-size-15"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control border-start-0 ps-1 rounded-end-3 font-size-12 py-1.5"
+            placeholder="Search tabs by customer, table..."
+            v-model="existingTabFilter"
+          />
+        </div>
       </div>
 
       <div v-if="loadingOpenTabs" class="text-center py-4">
         <div class="spinner-border text-primary spinner-border-sm mb-2" role="status"></div>
-        <p class="text-muted font-size-13 mb-0">Loading open tabs...</p>
+        <p class="text-muted font-size-12 mb-0">Loading open tabs...</p>
       </div>
 
       <div v-else-if="filteredOpenTabs.length === 0" class="text-center py-5 text-muted">
         <i class="bx bx-receipt fs-1 opacity-50 mb-2"></i>
-        <h6 class="fw-semibold text-dark">No open tabs found</h6>
-        <p class="font-size-13">Create a new tab or check another shift.</p>
+        <h6 class="fw-semibold text-dark font-size-14">No open tabs found</h6>
+        <p class="font-size-12">Create a new tab or check another shift.</p>
       </div>
 
-      <div v-else class="d-flex flex-column gap-3">
-        <!-- Reference Design: Open Tab Card (100% Match) -->
+      <div v-else class="d-flex flex-column gap-2.5">
+        <!-- Reference Design: Open Tab Card (Matching Image & Fog Fade) -->
         <div
           v-for="tab in filteredOpenTabs"
           :key="tab.id"
-          class="card border-0 mb-2 shadow-none text-start overflow-hidden"
-          style="background-color: #f0f7ff; border-radius: 14px; border: 1px solid #e0effe !important;"
+          class="card border-0 mb-1 shadow-none text-start overflow-hidden position-relative"
+          style="background-color: #f0f6ff; border-radius: 14px; border: 1px solid #dbeafe !important;"
         >
           <div class="card-body p-3">
-            <!-- Top Section: Tab Name/Table & Pending Amount -->
+            <!-- Top Section: Tab Name / Table Pin & Pending Balance -->
             <div class="d-flex justify-content-between align-items-start mb-2">
               <div class="overflow-hidden pe-2">
-                <h6 class="fw-bold mb-0.5 text-dark font-size-15 text-truncate" :title="tab.name || tab.tab_number">
+                <h6 class="fw-bold mb-0.5 text-dark font-size-14 text-truncate" :title="tab.name || tab.tab_number">
                   {{ tab.name || (tab.customer ? `${tab.customer.name}'s Tab` : tab.tab_number) }}
                 </h6>
-                <div class="font-size-12" style="color: #64748b;">
-                  {{ tab.table ? `Table Number ${tab.table.table_number || tab.table.label}` : (tab.customer?.name || 'Walk-in') }}
+                <div class="d-flex align-items-center gap-1 font-size-11" style="color: #64748b;">
+                  <i class="mdi mdi-map-marker font-size-13 text-secondary"></i>
+                  <span>{{ tab.table ? `Table ${tab.table.table_number || tab.table.label}` : 'Counter' }}</span>
+                  <span class="mx-0.5">•</span>
+                  <span>{{ formatRelativeTime(tab.created_at || tab.updated_at) }}</span>
                 </div>
               </div>
+
               <div class="text-end flex-shrink-0">
-                <div class="fw-bold font-size-15" style="color: #10b981;">
+                <div class="fw-bold font-size-15" style="color: #1e40af; line-height: 1.2;">
                   KES {{ Number(tab.total_amount || tab.pending_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) }}
                 </div>
-                <div class="font-size-11" style="color: #64748b;">Pending Amount</div>
-              </div>
-            </div>
-
-            <!-- Middle Section: Itemized List with Dot Leaders -->
-            <div
-              v-if="tab.items && tab.items.length > 0"
-              class="d-flex flex-column gap-1.5 my-3 font-size-12"
-              style="color: #334155;"
-            >
-              <div
-                v-for="(item, idx) in (expandedTabs[tab.id] ? tab.items : tab.items.slice(0, 3))"
-                :key="item.id || idx"
-                class="d-flex align-items-baseline"
-              >
-                <span class="text-nowrap me-1">
-                  {{ idx + 1 }}. {{ item.item_name || item.name || 'Item' }}
-                  <span v-if="item.quantity" class="text-muted">({{ Number(item.quantity) }})</span>
-                </span>
-                <!-- Dot leader connecting item name and price -->
                 <span
-                  class="flex-grow-1 border-bottom border-dotted mx-1 mb-1"
-                  style="border-style: dotted !important; border-color: #cbd5e1 !important; border-bottom-width: 1.5px !important;"
-                ></span>
-                <span class="text-nowrap fw-semibold text-end" style="color: #0f172a; min-width: 48px;">
-                  {{ Number(item.total_amount ?? (Number(item.unit_price || 0) * Number(item.quantity || 1))).toFixed(2) }}
+                  class="badge font-size-10 px-2 py-0.5 fw-bold rounded-pill"
+                  style="background-color: #dbeafe; color: #1d4ed8; letter-spacing: 0.2px; margin-top: 2px;"
+                >
+                  Outstanding
                 </span>
               </div>
             </div>
 
-            <!-- Fallback if no item details loaded -->
-            <div
-              v-else
-              class="my-2.5 py-1 text-muted font-size-12 fst-italic"
-            >
-              <span>{{ tab.active_items_count || 0 }} item(s) on tab</span>
+            <!-- Middle Section: Itemized List with Fog Fade Effect (shows up to 2 items) -->
+            <div class="position-relative my-2">
+              <div
+                class="d-flex flex-column gap-1.5 font-size-12 transition-all"
+                :style="(!expandedTabs[tab.id] && (tab.items?.length > 2)) ? 'max-height: 48px; overflow: hidden;' : ''"
+              >
+                <div
+                  v-for="(item, idx) in (tab.items || [])"
+                  :key="item.id || idx"
+                  class="d-flex justify-content-between align-items-baseline"
+                  style="color: #334155;"
+                >
+                  <div class="text-truncate pe-2">
+                    <span>{{ idx + 1 }}. {{ item.item_name || item.name || 'Item' }}</span>
+                    <span v-if="item.quantity && Number(item.quantity) > 1" class="text-muted font-size-11 ms-1">({{ Number(item.quantity) }})</span>
+                  </div>
+                  <div class="fw-semibold font-size-12 text-dark text-nowrap">
+                    KES {{ Number(item.total_amount ?? (Number(item.unit_price || 0) * Number(item.quantity || 1))).toFixed(2) }}
+                  </div>
+                </div>
+
+                <!-- Fallback if no items array -->
+                <div v-if="!tab.items || tab.items.length === 0" class="text-muted font-size-11 fst-italic py-0.5">
+                  {{ tab.active_items_count || 0 }} item(s) on tab
+                </div>
+              </div>
+
+              <!-- Fog Fade Overlay: gently fades the 2nd/3rd item into the card background -->
+              <div
+                v-if="!expandedTabs[tab.id] && (tab.items?.length > 2)"
+                class="position-absolute bottom-0 start-0 end-0 pointer-events-none"
+                style="height: 28px; background: linear-gradient(to bottom, rgba(240, 246, 255, 0) 0%, rgba(240, 246, 255, 0.75) 40%, #f0f6ff 100%);"
+              ></div>
             </div>
 
-            <!-- Action Button: Append Cart to this Tab -->
-            <div class="my-3">
+            <!-- Items Count & Show Details Toggle -->
+            <div class="d-flex justify-content-between align-items-center font-size-11 pt-0.5 mb-2.5" style="color: #64748b;">
+              <span class="fw-medium">
+                {{ (tab.items?.length || tab.active_items_count || 1) }} item{{ (tab.items?.length || tab.active_items_count || 1) === 1 ? '' : 's' }}
+              </span>
+
               <button
+                v-if="tab.items && tab.items.length > 2"
                 type="button"
-                class="btn w-100 fw-semibold font-size-13 py-2 text-dark bg-white shadow-none"
-                style="border: 1.5px solid #0f172a; border-radius: 8px;"
-                :disabled="saving || cartItemsCount === 0"
-                @click="appendToExistingTab(tab)"
+                class="btn btn-link p-0 fw-semibold font-size-11 text-decoration-none d-inline-flex align-items-center gap-1 shadow-none"
+                style="color: #1d4ed8;"
+                @click="toggleExpandTab(tab.id)"
               >
-                Append Cart ({{ cartItemsCount }} items) to this Tab
+                <span>{{ expandedTabs[tab.id] ? 'Hide details' : 'Show details' }}</span>
+                <i :class="expandedTabs[tab.id] ? 'bx bx-chevron-up' : 'bx bx-chevron-down'"></i>
               </button>
             </div>
 
-            <!-- Bottom Row: Show More ⌵ & Relative Time -->
-            <div class="d-flex justify-content-between align-items-center font-size-12 pt-1" style="color: #64748b;">
-              <div>
-                <button
-                  v-if="tab.items && tab.items.length > 3"
-                  type="button"
-                  class="btn btn-link p-0 fw-semibold font-size-12 text-decoration-none text-dark d-inline-flex align-items-center gap-1 shadow-none"
-                  @click="toggleExpandTab(tab.id)"
-                >
-                  <span>{{ expandedTabs[tab.id] ? 'Show Less ⌃' : 'Show More ⌵' }}</span>
-                </button>
-                <span v-else class="fw-semibold text-dark cursor-pointer" role="button" @click="toggleExpandTab(tab.id)">
-                  Show More ⌵
-                </span>
-              </div>
-              <div>
-                {{ formatRelativeTime(tab.created_at || tab.updated_at) }}
-              </div>
-            </div>
+            <!-- Action Button: Solid Vibrant Blue -->
+            <button
+              type="button"
+              class="btn btn-primary w-100 fw-semibold font-size-12 py-2 rounded-2 d-flex align-items-center justify-content-center gap-1.5 shadow-none"
+              style="background-color: #1d4ed8; border: none;"
+              :disabled="saving || cartItemsCount === 0"
+              @click="appendToExistingTab(tab)"
+            >
+              <i class="bx bx-plus font-size-15"></i>
+              <span>Add {{ cartItemsCount }} item{{ cartItemsCount === 1 ? '' : 's' }} to this tab</span>
+            </button>
           </div>
         </div>
       </div>

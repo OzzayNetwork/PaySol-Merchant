@@ -1,19 +1,19 @@
 <template>
   <div
     v-if="customer"
-    class="card border border-light-subtle rounded-4 bg-white p-3 mb-3 shadow-sm position-relative overflow-hidden text-start"
-    style="border-radius: 16px; border-color: #e2e8f0 !important;"
+    class="card border border-light-subtle rounded-3 bg-white p-2.5 mb-2.5 shadow-sm position-relative overflow-hidden text-start"
+    style="border-radius: 14px; border-color: #e2e8f0 !important;"
   >
     <!-- Top Row: Last Seen & Standing Badge (Clean, no 'X' button) -->
-    <div class="d-flex align-items-center justify-content-between mb-3">
-      <div class="d-flex align-items-center font-size-12 fw-medium" style="color: #475569;">
-        <i class="mdi mdi-clock-outline me-1.5 font-size-16" style="color: #2563eb;"></i>
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <div class="d-flex align-items-center font-size-11 fw-medium" style="color: #64748b;">
+        <i class="mdi mdi-clock-outline me-1 font-size-14" style="color: #2563eb;"></i>
         <span>Last seen {{ formattedLastSeen }}</span>
       </div>
 
-      <div class="d-flex align-items-center gap-2">
+      <div class="d-flex align-items-center gap-1.5">
         <span
-          class="badge font-size-11 px-2.5 py-1 fw-bold tracking-wide d-inline-flex align-items-center gap-1 rounded-2"
+          class="badge font-size-10 px-2 py-0.5 fw-bold tracking-wide d-inline-flex align-items-center gap-1 rounded-2"
           :style="badgeConfig.style"
           :class="badgeConfig.class"
         >
@@ -25,7 +25,7 @@
         <button
           v-if="allowChange"
           type="button"
-          class="btn btn-link text-muted p-0 font-size-11 text-decoration-none opacity-75 hover-opacity-100"
+          class="btn btn-link text-muted p-0 font-size-10 text-decoration-none opacity-75 hover-opacity-100"
           title="Switch customer"
           @click.stop="$emit('change-customer')"
         >
@@ -36,13 +36,13 @@
 
     <!-- Middle Profile Row: Circular Avatar with Progress Arc & Details -->
     <div
-      class="d-flex align-items-center gap-3 mb-3 cursor-pointer user-select-none"
+      class="d-flex align-items-center gap-2.5 mb-2 cursor-pointer user-select-none"
       role="button"
       title="Click to view full customer profile & standing"
       @click="$emit('open-profile', customer)"
     >
       <!-- Avatar with Arc and Trophy Badge -->
-      <div class="position-relative flex-shrink-0" style="width: 66px; height: 66px;">
+      <div class="position-relative flex-shrink-0" style="width: 52px; height: 52px;">
         <!-- Conic gradient arc: spanning across the top from 10 o'clock to 2 o'clock in gold -->
         <div
           class="w-100 h-100 rounded-circle d-flex align-items-center justify-content-center"
@@ -50,10 +50,10 @@
         >
           <div
             class="w-100 h-100 rounded-circle bg-white d-flex align-items-center justify-content-center"
-            style="padding: 2.5px;"
+            style="padding: 2px;"
           >
             <div
-              class="w-100 h-100 rounded-circle d-flex align-items-center justify-content-center fw-bold font-size-19"
+              class="w-100 h-100 rounded-circle d-flex align-items-center justify-content-center fw-bold font-size-15"
               style="background-color: #ede9fe; color: #3730a3;"
             >
               {{ initials }}
@@ -64,7 +64,7 @@
         <!-- Docked Trophy Badge at bottom right -->
         <span
           class="position-absolute d-flex align-items-center justify-content-center rounded-circle text-white shadow-none"
-          style="width: 22px; height: 22px; bottom: -2px; right: -2px; border: 2.5px solid #ffffff; font-size: 11px; background-color: #94a3b8;"
+          style="width: 18px; height: 18px; bottom: -2px; right: -2px; border: 2px solid #ffffff; font-size: 9px; background-color: #94a3b8;"
           title="Standing Trophy"
         >
           <i class="mdi mdi-trophy"></i>
@@ -73,27 +73,27 @@
 
       <!-- Customer Info -->
       <div class="overflow-hidden flex-grow-1">
-        <h5
-          class="fw-bold font-size-18 mb-1 text-truncate"
+        <h6
+          class="fw-bold font-size-15 mb-0.5 text-truncate"
           style="color: #0f172a;"
           :title="customer.name"
         >
           {{ customer.name }}
-        </h5>
+        </h6>
 
-        <div class="d-flex align-items-center gap-2 font-size-12 flex-wrap" style="color: #64748b;">
+        <div class="d-flex align-items-center gap-1.5 font-size-11 flex-wrap" style="color: #64748b;">
           <span class="d-inline-flex align-items-center gap-1">
-            <i class="mdi mdi-phone-outline font-size-14" style="color: #2563eb;"></i>
+            <i class="mdi mdi-phone-outline font-size-13" style="color: #2563eb;"></i>
             <span>{{ customer.phone || 'No phone' }}</span>
           </span>
           <span style="color: #cbd5e1;">|</span>
           <span class="d-inline-flex align-items-center gap-1 text-capitalize">
-            <i class="mdi mdi-medal-outline font-size-14" style="color: #64748b;"></i>
+            <i class="mdi mdi-medal-outline font-size-13" style="color: #64748b;"></i>
             <span>{{ customer.loyalty_tier || 'Silver' }}</span>
           </span>
           <span style="color: #cbd5e1;">|</span>
           <span class="d-inline-flex align-items-center gap-1">
-            <i class="mdi mdi-star-outline font-size-14" style="color: #64748b;"></i>
+            <i class="mdi mdi-star-outline font-size-13" style="color: #64748b;"></i>
             <span>{{ customer.loyalty_points ?? 45 }}</span>
           </span>
         </div>
@@ -103,34 +103,34 @@
     <!-- Bottom Notice Callout (Ice-Blue Card with Left Accent) -->
     <div
       v-if="showCallout"
-      class="p-3 d-flex align-items-start gap-3 position-relative text-start"
-      style="background-color: #f0f9ff; border-left: 4px solid #0284c7; border-radius: 8px;"
+      class="p-2 d-flex align-items-start gap-2.5 position-relative text-start"
+      style="background-color: #f0f9ff; border-left: 3.5px solid #0284c7; border-radius: 8px;"
     >
       <!-- Document Icon Badge -->
       <div
         class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
-        style="width: 38px; height: 38px; background-color: #e0f2fe; color: #0284c7;"
+        style="width: 32px; height: 32px; background-color: #e0f2fe; color: #0284c7;"
       >
-        <i class="mdi mdi-file-document-outline font-size-20"></i>
+        <i class="mdi mdi-file-document-outline font-size-17"></i>
       </div>
 
       <!-- Callout Content -->
       <div class="flex-grow-1 overflow-hidden">
-        <div class="font-size-14 mb-1" style="color: #0f172a;">
+        <div class="font-size-12 mb-0.5" style="color: #0f172a;">
           <template v-if="billsCount > 0 || outstandingDebt > 0">
             <span class="fw-bold">{{ billsCount || 1 }} unpaid bill<span v-if="(billsCount || 1) !== 1">s</span></span>
-            <span style="color: #94a3b8; margin: 0 4px;">•</span>
+            <span style="color: #94a3b8; margin: 0 3px;">•</span>
             <span style="color: #2563eb; font-weight: 700;">{{ formatMoney(outstandingDebt) }}</span>
             <span class="fw-bold"> outstanding</span>
           </template>
           <template v-else>
             <span class="fw-bold">No unpaid bills</span>
-            <span style="color: #94a3b8; margin: 0 4px;">•</span>
+            <span style="color: #94a3b8; margin: 0 3px;">•</span>
             <span class="text-success fw-bold">Good standing</span>
           </template>
         </div>
 
-        <p class="font-size-12 mb-2 lh-sm" style="color: #64748b; line-height: 1.45;">
+        <p class="font-size-11 mb-1 lh-sm" style="color: #64748b; line-height: 1.35;">
           {{ (billsCount > 0 || outstandingDebt > 0)
             ? 'Consider combining this cart with the existing bill instead of opening a new tab.'
             : 'Customer has settled all prior bills and is eligible for open tab privileges.'
@@ -139,12 +139,12 @@
 
         <button
           type="button"
-          class="btn btn-link p-0 fw-semibold font-size-12 text-decoration-none d-inline-flex align-items-center gap-1"
+          class="btn btn-link p-0 fw-semibold font-size-11 text-decoration-none d-inline-flex align-items-center gap-1"
           style="color: #2563eb;"
           @click="$emit('view-bills', customer)"
         >
           <span>View Customer Bills</span>
-          <i class="bx bx-right-arrow-alt font-size-15"></i>
+          <i class="bx bx-right-arrow-alt font-size-14"></i>
         </button>
       </div>
     </div>
