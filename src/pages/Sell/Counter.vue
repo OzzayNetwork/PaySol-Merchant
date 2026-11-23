@@ -47,8 +47,8 @@
     <div class="row justify-content-center">
       <div class="col-12">
         <div class="row">
-          <!-- LEFT 7/8 COLS: PRODUCT CATALOGUE -->
-          <div class="col-12 col-lg-7 col-xl-7 col-xxl-8">
+          <!-- LEFT COLS: PRODUCT CATALOGUE (8 COLS on Desktop) -->
+          <div class="col-8">
             <div class="card">
               <!-- Top Toolbar: Search & Action Buttons -->
               <div class="card-body border-bottom">
@@ -176,15 +176,15 @@
                     v-for="product in filteredProducts"
                     :key="product.id"
                     @click="handleProductClick(product)"
-                    class="col-6 col-sm-6 col-md-6 col-lg-6 col-xl-4 col-xxl-3 mb-4 position-relative"
+                    class="col-3 col-md-6 col-lg-4 col-xl-3 mb-4 position-relative"
                   >
                     <!-- Quantity Badge -->
                     <div v-if="cartStore.getItemQuantity(product.id) > 0">
                       <div
-                        class="avatar-xs mx-auto position-absolute"
+                        class="avatar-xs mx-auto position-absolute right-0"
                         style="z-index: 30; right: 0px; top: -15px;"
                       >
-                        <span class="avatar-title rounded-circle bg-success font-size-14 fw-bold text-white shadow-none">
+                        <span class="avatar-title rounded-circle bg-success-muted font-size-16 fw-boldx">
                           {{ cartStore.getItemQuantity(product.id) }}
                         </span>
                       </div>
@@ -192,43 +192,42 @@
 
                     <!-- Card Body -->
                     <div
-                      class="p-3 bg-light rounded border cursor-pointer waves-effect w-100 h-100 d-flex flex-column justify-content-between"
+                      class="p-3 bg-light rounded border cursor-pointer waves-effect w-100"
                       :class="[
-                        cartStore.getItemQuantity(product.id) > 0 ? 'border-success border-2' : ''
+                        cartStore.getItemQuantity(product.id) > 0 ? 'border-success-muted border-2' : ''
                       ]"
                     >
                       <div>
                         <div
                           style="height: 160px;"
-                          class="img-cont d-flex align-items-center justify-content-center overflow-hidden rounded w-100 bg-white"
+                          class="img-cont d-flex align-items-center overflow-hidden rounded w-100"
+                          :class="[product.image_url ? 'bg-dark-muted' : 'bg-transparent']"
                         >
                           <img
-                            v-if="product.image_url"
                             class="img h-auto"
-                            style="width: 100%; max-height: 150px; object-fit: contain;"
-                            :src="product.image_url"
+                            style="width: 100%;"
+                            :src="product.image_url || emptyImage"
                             :alt="product.name"
                           />
-                          <i v-else class="bx bx-package fs-1 text-muted opacity-50"></i>
                         </div>
                       </div>
 
                       <div class="pt-4">
-                        <h5 class="text-capitalize text-truncate mb-0 font-size-14 fw-semibold text-dark" :title="product.name">
+                        <h5 class="text-capitalize truncate-singleLine mb-0" :title="product.name">
                           {{ product.name || "Unknown" }}
                         </h5>
                         <p class="mb-2">
-                          <small class="text-muted">{{ product.size_label || product.sku || product.barcode || '' }}</small>
+                          <small class="text-muted">{{ product.size_label || product.sku || '' }}</small>
                         </p>
-                        <div class="d-flex gap-1 align-items-center justify-content-between">
+                        <div class="d-flex gap-2 align-items-center justify-content-between">
                           <div>
-                            <h5 class="my-0 font-size-13 font-size-md-14 fw-bold text-dark text-nowrap">
+                            <h5 class="my-0">
                               {{ formatMoney(product.selling_price) }}
                             </h5>
                           </div>
-                          <span class="text-end font-size-11 text-nowrap">
-                            <span :class="product.stock_on_hand > 0 ? 'text-muted' : 'text-danger fw-semibold'">
-                              {{ product.stock_on_hand > 0 ? `${product.stock_on_hand - cartStore.getItemQuantity(product.id)} In stock` : 'Out of stock' }}
+                          <span class="text-right">
+                            <span class="text-muted me-2">
+                              {{ (product.stock_on_hand || 0) - cartStore.getItemQuantity(product.id) }} <small>In stock</small>
                             </span>
                           </span>
                         </div>
@@ -255,7 +254,7 @@
                         <td>
                           <div class="rounded bg-light d-flex align-items-center justify-content-center overflow-hidden" style="width: 36px; height: 36px;">
                             <img v-if="product.image_url" :src="product.image_url" style="max-height: 32px; object-fit: contain;" />
-                            <i v-else class="bx bx-package text-muted"></i>
+                            <img v-else :src="emptyImage" style="max-height: 32px; object-fit: contain;" />
                           </div>
                         </td>
                         <td>
@@ -292,252 +291,165 @@
             </div>
           </div>
 
-          <!-- RIGHT 5/4 COLS: STICKY CART (Direct match to POS Make a sale) -->
-          <div class="col-12 col-lg-5 col-xl-5 col-xxl-4">
+          <!-- RIGHT COLS: STICKY CART (1:1 Match with POS.mainpage.vue) -->
+          <div class="col-4">
             <div class="card position-sticky" style="top: 20px;">
-              <!-- Cart Header -->
-              <div class="card-header bg-white border-bottom">
-                <div class="d-flex justify-content-between align-items-center">
-                  <h4 class="card-title d-flex align-items-center gap-2 mb-0 font-size-15">
-                    <i class="bx bx-cart fs-4"></i>
-                    <span>Cart ({{ cartStore.itemCount }})</span>
+              <div class="card-header">
+                <div class="d-flex justify-content-between">
+                  <h4 class="card-title d-flex align-items-center gap-2">
+                    <i class="dripicons-cart fs-4"></i>
+                    <span>Cart({{ cartStore.itemCount }})</span>
                   </h4>
                   <div>
                     <button
                       :disabled="cartStore.isEmpty"
                       type="button"
                       @click="cartStore.clearCart()"
-                      class="btn btn-soft-danger waves-effect fw-bold flex-nowrap d-flex btn-sm gap-1 align-items-center"
+                      class="btn btn-soft-danger waves-effect fw-bold flex-nowrap d-flex btn-sm gap-2 align-items-center"
                     >
-                      <i class="bx bx-trash fs-6"></i> Clear cart
+                      <i class="dripicons-trash fs-6"></i> Clear cart
                     </button>
                   </div>
                 </div>
               </div>
 
-              <!-- Table & Customer Bar -->
-              <div class="card-body py-2 px-3 bg-light border-bottom">
-                <!-- Assigned Table Pill -->
-                <div
-                  v-if="cartStore.table"
-                  class="mb-2 p-2 bg-white rounded border d-flex align-items-center justify-content-between font-size-12"
-                >
-                  <div class="d-flex align-items-center gap-2">
-                    <i class="bx bx-restaurant text-primary fs-5"></i>
-                    <div>
-                      <strong>Table {{ cartStore.table.table_number }}</strong>
-                      <span v-if="cartStore.table.label" class="text-muted ms-1">({{ cartStore.table.label }})</span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-light p-1"
-                    title="Remove Table"
-                    @click="cartStore.clearTable"
-                  >
-                    <i class="bx bx-x fs-6"></i>
-                  </button>
-                </div>
+              <div class="card-body cart-container pt-1" style="height: 50vh;">
+                <h4 class="card-title text-black d-none">Cart Items</h4>
 
-                <!-- Customer Info -->
-                <div
-                  v-if="cartStore.customer"
-                  class="p-2 bg-white rounded border d-flex align-items-center justify-content-between font-size-12"
-                >
-                  <div class="d-flex align-items-center gap-2 text-truncate me-2">
-                    <i class="bx bx-user-check text-success fs-5"></i>
-                    <div class="text-truncate">
-                      <strong class="text-dark">{{ cartStore.customer.name }}</strong>
-                      <div class="text-muted font-size-11">
-                        {{ cartStore.customer.phone || 'No phone' }} • {{ cartStore.customer.loyalty_points }} pts
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-light p-1"
-                    title="Change Customer"
-                    @click="cartStore.clearCustomer"
-                  >
-                    <i class="bx bx-x fs-6"></i>
-                  </button>
-                </div>
-
-                <!-- Customer Picker Input -->
-                <div v-else class="d-flex gap-2">
-                  <div class="flex-grow-1 position-relative">
-                    <input
-                      v-model="customerSearch"
-                      type="text"
-                      class="form-control form-control-sm bg-white"
-                      placeholder="Search Customer or Walk-in..."
-                      @focus="showCustomerDropdown = true"
-                      @input="searchCustomers"
-                    />
-                    <!-- Dropdown search results -->
-                    <div
-                      v-if="showCustomerDropdown && (customersList.length > 0 || isSearchingCustomers)"
-                      class="position-absolute start-0 end-0 mt-1 bg-white border rounded p-1"
-                      style="z-index: 1000; max-height: 220px; overflow-y: auto;"
-                    >
-                      <div
-                        class="p-2 hover-bg cursor-pointer rounded font-size-12 text-muted border-bottom"
-                        @click="selectWalkIn"
-                      >
-                        <i class="bx bx-user me-1"></i> Walk-in Customer (Default)
-                      </div>
-                      <div
-                        v-for="c in customersList"
-                        :key="c.id"
-                        class="p-2 hover-bg cursor-pointer rounded font-size-12 d-flex justify-content-between align-items-center"
-                        @click="selectCustomer(c)"
-                      >
-                        <div>
-                          <strong class="text-dark">{{ c.name }}</strong>
-                          <div class="text-muted font-size-11">{{ c.phone || 'No phone' }}</div>
-                        </div>
-                        <span class="badge bg-light text-muted border font-size-10">{{ c.loyalty_points }} pts</span>
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-light border d-inline-flex align-items-center gap-1"
-                    title="Register Customer"
-                    @click="openCustomerModal"
-                  >
-                    <i class="bx bx-user-plus"></i>
-                    <span>New</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Cart Line Items Container (Table styling from reference) -->
-              <div class="card-body cart-container pt-1 px-3 py-2" style="height: 38vh; overflow-y: auto; overflow-x: hidden;">
-                <table v-if="!cartStore.isEmpty" class="table table-sm align-middle mb-0 w-100" style="table-layout: auto;">
+                <table class="table table-s">
                   <tbody>
                     <tr
+                      class="verticle-align-middle table-striped"
                       v-for="(cartItem, index) in cartStore.items"
                       :key="cartItem.id"
-                      class="table-striped"
                     >
-                      <td class="align-middle border-0 ps-0 pe-1">
-                        <div class="d-flex gap-2 align-items-center">
-                          <div
-                            class="product-img bg-light d-flex align-items-center justify-content-center rounded overflow-hidden flex-shrink-0"
-                            style="width: 36px; height: 36px; min-width: 36px;"
-                          >
-                            <img
-                              v-if="cartItem.product.image_url"
-                              :src="cartItem.product.image_url"
-                              class="img-fluid"
-                              style="width: 100%; height: 100%; object-fit: cover;"
-                              alt=""
-                            />
-                            <i v-else class="bx bx-package text-muted"></i>
-                          </div>
-                          <div class="text-truncate" style="max-width: 110px;">
-                            <p class="m-0 fw-bold text-black font-size-13 text-truncate">
-                              {{ cartItem.product.name }}
-                            </p>
-                            <small class="text-muted">{{ formatMoney(cartItem.unit_price) }}</small>
+                      <th class="verticle-align-middle pl-0 d-none" style="width: 10px;">{{ index + 1 }}.</th>
+                      <th class="verticle-align-middle d-flex gap-2 align-items-center pl-0">
+                        <div class="product-img bg-light d-flex align-items-center justify-content-center">
+                          <img
+                            :src="cartItem.product.image_url || emptyImage"
+                            class="img-fluid product-image"
+                            alt="Product Icon"
+                          />
+                        </div>
+                        <div>
+                          <p class="m-0 fw-bold text-black">{{ cartItem.product.name }}</p>
+                          <div class="d-flex gap-2 p-0">
+                            <small class="text-muted p-0 m-0 gap-2 d-flex">
+                              {{ cartItem.product.size_label || '-' }}
+                              <span class="p-0">|</span>
+                              {{ formatMoney(cartItem.unit_price) }}
+                            </small>
                           </div>
                         </div>
-                      </td>
-                      <td class="align-middle border-0 px-0 text-center text-nowrap" style="width: 65px;">
-                        <div class="d-flex align-items-center justify-content-center p-0 gap-1">
+                      </th>
+                      <td class="verticle-align-middle">
+                        <div class="d-flex align-items-center p-0 gap-2">
                           <span
                             @click="cartStore.decreaseQty(cartItem.id)"
-                            class="waves-effect p-1 cursor-pointer"
+                            class="waves-effect p-2 cursor-pointer"
                           >
-                            <i class="mdi mdi-minus fs-6"></i>
+                            <i class="mdi mdi-minus cursor-pointer fs-6"></i>
                           </span>
-                          <span class="fw-bold font-size-12 px-1">{{ cartItem.quantity }}</span>
+                          <span class="">{{ cartItem.quantity }}</span>
                           <span
                             @click="cartStore.increaseQty(cartItem.id)"
-                            class="waves-effect p-1 cursor-pointer"
+                            class="waves-effect p-2 cursor-pointer"
                           >
-                            <i class="mdi mdi-plus fs-6"></i>
+                            <i class="mdi mdi-plus cursor-pointer fs-6"></i>
                           </span>
                         </div>
                       </td>
-                      <td class="align-middle text-end border-0 pe-0 ps-1 text-nowrap" style="width: 80px;">
-                        <div class="d-flex align-items-center gap-1 justify-content-end text-end">
-                          <span class="fw-bold font-size-12 text-dark">
-                            {{ formatMoney(cartItem.quantity * cartItem.unit_price) }}
-                          </span>
+                      <th class="text-right verticle-align-middle px-0">
+                        <div class="d-flex w-100 align-items-center p-0 gap-2 justify-content-end text-right">
+                          <div class="p-0 text-right">
+                            <span class="text-right fw-bold">
+                              {{ formatMoney(cartItem.quantity * cartItem.unit_price) }}
+                            </span>
+                          </div>
                           <span
                             title="Remove item from cart"
-                            class="waves-effect p-1 d-flex cursor-pointer text-danger ms-1"
+                            class="waves-effect px-2 align-items-center py-0 d-flex justify-content-center cursor-pointer"
                             @click="cartStore.removeItem(cartItem.id)"
                           >
-                            <i class="mdi mdi-close fs-5"></i>
+                            <i class="dripicons-cross text-danger cursor-pointer fs-5 p-0 d-flex"></i>
                           </span>
                         </div>
-                      </td>
+                      </th>
                     </tr>
                   </tbody>
                 </table>
 
                 <div
-                  v-else
-                  class="d-flex flex-column text-center align-items-center justify-content-center w-100 h-100 py-4 opacity-50"
+                  v-if="cartStore.isEmpty"
+                  class="d-flex flex-column text-center align-items-center justify-content-center w-100 h-100"
                 >
-                  <i class="bx bx-shopping-bag fs-1 mb-2"></i>
-                  <h5 class="fw-bold text-capitalize font-size-14 mb-0">Tap items to add to <br /> the order</h5>
+                  <div class="opacity-50">
+                    <div class="mb-4">
+                      <img :src="emptyCart" class="img" height="50%" alt="" />
+                    </div>
+                    <h5 class="fw-bold text-capitalize">Tap items to add to <br /> the order</h5>
+                  </div>
                 </div>
               </div>
 
-              <!-- Sale Summary Box (From reference) -->
               <div class="card-body pt-2 border-top border-2">
-                <div class="p-3 pb-1 bg-light rounded border">
-                  <h5 class="card-title d-flex gap-2 align-items-center font-size-13 fw-bold mb-2">
-                    <i class="bx bx-purchase-tag fs-5 text-primary"></i>
+                <div class="p-3 pb-1 bg-success-muted rounded">
+                  <h4 class="card-title d-flex gap-2 align-items-center">
+                    <i class="dripicons-tags fs-5"></i>
                     <span>Sale Summary</span>
-                  </h5>
-                  <table class="table text-uppercase fs-6 table-sm m-0 font-size-12">
+                  </h4>
+                  <table class="table text-uppercase fs-6 table-sm border-success m-0">
                     <tbody>
-                      <tr v-if="cartStore.discountAmount > 0" class="border-bottom">
+                      <tr class="border-success">
                         <td>Discount</td>
-                        <th class="text-end text-danger">-{{ formatMoney(cartStore.discountAmount) }}</th>
+                        <th class="text-right">
+                          {{ formatMoney(cartStore.discountAmount) }}
+                        </th>
                       </tr>
-                      <tr class="border-bottom">
-                        <td>Subtotal</td>
-                        <th class="text-end">{{ formatMoney(cartStore.subtotal) }}</th>
+                      <tr class="border-success">
+                        <td>Total</td>
+                        <th class="text-right">
+                          {{ formatMoney(cartStore.totalAmount) }}
+                        </th>
                       </tr>
-                      <tr v-if="cartStore.taxAmount > 0" class="border-bottom">
-                        <td>Tax / VAT</td>
-                        <th class="text-end">{{ formatMoney(cartStore.taxAmount) }}</th>
+                      <tr>
+                        <td>Tax</td>
+                        <th class="text-right">
+                          {{ formatMoney(cartStore.taxAmount) }}
+                        </th>
                       </tr>
-                      <tr class="fs-5 text-black">
-                        <th class="pt-2">TOTAL</th>
-                        <th class="text-end pt-2 fw-bold text-primary">{{ formatMoney(cartStore.totalAmount) }}</th>
+                      <tr class="fs-4 text-black">
+                        <th>Sub Total</th>
+                        <th class="text-right">
+                          {{ formatMoney(cartStore.totalAmount) }}
+                        </th>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
 
-              <!-- Card Footer Action Buttons (From reference) -->
-              <div class="card-footer pt-0 bg-white p-3 gap-2 d-flex justify-content-between align-items-center">
-                <button
-                  :disabled="cartStore.isEmpty"
-                  type="button"
-                  class="btn btn-light waves-effect fw-bold flex-nowrap d-flex align-items-center justify-content-center btn-lg border"
-                  @click="openSaveTabModal"
-                >
-                  <i class="bx bx-time fs-4 align-middle me-1"></i>
-                  Save as Open Bill
-                </button>
-                <button
-                  :disabled="cartStore.isEmpty"
-                  type="button"
-                  class="btn btn-primary waves-effect btn-lg fw-bold flex-grow-1 d-flex align-items-center justify-content-center"
-                  @click="handleProceedToCheckout"
-                >
-                  <i class="mdi mdi-check-all fs-4 align-middle me-1"></i>
-                  Complete Payment
-                </button>
+              <div class="card-footer pt-0 bg-white p-3 gap-3 d-flex justify-content-between align-items-center">
+                <div class="gap-2 d-flex w-100">
+                  <button
+                    :disabled="cartStore.isEmpty"
+                    @click="openSaveTabModal"
+                    type="button"
+                    class="btn btn-light waves-effect fw-bold flex-nowrap d-flex align-items-center justify-content-center btn-lg"
+                  >
+                    <i class="dripicons-clock bx fs-4 align-middle me-2"></i>
+                    Save as Open Bill
+                  </button>
+                  <button
+                    :disabled="cartStore.isEmpty"
+                    @click="handleProceedToCheckout"
+                    class="btn btn-primary waves-effect btn-lg fw-bold flex-grow-1"
+                  >
+                    <i class="mdi mdi-check-all fs-4 align-middle me-2"></i>
+                    Complete Payment
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -594,6 +506,8 @@ import PaymentModal from './components/PaymentModal.vue';
 import ReceiptModal from './components/ReceiptModal.vue';
 import SaveTabModal from './components/SaveTabModal.vue';
 import ShiftActionModal from '@/components/Shifts/ShiftActionModal.vue';
+import emptyCart from '@/assets/images/icons/POS/empty-cart.svg';
+import emptyImage from '@/assets/images/icons/packaging.svg';
 
 const route = useRoute();
 const router = useRouter();
@@ -862,7 +776,41 @@ onMounted(async () => {
   background-color: #f8f9fa;
 }
 
+.product-img {
+  width: 50px;
+  height: 50px;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  min-width: 50px;
+  max-width: 50px;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .category-scroll::-webkit-scrollbar {
   display: none;
+}
+
+.border-success-muted {
+  border-color: rgba(var(--bs-success-rgb, 52, 195, 143), 0.5) !important;
+}
+
+.bg-dark-muted {
+  background-color: rgba(var(--bs-dark-rgb, 42, 48, 66), 0.05) !important;
+}
+
+.truncate-singleLine {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-right {
+  text-align: right !important;
 }
 </style>
