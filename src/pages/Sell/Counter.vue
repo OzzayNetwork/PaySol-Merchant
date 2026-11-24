@@ -1,22 +1,9 @@
 <template>
-  <!-- Operational Shift Alert Banner (Teleported directly underneath the header, matching reference on /test-page) -->
+  <!-- Operational Shift Alert Banner (Only shown when cashier needs to join or open a shift) -->
   <Teleport to="#main-content-alert-slot">
-    <!-- State 1: Active Shift & Cashier On Duty -->
+    <!-- State 1: Active Shift Running in Branch, Cashier not yet on duty -->
     <HeaderAlertBanner
-      v-if="shiftStore.isOnDuty"
-      tone="success"
-      label="Counter Active"
-      icon="mdi:check-circle-outline"
-      :title="`Active Shift ${shiftStore.activeShiftNumber}`"
-      :message="`Branch: ${currentBranchName} · Float: ${formatMoney(shiftStore.openingFloat)} · ${shiftStore.activeMembersCount} cashier${shiftStore.activeMembersCount === 1 ? '' : 's'} on duty`"
-      action-label="Shift Details"
-      action-icon="mdi:cog-outline"
-      @action="openShiftModal"
-    />
-
-    <!-- State 2: Active Shift Running in Branch, Cashier can Join -->
-    <HeaderAlertBanner
-      v-else-if="shiftStore.hasActiveShift"
+      v-if="!shiftStore.isOnDuty && shiftStore.hasActiveShift"
       tone="info"
       label="Counter Open"
       icon="mdi:account-arrow-right-outline"
@@ -30,9 +17,9 @@
       @details="openShiftModal"
     />
 
-    <!-- State 3: No Active Shift Running -->
+    <!-- State 2: No Active Shift Running -->
     <HeaderAlertBanner
-      v-else
+      v-else-if="!shiftStore.hasActiveShift"
       tone="warning"
       label="Shift Required"
       icon="mdi:alert-outline"

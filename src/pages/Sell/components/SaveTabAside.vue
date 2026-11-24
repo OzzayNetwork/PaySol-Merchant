@@ -267,13 +267,13 @@
         </div>
 
         <!-- Section: Billing Summary -->
-        <div class="p-3 pt-2">
-          <div class="p-2.5 pb-1 bg-success-muted rounded border border-2 border-success-subtle">
-            <h5 class="card-title d-flex gap-1.5 align-items-center font-size-13 mb-2">
-              <i class="dripicons-tags font-size-14"></i>
-              <span class="fw-bold">Billing Summary</span>
-            </h5>
-            <table class="table text-uppercase font-size-12 table-sm border-success m-0">
+        <div class="p-3">
+          <div class="p-3 pb-1 bg-success-muted rounded border-success-subtle border border-2">
+            <h4 class="card-title d-flex gap-2 align-items-center">
+              <i class="dripicons-tags fs-5"></i>
+              <span>Billing Summary</span>
+            </h4>
+            <table class="table text-uppercase fs-6 table-sm border-success m-0">
               <tbody>
                 <tr class="border-success">
                   <td>Total Items</td>
@@ -281,7 +281,7 @@
                 </tr>
                 <tr class="border-success">
                   <td>Discount</td>
-                  <th class="text-right">KES 0.00</th>
+                  <th class="text-right">Kes 0.00</th>
                 </tr>
                 <tr class="border-success">
                   <td>Total</td>
@@ -289,9 +289,9 @@
                 </tr>
                 <tr>
                   <td>Tax</td>
-                  <th class="text-right">KES 0.00</th>
+                  <th class="text-right">Kes 0.00</th>
                 </tr>
-                <tr class="font-size-13 text-black">
+                <tr class="fs-4 text-black">
                   <th>Sub Total</th>
                   <th class="text-right">{{ formatMoney(cartTotal) }}</th>
                 </tr>
