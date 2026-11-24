@@ -18,20 +18,18 @@
     id="saveTabAside"
     ref="offcanvasRef"
   >
-    <!-- Header (Matching Reference Design Image 1) -->
-    <div class="offcanvas-header border-bottom py-2.5 px-3.5 d-flex align-items-center bg-white">
-      <button
-        type="button"
-        class="btn btn-link text-dark p-0 me-2.5 shadow-none border-0 d-flex align-items-center cursor-pointer"
-        data-bs-dismiss="offcanvas"
-        aria-label="Back"
-      >
-        <i class="bx bx-arrow-back font-size-18"></i>
-      </button>
-      <div>
-        <h5 class="mb-0 fw-bold font-size-15 text-dark">Save As open bill</h5>
-        <p class="m-0 text-muted font-size-11">Save this sale as a tab for your customer.</p>
+    <!-- Header (Matching Reference Design) -->
+    <div class="offcanvas-header border-bottom py-2.5 px-3.5 d-flex align-items-center justify-content-between bg-white">
+      <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center justify-content-center rounded-3 bg-light border p-1.5 flex-shrink-0" style="width: 36px; height: 36px;">
+          <i class="mdi mdi-receipt-text-outline font-size-18 text-dark"></i>
+        </div>
+        <div>
+          <h5 class="mb-0 fw-bold font-size-15 text-dark">Open Tabs</h5>
+          <p class="m-0 text-muted font-size-11">Select an existing tab or create a new one.</p>
+        </div>
       </div>
+      <button type="button" class="btn-close text-reset shadow-none font-size-11" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
 
     <!-- Navigation Tabs: Segmented Control (Matching Reference Design) -->
@@ -334,15 +332,19 @@
 
     <!-- Offcanvas Body: EXISTING TABS -->
     <div v-else class="offcanvas-body p-3">
-      <!-- Search Input (Matching Reference Design Image 1) -->
-      <div class="mb-3">
-        <input
-          type="text"
-          class="form-control rounded-2 font-size-12 py-2 px-3 border"
-          style="border-color: #cbd5e1;"
-          placeholder="Filter open tabs by name, customer, table..."
-          v-model="existingTabFilter"
-        />
+      <!-- Search Input with Search Icon (Matching Reference Design) -->
+      <div class="mb-3 position-relative">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0 pe-1 text-muted rounded-start-3 py-1">
+            <i class="bx bx-search font-size-15"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control border-start-0 ps-1 rounded-end-3 font-size-12 py-1.5"
+            placeholder="Search tabs by customer, table..."
+            v-model="existingTabFilter"
+          />
+        </div>
       </div>
 
       <div v-if="loadingOpenTabs" class="text-center py-4">
@@ -357,108 +359,105 @@
       </div>
 
       <div v-else class="d-flex flex-column gap-3 p-1">
-        <!-- Reference Design: Open Tab Card (Matching Image 1, Refined Spacing & Status Colors) -->
+        <!-- Reference Design: Open Tab Card (Matching Image & Fog Fade) -->
         <div
           v-for="tab in filteredOpenTabs"
           :key="tab.id"
-          class="card border-0 shadow-none text-start overflow-hidden position-relative transition-all"
-          :style="{
-            backgroundColor: getTabTheme(tab).cardBg,
-            border: '1px solid ' + getTabTheme(tab).cardBorder + ' !important',
-            borderRadius: '14px',
-            marginBottom: '14px',
-          }"
+          class="card border-0 shadow-none text-start overflow-hidden position-relative"
+          style="background-color: #f0f6ff; border-radius: 14px; border: 1px solid #dbeafe !important; margin-bottom: 12px !important;"
         >
           <div class="card-body p-3.5">
-            <!-- Top Section: Tab Name / Table Number & Pending Amount (Matching Image 1) -->
+            <!-- Top Section: Tab Name / Table Pin & Pending Balance -->
             <div class="d-flex justify-content-between align-items-start mb-2.5">
               <div class="overflow-hidden pe-2">
                 <h6 class="fw-bold mb-0.5 text-dark font-size-14 text-truncate" :title="tab.name || tab.tab_number">
                   {{ tab.name || (tab.customer ? `${tab.customer.name}'s Tab` : tab.tab_number) }}
                 </h6>
-                <div class="font-size-11 text-muted">
-                  {{ getTabTableDisplay(tab) }}
+                <div class="d-flex align-items-center gap-1 font-size-11" style="color: #64748b;">
+                  <i class="mdi mdi-map-marker font-size-13 text-secondary"></i>
+                  <span>{{ getTabTableDisplay(tab) }}</span>
+                  <span class="mx-0.5">•</span>
+                  <span>{{ formatRelativeTime(tab.created_at || tab.updated_at) }}</span>
                 </div>
               </div>
 
               <div class="text-end flex-shrink-0">
-                <div class="fw-bold font-size-15" :style="{ color: getTabTheme(tab).priceColor, lineHeight: 1.2 }">
+                <div class="fw-bold font-size-15" style="color: #1e40af; line-height: 1.2;">
                   KES {{ Number(tab.total_amount || tab.pending_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) }}
                 </div>
-                <div class="font-size-10 text-muted mt-0.5">
-                  {{ tab.status && tab.status !== 'open' ? getTabTheme(tab).label : 'Pending Amount' }}
-                </div>
+                <span
+                  class="badge font-size-10 px-2 py-0.5 fw-bold rounded-pill"
+                  style="background-color: #dbeafe; color: #1d4ed8; letter-spacing: 0.2px; margin-top: 2px;"
+                >
+                  Outstanding
+                </span>
               </div>
             </div>
 
-            <!-- Middle Section: Itemized List with Dotted Leader & Fog Fade Effect (shows up to 2 items) -->
+            <!-- Middle Section: Itemized List with Fog Fade Effect (shows up to 2 items) -->
             <div class="position-relative my-2">
               <div
-                class="d-flex flex-column gap-1 transition-all"
+                class="d-flex flex-column gap-1.5 font-size-12 transition-all"
                 :style="(!expandedTabs[tab.id] && (tab.items?.length > 2)) ? 'max-height: 48px; overflow: hidden;' : ''"
               >
                 <div
                   v-for="(item, idx) in (tab.items || [])"
                   :key="item.id || idx"
-                  class="d-flex align-items-baseline font-size-11"
-                  style="color: #475569; padding: 1.5px 0; line-height: 1.4;"
+                  class="d-flex justify-content-between align-items-baseline"
+                  style="color: #334155;"
                 >
-                  <span class="text-truncate fw-normal" style="max-width: 65%;">
-                    {{ idx + 1 }}. {{ item.item_name || item.name || 'Item' }}
-                    <span v-if="item.quantity && Number(item.quantity) > 1" class="text-muted ms-0.5">({{ Number(item.quantity) }})</span>
-                  </span>
-                  <span class="flex-grow-1 mx-2" style="border-bottom: 1.5px dotted #94a3b8; height: 1px; align-self: baseline; min-width: 15px; margin-bottom: 3px;"></span>
-                  <span class="fw-semibold text-nowrap" style="color: #0f172a;">
-                    {{ Number(item.total_amount ?? (Number(item.unit_price || 0) * Number(item.quantity || 1))).toFixed(2) }}
-                  </span>
+                  <div class="text-truncate pe-2">
+                    <span>{{ idx + 1 }}. {{ item.item_name || item.name || 'Item' }}</span>
+                    <span v-if="item.quantity && Number(item.quantity) > 1" class="text-muted font-size-11 ms-1">({{ Number(item.quantity) }})</span>
+                  </div>
+                  <div class="fw-semibold font-size-12 text-dark text-nowrap">
+                    KES {{ Number(item.total_amount ?? (Number(item.unit_price || 0) * Number(item.quantity || 1))).toFixed(2) }}
+                  </div>
                 </div>
 
                 <!-- Fallback if no items array -->
-                <div v-if="!tab.items || tab.items.length === 0" class="text-muted font-size-11 fst-italic py-1">
+                <div v-if="!tab.items || tab.items.length === 0" class="text-muted font-size-11 fst-italic py-0.5">
                   {{ tab.active_items_count || 0 }} item(s) on tab
                 </div>
               </div>
 
-              <!-- Fog Fade Overlay: covers 3rd item smoothly blending into card's subtle background tint -->
+              <!-- Fog Fade Overlay: gently fades the 2nd/3rd item into the card background -->
               <div
                 v-if="!expandedTabs[tab.id] && (tab.items?.length > 2)"
                 class="position-absolute bottom-0 start-0 end-0 pointer-events-none"
-                :style="{
-                  height: '24px',
-                  background: getTabTheme(tab).fadeGradient
-                }"
+                style="height: 28px; background: linear-gradient(to bottom, rgba(240, 246, 255, 0) 0%, rgba(240, 246, 255, 0.75) 40%, #f0f6ff 100%);"
               ></div>
             </div>
 
-            <!-- Action Button: Append Cart Button (Matching Image 1) -->
-            <button
-              type="button"
-              class="btn btn-append-tab w-100 fw-semibold font-size-12 py-2 px-3 rounded-2 d-flex align-items-center justify-content-center gap-1.5 shadow-none transition-all my-2.5"
-              :disabled="saving || cartItemsCount === 0"
-              @click="appendToExistingTab(tab)"
-            >
-              Append Cart ({{ cartItemsCount }} item{{ cartItemsCount === 1 ? '' : 's' }}) to this Tab
-            </button>
-
-            <!-- Bottom Row: Show More Toggle on Left, Relative Time on Right (Matching Image 1) -->
-            <div class="d-flex justify-content-between align-items-center font-size-11 pt-0.5 text-muted">
-              <button
-                v-if="tab.items && tab.items.length > 2"
-                type="button"
-                class="btn btn-link p-0 fw-semibold font-size-11 text-decoration-none d-inline-flex align-items-center gap-1 shadow-none text-dark"
-                @click="toggleExpandTab(tab.id)"
-              >
-                <span>{{ expandedTabs[tab.id] ? 'Show Less' : 'Show More' }}</span>
-                <i :class="expandedTabs[tab.id] ? 'bx bx-chevron-up' : 'bx bx-chevron-down'"></i>
-              </button>
-              <span v-else class="text-muted font-size-11">
+            <!-- Items Count & Show Details Toggle -->
+            <div class="d-flex justify-content-between align-items-center font-size-11 pt-0.5 mb-2.5" style="color: #64748b;">
+              <span class="fw-medium">
                 {{ (tab.items?.length || tab.active_items_count || 1) }} item{{ (tab.items?.length || tab.active_items_count || 1) === 1 ? '' : 's' }}
               </span>
 
-              <span class="text-muted font-size-11">
-                {{ formatRelativeTime(tab.created_at || tab.updated_at) }}
-              </span>
+              <button
+                v-if="tab.items && tab.items.length > 2"
+                type="button"
+                class="btn btn-link p-0 fw-semibold font-size-11 text-decoration-none d-inline-flex align-items-center gap-1 shadow-none"
+                style="color: #1d4ed8;"
+                @click="toggleExpandTab(tab.id)"
+              >
+                <span>{{ expandedTabs[tab.id] ? 'Hide details' : 'Show details' }}</span>
+                <i :class="expandedTabs[tab.id] ? 'bx bx-chevron-up' : 'bx bx-chevron-down'"></i>
+              </button>
             </div>
+
+            <!-- Action Button: Solid Vibrant Blue -->
+            <button
+              type="button"
+              class="btn btn-primary w-100 fw-semibold font-size-12 py-2 rounded-2 d-flex align-items-center justify-content-center gap-1.5 shadow-none"
+              style="background-color: #1d4ed8; border: none;"
+              :disabled="saving || cartItemsCount === 0"
+              @click="appendToExistingTab(tab)"
+            >
+              <i class="bx bx-plus font-size-15"></i>
+              <span>Add {{ cartItemsCount }} item{{ cartItemsCount === 1 ? '' : 's' }} to this tab</span>
+            </button>
           </div>
         </div>
       </div>
@@ -541,95 +540,22 @@ const formatRelativeTime = (timestamp) => {
 };
 
 const getTabTableDisplay = (tab) => {
-  if (tab?.table?.table_number) return `Table Number ${tab.table.table_number}`;
-  if (tab?.table?.label) return tab.table.label.includes('Table') ? tab.table.label : `Table Number ${tab.table.label.replace(/[^0-9A-Za-z]/g, '')}`;
-  if (tab?.table_number) return `Table Number ${tab.table_number}`;
+  if (tab?.table?.table_number) return `Table ${tab.table.table_number}`;
+  if (tab?.table?.label) return `Table ${tab.table.label}`;
+  if (tab?.table_number) return `Table ${tab.table_number}`;
   
-  const match = (tab?.name || '').match(/Table\s*(?:Number\s*)?([0-9A-Za-z]+)/i);
-  if (match) return `Table Number ${match[1]}`;
+  const match = (tab?.name || '').match(/Table\s*([0-9A-Za-z]+)/i);
+  if (match) return `Table ${match[1]}`;
 
   if (tab?.table_id && availableTables.value?.length) {
     const tbl = availableTables.value.find((t) => t.id === tab.table_id);
-    if (tbl?.table_number) return `Table Number ${tbl.table_number}`;
-    if (tbl?.label) return `Table Number ${tbl.label.replace(/[^0-9A-Za-z]/g, '')}`;
+    if (tbl?.table_number) return `Table ${tbl.table_number}`;
+    if (tbl?.label) return `Table ${tbl.label}`;
   }
 
-  // Fallback to table number from tab or default to Table Number 23 (never say Counter)
+  // Fallback to table number from tab or default to Table 23 (never say Counter)
   const tabNum = tab?.tab_number ? tab.tab_number.replace(/\D/g, '').slice(-2) : '23';
-  return `Table Number ${tabNum ? parseInt(tabNum, 10) || 23 : 23}`;
-};
-
-const getTabTheme = (tab) => {
-  const status = String(tab?.status || '').toLowerCase();
-  const paidAmount = Number(tab?.paid_amount || 0);
-  const totalAmount = Number(tab?.total_amount || 0);
-  const balanceDue = Number(tab?.balance_due ?? (totalAmount - paidAmount));
-
-  // 1. Settled / Fully Paid
-  if (status === 'settled' || status === 'paid' || (totalAmount > 0 && balanceDue <= 0)) {
-    return {
-      statusKey: 'settled',
-      label: 'Settled',
-      cardBg: '#f0fdf4',
-      cardBorder: '#bbf7d0',
-      priceColor: '#15803d',
-      badgeBg: '#dcfce7',
-      badgeText: '#166534',
-      badgeBorder: '#86efac',
-      fadeGradient: 'linear-gradient(to bottom, rgba(240, 253, 244, 0) 0%, rgba(240, 253, 244, 0.9) 70%, #f0fdf4 100%)',
-      btnBg: '#ffffff',
-      btnBorder: '#0f172a',
-    };
-  }
-
-  // 2. Partially Paid
-  if (status === 'partially_paid' || (paidAmount > 0 && balanceDue > 0)) {
-    return {
-      statusKey: 'partially_paid',
-      label: 'Partially Paid',
-      cardBg: '#fffdf5',
-      cardBorder: '#fde68a',
-      priceColor: '#b45309',
-      badgeBg: '#fef3c7',
-      badgeText: '#92400e',
-      badgeBorder: '#fcd34d',
-      fadeGradient: 'linear-gradient(to bottom, rgba(255, 253, 245, 0) 0%, rgba(255, 253, 245, 0.9) 70%, #fffdf5 100%)',
-      btnBg: '#ffffff',
-      btnBorder: '#0f172a',
-    };
-  }
-
-  // 3. Overdue / Voided
-  if (status === 'overdue' || status === 'voided') {
-    return {
-      statusKey: 'overdue',
-      label: status === 'voided' ? 'Voided' : 'Overdue',
-      cardBg: '#fff1f2',
-      cardBorder: '#fecdd3',
-      priceColor: '#be123c',
-      badgeBg: '#ffe4e6',
-      badgeText: '#9f1239',
-      badgeBorder: '#fca5a5',
-      fadeGradient: 'linear-gradient(to bottom, rgba(255, 241, 242, 0) 0%, rgba(255, 241, 242, 0.9) 70%, #fff1f2 100%)',
-      btnBg: '#ffffff',
-      btnBorder: '#0f172a',
-    };
-  }
-
-  // 4. Default: Open / Outstanding (Matching Image 1: Green price KES 3,900, subtle tint)
-  return {
-    statusKey: 'open',
-    label: 'Outstanding',
-    cardBg: '#f0f7ff',
-    cardBorder: '#dbeafe',
-    priceColor: '#16a34a',
-    badgeBg: '#dbeafe',
-    badgeText: '#1e40af',
-    badgeBorder: '#bfdbfe',
-    fadeGradient: 'linear-gradient(to bottom, rgba(240, 247, 255, 0) 0%, rgba(240, 247, 255, 0.9) 70%, #f0f7ff 100%)',
-    btnBg: '#ffffff',
-    btnBorder: '#0f172a',
-  };
+  return `Table ${tabNum ? parseInt(tabNum, 10) || 23 : 23}`;
 };
 
 let searchTimer = null;
@@ -1118,24 +1044,5 @@ onBeforeUnmount(() => {
 
 .text-right {
   text-align: right !important;
-}
-
-.btn-append-tab {
-  border: 1.5px solid #0f172a !important;
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
-  transition: all 0.15s ease-in-out;
-}
-
-.btn-append-tab:hover:not(:disabled) {
-  background-color: #f8fafc !important;
-  border-color: #000000 !important;
-  color: #000000 !important;
-}
-
-.btn-append-tab:disabled {
-  opacity: 0.55 !important;
-  cursor: not-allowed !important;
 }
 </style>
