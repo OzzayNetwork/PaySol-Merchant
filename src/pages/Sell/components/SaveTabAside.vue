@@ -359,12 +359,18 @@
       </div>
 
       <div v-else class="d-flex flex-column gap-3 p-1">
-        <!-- Reference Design: Open Tab Card (Matching Image & Fog Fade) -->
+        <!-- Reference Design: Open Tab Card with Subtle Aging Bottom Border -->
         <div
           v-for="tab in filteredOpenTabs"
           :key="tab.id"
           class="card border-0 shadow-none text-start overflow-hidden position-relative"
-          style="background-color: #f0f6ff; border-radius: 14px; border: 1px solid #dbeafe !important; margin-bottom: 12px !important;"
+          :style="{
+            backgroundColor: '#ffffff',
+            borderRadius: '14px',
+            border: '1px solid #e2e8f0 !important',
+            borderBottom: '3.5px solid ' + getTabAgingTheme(tab).bottomBorder + ' !important',
+            marginBottom: '12px !important',
+          }"
         >
           <div class="card-body p-3.5">
             <!-- Top Section: Tab Name / Table Pin & Pending Balance -->
@@ -382,14 +388,21 @@
               </div>
 
               <div class="text-end flex-shrink-0">
-                <div class="fw-bold font-size-15" style="color: #1e40af; line-height: 1.2;">
+                <div class="fw-bold font-size-15" :style="{ color: getTabAgingTheme(tab).priceColor, lineHeight: 1.2 }">
                   KES {{ Number(tab.total_amount || tab.pending_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) }}
                 </div>
                 <span
                   class="badge font-size-10 px-2 py-0.5 fw-bold rounded-pill"
-                  style="background-color: #dbeafe; color: #1d4ed8; letter-spacing: 0.2px; margin-top: 2px;"
+                  :style="{
+                    backgroundColor: getTabAgingTheme(tab).badgeBg,
+                    color: getTabAgingTheme(tab).badgeText,
+                    border: '1px solid ' + getTabAgingTheme(tab).badgeBorder,
+                    letterSpacing: '0.2px',
+                    marginTop: '2px',
+                    display: 'inline-block'
+                  }"
                 >
-                  Outstanding
+                  {{ getTabAgingTheme(tab).label }}
                 </span>
               </div>
             </div>
@@ -425,7 +438,7 @@
               <div
                 v-if="!expandedTabs[tab.id] && (tab.items?.length > 2)"
                 class="position-absolute bottom-0 start-0 end-0 pointer-events-none"
-                style="height: 28px; background: linear-gradient(to bottom, rgba(240, 246, 255, 0) 0%, rgba(240, 246, 255, 0.75) 40%, #f0f6ff 100%);"
+                style="height: 28px; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, #ffffff 100%);"
               ></div>
             </div>
 
@@ -556,6 +569,81 @@ const getTabTableDisplay = (tab) => {
   // Fallback to table number from tab or default to Table 23 (never say Counter)
   const tabNum = tab?.tab_number ? tab.tab_number.replace(/\D/g, '').slice(-2) : '23';
   return `Table ${tabNum ? parseInt(tabNum, 10) || 23 : 23}`;
+};
+
+const getTabAgingTheme = (tab) => {
+  const status = String(tab?.status || '').toLowerCase();
+  const totalAmount = Number(tab?.total_amount || 0);
+  const paidAmount = Number(tab?.paid_amount || 0);
+  const balanceDue = Number(tab?.balance_due ?? (totalAmount - paidAmount));
+
+  // 1. Settled / Fully Paid (Subtle mint)
+  if (status === 'settled' || status === 'paid' || (totalAmount > 0 && balanceDue <= 0)) {
+    return {
+      tier: 'settled',
+      label: 'Settled',
+      bottomBorder: '#86efac',
+      badgeBg: '#dcfce7',
+      badgeText: '#166534',
+      badgeBorder: '#bbf7d0',
+      priceColor: '#15803d',
+    };
+  }
+
+  // 2. Partially Paid (Subtle warm amber)
+  if (status === 'partially_paid' || (paidAmount > 0 && balanceDue > 0)) {
+    return {
+      tier: 'partial',
+      label: 'Partially Paid',
+      bottomBorder: '#fde68a',
+      badgeBg: '#fef3c7',
+      badgeText: '#92400e',
+      badgeBorder: '#fde68a',
+      priceColor: '#b45309',
+    };
+  }
+
+  // Calculate elapsed duration in minutes
+  const timestamp = tab?.opened_at || tab?.created_at || tab?.updated_at;
+  const createdDate = timestamp ? new Date(timestamp) : new Date();
+  const elapsedMin = isNaN(createdDate.getTime()) ? 0 : Math.max(0, Math.floor((Date.now() - createdDate.getTime()) / (1000 * 60)));
+
+  // 3. Overdue / Critical Aging: > 4 hours (Subtle soft rose)
+  if (elapsedMin >= 240 || status === 'overdue' || status === 'voided') {
+    return {
+      tier: 'overdue',
+      label: 'Overdue',
+      bottomBorder: '#fca5a5',
+      badgeBg: '#ffe4e6',
+      badgeText: '#9f1239',
+      badgeBorder: '#fecdd3',
+      priceColor: '#be123c',
+    };
+  }
+
+  // 4. Extended Session / Warning: 2 to 4 hours (Subtle honey amber)
+  if (elapsedMin >= 120) {
+    return {
+      tier: 'extended',
+      label: 'Active (2h+)',
+      bottomBorder: '#fde68a',
+      badgeBg: '#fef9c3',
+      badgeText: '#854d0e',
+      badgeBorder: '#fef08a',
+      priceColor: '#b45309',
+    };
+  }
+
+  // 5. Fresh / Active: < 2 hours (Subtle sky blue)
+  return {
+    tier: 'fresh',
+    label: 'Outstanding',
+    bottomBorder: '#93c5fd',
+    badgeBg: '#dbeafe',
+    badgeText: '#1e40af',
+    badgeBorder: '#bfdbfe',
+    priceColor: '#1d4ed8',
+  };
 };
 
 let searchTimer = null;
