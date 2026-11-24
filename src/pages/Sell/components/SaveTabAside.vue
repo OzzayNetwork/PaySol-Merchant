@@ -374,7 +374,7 @@
         >
           <div class="card-body p-3.5">
             <!-- Top Section: Tab Name / Table Pin & Pending Balance -->
-            <div class="d-flex justify-content-between align-items-start mb-2.5">
+            <div class="d-flex justify-content-between align-items-start mb-3.5">
               <div class="overflow-hidden pe-2">
                 <h6 class="fw-bold mb-1.5 text-dark font-size-14 text-truncate" style="line-height: 1.3;" :title="tab.name || tab.tab_number">
                   {{ tab.name || (tab.customer ? `${tab.customer.name}'s Tab` : tab.tab_number) }}
@@ -385,11 +385,7 @@
                     <span class="fw-medium text-dark">{{ getTabTableDisplay(tab) }}</span>
                     <span class="mx-1">•</span>
                   </template>
-                  <template v-else>
-                    <i class="mdi mdi-store-outline font-size-13 text-secondary"></i>
-                    <span class="text-muted">Takeaway / Counter</span>
-                    <span class="mx-1">•</span>
-                  </template>
+                  <i class="mdi mdi-clock-outline font-size-12 text-secondary"></i>
                   <span>{{ formatRelativeTime(tab.created_at || tab.updated_at) }}</span>
                 </div>
               </div>
@@ -414,8 +410,8 @@
               </div>
             </div>
 
-            <!-- Middle Section: Itemized List with Fog Fade Effect (shows up to 2 items) -->
-            <div class="position-relative my-2.5">
+            <!-- Middle Section: Itemized List with Increased Top Spacing & Fog Fade Effect -->
+            <div class="position-relative pt-1 mt-1 mb-3">
               <div
                 class="d-flex flex-column gap-2 transition-all"
                 :style="(!expandedTabs[tab.id] && (tab.items?.length > 2)) ? 'max-height: 52px; overflow: hidden;' : ''"
@@ -470,13 +466,15 @@
               </button>
             </div>
 
-            <!-- Action Button: Styled to match tab status theme -->
+            <!-- Action Button: Outline Style -->
             <button
               type="button"
-              class="btn text-white w-100 fw-semibold font-size-12 py-2 rounded-2 d-flex align-items-center justify-content-center gap-1.5 shadow-none"
+              class="btn w-100 fw-semibold font-size-12 py-2 rounded-2 d-flex align-items-center justify-content-center gap-1.5 shadow-none transition-all"
               :style="{
-                backgroundColor: getTabAgingTheme(tab).btnBg,
-                border: 'none'
+                backgroundColor: 'transparent',
+                color: getTabAgingTheme(tab).outlineBtnColor || getTabAgingTheme(tab).priceColor,
+                border: '1.5px solid ' + (getTabAgingTheme(tab).outlineBtnBorder || getTabAgingTheme(tab).priceColor),
+                opacity: (saving || cartItemsCount === 0) ? 0.6 : 1
               }"
               :disabled="saving || cartItemsCount === 0"
               @click="appendToExistingTab(tab)"
@@ -600,6 +598,8 @@ const getTabAgingTheme = (tab) => {
       badgeText: '#166534',
       badgeBorder: '#bbf7d0',
       priceColor: '#15803d',
+      outlineBtnColor: '#15803d',
+      outlineBtnBorder: '#16a34a',
       btnBg: '#16a34a',
       fadeGradient: 'linear-gradient(to bottom, rgba(240, 249, 243, 0) 0%, rgba(240, 249, 243, 0.9) 65%, #f0f9f3 100%)',
     };
@@ -617,6 +617,8 @@ const getTabAgingTheme = (tab) => {
       badgeText: '#92400e',
       badgeBorder: '#fde68a',
       priceColor: '#b45309',
+      outlineBtnColor: '#b45309',
+      outlineBtnBorder: '#d97706',
       btnBg: '#d97706',
       fadeGradient: 'linear-gradient(to bottom, rgba(253, 248, 234, 0) 0%, rgba(253, 248, 234, 0.9) 65%, #fdf8ea 100%)',
     };
@@ -639,6 +641,8 @@ const getTabAgingTheme = (tab) => {
       badgeText: '#9f1239',
       badgeBorder: '#fecdd3',
       priceColor: '#be123c',
+      outlineBtnColor: '#be123c',
+      outlineBtnBorder: '#e11d48',
       btnBg: '#e11d48',
       fadeGradient: 'linear-gradient(to bottom, rgba(253, 242, 242, 0) 0%, rgba(253, 242, 242, 0.9) 65%, #fdf2f2 100%)',
     };
@@ -656,6 +660,8 @@ const getTabAgingTheme = (tab) => {
       badgeText: '#854d0e',
       badgeBorder: '#fef08a',
       priceColor: '#b45309',
+      outlineBtnColor: '#b45309',
+      outlineBtnBorder: '#d97706',
       btnBg: '#d97706',
       fadeGradient: 'linear-gradient(to bottom, rgba(253, 248, 234, 0) 0%, rgba(253, 248, 234, 0.9) 65%, #fdf8ea 100%)',
     };
@@ -672,6 +678,8 @@ const getTabAgingTheme = (tab) => {
     badgeText: '#1e40af',
     badgeBorder: '#bfdbfe',
     priceColor: '#1d4ed8',
+    outlineBtnColor: '#1d4ed8',
+    outlineBtnBorder: '#2563eb',
     btnBg: '#1d4ed8',
     fadeGradient: 'linear-gradient(to bottom, rgba(241, 246, 253, 0) 0%, rgba(241, 246, 253, 0.9) 65%, #f1f6fd 100%)',
   };
