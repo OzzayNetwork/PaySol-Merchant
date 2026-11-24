@@ -505,6 +505,7 @@ import CustomerProfileModal from './CustomerProfileModal.vue';
 import SelectedCustomerCard from './SelectedCustomerCard.vue';
 import { useCartStore } from '@/stores/cart';
 import { useShiftStore } from '@/stores/shift';
+import { getTabAgingTheme, formatTabRelativeTime } from '@/utils/tabAging';
 
 const props = defineProps({
   cart: { type: Array, default: () => [] },
@@ -548,20 +549,7 @@ const toggleExpandTab = (tabId) => {
   expandedTabs.value[tabId] = !expandedTabs.value[tabId];
 };
 
-const formatRelativeTime = (timestamp) => {
-  if (!timestamp) return 'Just now';
-  const now = new Date();
-  const date = new Date(timestamp);
-  if (isNaN(date.getTime())) return 'Recently';
-  const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000);
-  if (diffSec < 60) return 'Just now';
-  const diffMin = Math.floor(diffSec / 60);
-  if (diffMin < 60) return `${diffMin} Min Ago`;
-  const diffHours = Math.floor(diffMin / 60);
-  if (diffHours < 24) return `${diffHours} Hour${diffHours > 1 ? 's' : ''} Ago`;
-  const diffDays = Math.floor(diffHours / 24);
-  return `${diffDays} Day${diffDays > 1 ? 's' : ''} Ago`;
-};
+const formatRelativeTime = formatTabRelativeTime;
 
 const getTabTableDisplay = (tab) => {
   if (tab?.table?.table_number) return `Table ${tab.table.table_number}`;
@@ -578,111 +566,6 @@ const getTabTableDisplay = (tab) => {
   if (match) return `Table ${match[1]}`;
 
   return null;
-};
-
-const getTabAgingTheme = (tab) => {
-  const status = String(tab?.status || '').toLowerCase();
-  const totalAmount = Number(tab?.total_amount || 0);
-  const paidAmount = Number(tab?.paid_amount || 0);
-  const balanceDue = Number(tab?.balance_due ?? (totalAmount - paidAmount));
-
-  // 1. Settled / Fully Paid (Muted Sage Green)
-  if (status === 'settled' || status === 'paid' || (totalAmount > 0 && balanceDue <= 0)) {
-    return {
-      tier: 'settled',
-      label: 'Settled',
-      cardBg: '#f0f9f3',
-      cardBorder: '#c7edd2',
-      bottomBorder: '#86efac',
-      badgeBg: '#dcfce7',
-      badgeText: '#166534',
-      badgeBorder: '#bbf7d0',
-      priceColor: '#15803d',
-      outlineBtnColor: '#15803d',
-      outlineBtnBorder: '#16a34a',
-      btnBg: '#16a34a',
-      fadeGradient: 'linear-gradient(to bottom, rgba(240, 249, 243, 0) 0%, rgba(240, 249, 243, 0.9) 65%, #f0f9f3 100%)',
-    };
-  }
-
-  // 2. Partially Paid (Muted Warm Honey)
-  if (status === 'partially_paid' || (paidAmount > 0 && balanceDue > 0)) {
-    return {
-      tier: 'partial',
-      label: 'Partially Paid',
-      cardBg: '#fdf8ea',
-      cardBorder: '#fae8b6',
-      bottomBorder: '#fde68a',
-      badgeBg: '#fef3c7',
-      badgeText: '#92400e',
-      badgeBorder: '#fde68a',
-      priceColor: '#b45309',
-      outlineBtnColor: '#b45309',
-      outlineBtnBorder: '#d97706',
-      btnBg: '#d97706',
-      fadeGradient: 'linear-gradient(to bottom, rgba(253, 248, 234, 0) 0%, rgba(253, 248, 234, 0.9) 65%, #fdf8ea 100%)',
-    };
-  }
-
-  // Calculate elapsed duration in minutes
-  const timestamp = tab?.opened_at || tab?.created_at || tab?.updated_at;
-  const createdDate = timestamp ? new Date(timestamp) : new Date();
-  const elapsedMin = isNaN(createdDate.getTime()) ? 0 : Math.max(0, Math.floor((Date.now() - createdDate.getTime()) / (1000 * 60)));
-
-  // 3. Overdue / Critical Aging: > 4 hours (Muted Dusty Rose)
-  if (elapsedMin >= 240 || status === 'overdue' || status === 'voided') {
-    return {
-      tier: 'overdue',
-      label: 'Overdue',
-      cardBg: '#fdf2f2',
-      cardBorder: '#fcdada',
-      bottomBorder: '#fca5a5',
-      badgeBg: '#ffe4e6',
-      badgeText: '#9f1239',
-      badgeBorder: '#fecdd3',
-      priceColor: '#be123c',
-      outlineBtnColor: '#be123c',
-      outlineBtnBorder: '#e11d48',
-      btnBg: '#e11d48',
-      fadeGradient: 'linear-gradient(to bottom, rgba(253, 242, 242, 0) 0%, rgba(253, 242, 242, 0.9) 65%, #fdf2f2 100%)',
-    };
-  }
-
-  // 4. Extended Session / Warning: 2 to 4 hours (Muted Warm Honey/Wheat)
-  if (elapsedMin >= 120) {
-    return {
-      tier: 'extended',
-      label: 'Active (2h+)',
-      cardBg: '#fdf8ea',
-      cardBorder: '#fae8b6',
-      bottomBorder: '#fde68a',
-      badgeBg: '#fef9c3',
-      badgeText: '#854d0e',
-      badgeBorder: '#fef08a',
-      priceColor: '#b45309',
-      outlineBtnColor: '#b45309',
-      outlineBtnBorder: '#d97706',
-      btnBg: '#d97706',
-      fadeGradient: 'linear-gradient(to bottom, rgba(253, 248, 234, 0) 0%, rgba(253, 248, 234, 0.9) 65%, #fdf8ea 100%)',
-    };
-  }
-
-  // 5. Fresh / Active: < 2 hours (Muted Soft Slate-Blue)
-  return {
-    tier: 'fresh',
-    label: 'Outstanding',
-    cardBg: '#f1f6fd',
-    cardBorder: '#dbe7f7',
-    bottomBorder: '#93c5fd',
-    badgeBg: '#dbeafe',
-    badgeText: '#1e40af',
-    badgeBorder: '#bfdbfe',
-    priceColor: '#1d4ed8',
-    outlineBtnColor: '#1d4ed8',
-    outlineBtnBorder: '#2563eb',
-    btnBg: '#1d4ed8',
-    fadeGradient: 'linear-gradient(to bottom, rgba(241, 246, 253, 0) 0%, rgba(241, 246, 253, 0.9) 65%, #f1f6fd 100%)',
-  };
 };
 
 let searchTimer = null;
