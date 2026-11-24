@@ -359,30 +359,37 @@
       </div>
 
       <div v-else class="d-flex flex-column gap-3 p-1">
-        <!-- Reference Design: Open Tab Card with Subtle Aging Bottom Border -->
+        <!-- Reference Design: Open Tab Card with Muted Colors & Subtle Aging Bottom Border -->
         <div
           v-for="tab in filteredOpenTabs"
           :key="tab.id"
-          class="card border-0 shadow-none text-start overflow-hidden position-relative"
+          class="card border-0 shadow-none text-start overflow-hidden position-relative transition-all"
           :style="{
-            backgroundColor: '#ffffff',
+            backgroundColor: getTabAgingTheme(tab).cardBg,
             borderRadius: '14px',
-            border: '1px solid #e2e8f0 !important',
+            border: '1px solid ' + getTabAgingTheme(tab).cardBorder + ' !important',
             borderBottom: '3.5px solid ' + getTabAgingTheme(tab).bottomBorder + ' !important',
-            marginBottom: '12px !important',
+            marginBottom: '14px !important',
           }"
         >
           <div class="card-body p-3.5">
             <!-- Top Section: Tab Name / Table Pin & Pending Balance -->
             <div class="d-flex justify-content-between align-items-start mb-2.5">
               <div class="overflow-hidden pe-2">
-                <h6 class="fw-bold mb-0.5 text-dark font-size-14 text-truncate" :title="tab.name || tab.tab_number">
+                <h6 class="fw-bold mb-1.5 text-dark font-size-14 text-truncate" style="line-height: 1.3;" :title="tab.name || tab.tab_number">
                   {{ tab.name || (tab.customer ? `${tab.customer.name}'s Tab` : tab.tab_number) }}
                 </h6>
                 <div class="d-flex align-items-center gap-1 font-size-11" style="color: #64748b;">
-                  <i class="mdi mdi-map-marker font-size-13 text-secondary"></i>
-                  <span>{{ getTabTableDisplay(tab) }}</span>
-                  <span class="mx-0.5">•</span>
+                  <template v-if="getTabTableDisplay(tab)">
+                    <i class="mdi mdi-map-marker font-size-13 text-secondary"></i>
+                    <span class="fw-medium text-dark">{{ getTabTableDisplay(tab) }}</span>
+                    <span class="mx-1">•</span>
+                  </template>
+                  <template v-else>
+                    <i class="mdi mdi-store-outline font-size-13 text-secondary"></i>
+                    <span class="text-muted">Takeaway / Counter</span>
+                    <span class="mx-1">•</span>
+                  </template>
                   <span>{{ formatRelativeTime(tab.created_at || tab.updated_at) }}</span>
                 </div>
               </div>
@@ -392,13 +399,13 @@
                   KES {{ Number(tab.total_amount || tab.pending_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) }}
                 </div>
                 <span
-                  class="badge font-size-10 px-2 py-0.5 fw-bold rounded-pill"
+                  class="badge font-size-10 px-2.5 py-0.5 fw-bold rounded-pill"
                   :style="{
                     backgroundColor: getTabAgingTheme(tab).badgeBg,
                     color: getTabAgingTheme(tab).badgeText,
                     border: '1px solid ' + getTabAgingTheme(tab).badgeBorder,
                     letterSpacing: '0.2px',
-                    marginTop: '2px',
+                    marginTop: '3px',
                     display: 'inline-block'
                   }"
                 >
@@ -408,42 +415,45 @@
             </div>
 
             <!-- Middle Section: Itemized List with Fog Fade Effect (shows up to 2 items) -->
-            <div class="position-relative my-2">
+            <div class="position-relative my-2.5">
               <div
-                class="d-flex flex-column gap-1.5 font-size-12 transition-all"
-                :style="(!expandedTabs[tab.id] && (tab.items?.length > 2)) ? 'max-height: 48px; overflow: hidden;' : ''"
+                class="d-flex flex-column gap-2 transition-all"
+                :style="(!expandedTabs[tab.id] && (tab.items?.length > 2)) ? 'max-height: 52px; overflow: hidden;' : ''"
               >
                 <div
                   v-for="(item, idx) in (tab.items || [])"
                   :key="item.id || idx"
                   class="d-flex justify-content-between align-items-baseline"
-                  style="color: #334155;"
+                  style="color: #334155; font-size: 11px; line-height: 1.45;"
                 >
                   <div class="text-truncate pe-2">
-                    <span>{{ idx + 1 }}. {{ item.item_name || item.name || 'Item' }}</span>
-                    <span v-if="item.quantity && Number(item.quantity) > 1" class="text-muted font-size-11 ms-1">({{ Number(item.quantity) }})</span>
+                    <span class="fw-medium">{{ idx + 1 }}. {{ item.item_name || item.name || 'Item' }}</span>
+                    <span v-if="item.quantity && Number(item.quantity) > 1" class="text-muted ms-1">({{ Number(item.quantity) }})</span>
                   </div>
-                  <div class="fw-semibold font-size-12 text-dark text-nowrap">
+                  <div class="fw-semibold text-dark text-nowrap" style="font-size: 11px;">
                     KES {{ Number(item.total_amount ?? (Number(item.unit_price || 0) * Number(item.quantity || 1))).toFixed(2) }}
                   </div>
                 </div>
 
                 <!-- Fallback if no items array -->
-                <div v-if="!tab.items || tab.items.length === 0" class="text-muted font-size-11 fst-italic py-0.5">
+                <div v-if="!tab.items || tab.items.length === 0" class="text-muted fst-italic py-0.5" style="font-size: 11px;">
                   {{ tab.active_items_count || 0 }} item(s) on tab
                 </div>
               </div>
 
-              <!-- Fog Fade Overlay: gently fades the 2nd/3rd item into the card background -->
+              <!-- Fog Fade Overlay: gently fades the 2nd/3rd item into the muted card background -->
               <div
                 v-if="!expandedTabs[tab.id] && (tab.items?.length > 2)"
                 class="position-absolute bottom-0 start-0 end-0 pointer-events-none"
-                style="height: 28px; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, #ffffff 100%);"
+                :style="{
+                  height: '28px',
+                  background: getTabAgingTheme(tab).fadeGradient
+                }"
               ></div>
             </div>
 
             <!-- Items Count & Show Details Toggle -->
-            <div class="d-flex justify-content-between align-items-center font-size-11 pt-0.5 mb-2.5" style="color: #64748b;">
+            <div class="d-flex justify-content-between align-items-center font-size-11 pt-1 mb-3" style="color: #64748b;">
               <span class="fw-medium">
                 {{ (tab.items?.length || tab.active_items_count || 1) }} item{{ (tab.items?.length || tab.active_items_count || 1) === 1 ? '' : 's' }}
               </span>
@@ -452,7 +462,7 @@
                 v-if="tab.items && tab.items.length > 2"
                 type="button"
                 class="btn btn-link p-0 fw-semibold font-size-11 text-decoration-none d-inline-flex align-items-center gap-1 shadow-none"
-                style="color: #1d4ed8;"
+                :style="{ color: getTabAgingTheme(tab).priceColor }"
                 @click="toggleExpandTab(tab.id)"
               >
                 <span>{{ expandedTabs[tab.id] ? 'Hide details' : 'Show details' }}</span>
@@ -460,11 +470,14 @@
               </button>
             </div>
 
-            <!-- Action Button: Solid Vibrant Blue -->
+            <!-- Action Button: Styled to match tab status theme -->
             <button
               type="button"
-              class="btn btn-primary w-100 fw-semibold font-size-12 py-2 rounded-2 d-flex align-items-center justify-content-center gap-1.5 shadow-none"
-              style="background-color: #1d4ed8; border: none;"
+              class="btn text-white w-100 fw-semibold font-size-12 py-2 rounded-2 d-flex align-items-center justify-content-center gap-1.5 shadow-none"
+              :style="{
+                backgroundColor: getTabAgingTheme(tab).btnBg,
+                border: 'none'
+              }"
               :disabled="saving || cartItemsCount === 0"
               @click="appendToExistingTab(tab)"
             >
@@ -557,18 +570,16 @@ const getTabTableDisplay = (tab) => {
   if (tab?.table?.label) return `Table ${tab.table.label}`;
   if (tab?.table_number) return `Table ${tab.table_number}`;
   
-  const match = (tab?.name || '').match(/Table\s*([0-9A-Za-z]+)/i);
-  if (match) return `Table ${match[1]}`;
-
   if (tab?.table_id && availableTables.value?.length) {
     const tbl = availableTables.value.find((t) => t.id === tab.table_id);
     if (tbl?.table_number) return `Table ${tbl.table_number}`;
     if (tbl?.label) return `Table ${tbl.label}`;
   }
 
-  // Fallback to table number from tab or default to Table 23 (never say Counter)
-  const tabNum = tab?.tab_number ? tab.tab_number.replace(/\D/g, '').slice(-2) : '23';
-  return `Table ${tabNum ? parseInt(tabNum, 10) || 23 : 23}`;
+  const match = (tab?.name || '').match(/Table\s*([0-9A-Za-z]+)/i);
+  if (match) return `Table ${match[1]}`;
+
+  return null;
 };
 
 const getTabAgingTheme = (tab) => {
@@ -577,29 +588,37 @@ const getTabAgingTheme = (tab) => {
   const paidAmount = Number(tab?.paid_amount || 0);
   const balanceDue = Number(tab?.balance_due ?? (totalAmount - paidAmount));
 
-  // 1. Settled / Fully Paid (Subtle mint)
+  // 1. Settled / Fully Paid (Muted Sage Green)
   if (status === 'settled' || status === 'paid' || (totalAmount > 0 && balanceDue <= 0)) {
     return {
       tier: 'settled',
       label: 'Settled',
+      cardBg: '#f0f9f3',
+      cardBorder: '#c7edd2',
       bottomBorder: '#86efac',
       badgeBg: '#dcfce7',
       badgeText: '#166534',
       badgeBorder: '#bbf7d0',
       priceColor: '#15803d',
+      btnBg: '#16a34a',
+      fadeGradient: 'linear-gradient(to bottom, rgba(240, 249, 243, 0) 0%, rgba(240, 249, 243, 0.9) 65%, #f0f9f3 100%)',
     };
   }
 
-  // 2. Partially Paid (Subtle warm amber)
+  // 2. Partially Paid (Muted Warm Honey)
   if (status === 'partially_paid' || (paidAmount > 0 && balanceDue > 0)) {
     return {
       tier: 'partial',
       label: 'Partially Paid',
+      cardBg: '#fdf8ea',
+      cardBorder: '#fae8b6',
       bottomBorder: '#fde68a',
       badgeBg: '#fef3c7',
       badgeText: '#92400e',
       badgeBorder: '#fde68a',
       priceColor: '#b45309',
+      btnBg: '#d97706',
+      fadeGradient: 'linear-gradient(to bottom, rgba(253, 248, 234, 0) 0%, rgba(253, 248, 234, 0.9) 65%, #fdf8ea 100%)',
     };
   }
 
@@ -608,45 +627,58 @@ const getTabAgingTheme = (tab) => {
   const createdDate = timestamp ? new Date(timestamp) : new Date();
   const elapsedMin = isNaN(createdDate.getTime()) ? 0 : Math.max(0, Math.floor((Date.now() - createdDate.getTime()) / (1000 * 60)));
 
-  // 3. Overdue / Critical Aging: > 4 hours (Subtle soft rose)
+  // 3. Overdue / Critical Aging: > 4 hours (Muted Dusty Rose)
   if (elapsedMin >= 240 || status === 'overdue' || status === 'voided') {
     return {
       tier: 'overdue',
       label: 'Overdue',
+      cardBg: '#fdf2f2',
+      cardBorder: '#fcdada',
       bottomBorder: '#fca5a5',
       badgeBg: '#ffe4e6',
       badgeText: '#9f1239',
       badgeBorder: '#fecdd3',
       priceColor: '#be123c',
+      btnBg: '#e11d48',
+      fadeGradient: 'linear-gradient(to bottom, rgba(253, 242, 242, 0) 0%, rgba(253, 242, 242, 0.9) 65%, #fdf2f2 100%)',
     };
   }
 
-  // 4. Extended Session / Warning: 2 to 4 hours (Subtle honey amber)
+  // 4. Extended Session / Warning: 2 to 4 hours (Muted Warm Honey/Wheat)
   if (elapsedMin >= 120) {
     return {
       tier: 'extended',
       label: 'Active (2h+)',
+      cardBg: '#fdf8ea',
+      cardBorder: '#fae8b6',
       bottomBorder: '#fde68a',
       badgeBg: '#fef9c3',
       badgeText: '#854d0e',
       badgeBorder: '#fef08a',
       priceColor: '#b45309',
+      btnBg: '#d97706',
+      fadeGradient: 'linear-gradient(to bottom, rgba(253, 248, 234, 0) 0%, rgba(253, 248, 234, 0.9) 65%, #fdf8ea 100%)',
     };
   }
 
-  // 5. Fresh / Active: < 2 hours (Subtle sky blue)
+  // 5. Fresh / Active: < 2 hours (Muted Soft Slate-Blue)
   return {
     tier: 'fresh',
     label: 'Outstanding',
+    cardBg: '#f1f6fd',
+    cardBorder: '#dbe7f7',
     bottomBorder: '#93c5fd',
     badgeBg: '#dbeafe',
     badgeText: '#1e40af',
     badgeBorder: '#bfdbfe',
     priceColor: '#1d4ed8',
+    btnBg: '#1d4ed8',
+    fadeGradient: 'linear-gradient(to bottom, rgba(241, 246, 253, 0) 0%, rgba(241, 246, 253, 0.9) 65%, #f1f6fd 100%)',
   };
 };
 
 let searchTimer = null;
+let lastRefreshTime = 0;
 
 const formatMoney = (val) => {
   return Number(val || 0).toLocaleString('en-US', { style: 'currency', currency: 'KES' });
@@ -812,9 +844,11 @@ function handleSearchInput() {
   }, 350);
 }
 
-async function loadCustomers() {
+async function loadCustomers(silent = false) {
   try {
-    loadingCustomers.value = true;
+    if (!silent || customers.value.length === 0) {
+      loadingCustomers.value = true;
+    }
     const params = { limit: 50 };
     if (searchQuery.value.trim()) {
       params.search = searchQuery.value.trim();
@@ -837,9 +871,11 @@ async function loadTables() {
   }
 }
 
-async function loadOpenTabs() {
+async function loadOpenTabs(silent = false) {
   try {
-    loadingOpenTabs.value = true;
+    if (!silent && openTabs.value.length === 0) {
+      loadingOpenTabs.value = true;
+    }
     const branchId =
       shiftStore.activeShift?.branch_id ||
       shiftStore.selectedBranchId ||
@@ -1021,34 +1057,35 @@ function handleClickOutside(event) {
   }
 }
 
-watch(
-  () => props.isTabAsideOpen,
-  (open) => {
-    if (open) {
-      loadCustomers();
-      loadTables();
-      loadOpenTabs();
-      if (cartStore.customer) {
-        selectCustomer(cartStore.customer);
-      }
-      if (cartStore.table) {
-        form.value.table_id = cartStore.table.id;
-        onTableChange();
-      }
-    }
-  }
-);
+function refreshDrawerData(silent = true) {
+  const now = Date.now();
+  if (now - lastRefreshTime < 2000) return; // Debounce rapid back-to-back triggers
+  lastRefreshTime = now;
 
-function handleOffcanvasShow() {
-  loadCustomers();
+  loadCustomers(silent);
   loadTables();
-  loadOpenTabs();
+  loadOpenTabs(silent);
+
   if (cartStore.customer) {
     selectCustomer(cartStore.customer);
   }
   if (cartStore.table) {
     form.value.table_id = cartStore.table.id;
+    onTableChange();
   }
+}
+
+watch(
+  () => props.isTabAsideOpen,
+  (open) => {
+    if (open) {
+      refreshDrawerData(true);
+    }
+  }
+);
+
+function handleOffcanvasShow() {
+  refreshDrawerData(true);
 }
 
 onMounted(() => {
