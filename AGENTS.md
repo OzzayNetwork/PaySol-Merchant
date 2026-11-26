@@ -316,6 +316,12 @@ the backend offers, used or not, is `README.md` §8; what is still missing is §
 | POST | `/tenant/shifts/{id}/join` | `shifts.join` | `components/Shifts/ShiftActionModal.vue` | any |
 | GET | `/tenant/shifts` | `shifts.list` | `pages/Shifts/Shifts.List.vue` | any |
 | GET | `/tenant/shifts/{id}` | `shifts.get` | `components/Shifts/ShiftActionModal.vue`, `pages/Shifts/Shifts.List.vue` | any |
+| GET | `/tenant/tabs` | `tabs.list` | `pages/Sell/Tabs.List.vue`, `pages/Sell/components/SaveTabAside.vue` | owner, manager, cashier, waiter |
+| POST | `/tenant/tabs` | `tabs.open` | `pages/Sell/components/SaveTabAside.vue` | owner, manager, cashier, waiter |
+| POST | `/tenant/tabs/{id}/items` | `tabs.addItems` | `pages/Sell/components/SaveTabAside.vue` | owner, manager, cashier, waiter |
+| POST | `/tenant/tabs/{id}/payments` | `tabs.recordPayment` | `pages/Sell/Tabs.List.vue` | owner, manager, cashier, waiter |
+| POST | `/tenant/tabs/{id}/split` | `tabs.split` | `pages/Sell/Tabs.List.vue` | owner, manager, cashier, waiter |
+| POST | `/tenant/tabs/{id}/merge` | `tabs.merge` | `pages/Sell/Tabs.List.vue` | owner, manager, cashier, waiter |
 
 ## 13. `_admin_leftovers/` (11 Nov 2026)
 

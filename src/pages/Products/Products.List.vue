@@ -273,6 +273,60 @@
                                 </div>
                             </div>
                             <div class="col-12">
+                                <div class="rounded border p-3" style="background-color: #f8fafc;">
+                                    <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap mb-2">
+                                        <h6 class="mb-0 fw-bold font-size-13">Counter Discount Policy</h6>
+                                        <div class="form-check form-switch mb-0">
+                                            <input id="detailAllowDiscount" v-model="discountForm.allow_discount" class="form-check-input" type="checkbox">
+                                            <label class="form-check-label font-size-12 fw-medium" for="detailAllowDiscount">
+                                                {{ discountForm.allow_discount ? 'Discounts Allowed' : 'Discounts Disabled' }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div v-if="discountForm.allow_discount" class="row g-2 align-items-end">
+                                        <div class="col-sm-7">
+                                            <label class="form-label font-size-11 text-muted fw-semibold mb-1">Max discount without manager OTP approval</label>
+                                            <div class="input-group input-group-sm">
+                                                <button
+                                                    type="button"
+                                                    class="btn"
+                                                    :class="discountForm.max_discount_without_approval_type === 'percent' ? 'btn-primary' : 'btn-white border'"
+                                                    @click="discountForm.max_discount_without_approval_type = 'percent'"
+                                                >%</button>
+                                                <button
+                                                    type="button"
+                                                    class="btn"
+                                                    :class="discountForm.max_discount_without_approval_type === 'fixed' ? 'btn-primary' : 'btn-white border'"
+                                                    @click="discountForm.max_discount_without_approval_type = 'fixed'"
+                                                >KSh</button>
+                                                <input
+                                                    v-model="discountForm.max_discount_without_approval_value"
+                                                    type="number"
+                                                    min="0"
+                                                    :max="discountForm.max_discount_without_approval_type === 'percent' ? 100 : undefined"
+                                                    step="any"
+                                                    class="form-control"
+                                                    placeholder="0 (always require OTP)"
+                                                >
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5 text-sm-end">
+                                            <button type="button" class="btn btn-sm btn-primary fw-semibold" :disabled="savingDiscountPolicy" @click="saveDiscountPolicy">
+                                                <span v-if="savingDiscountPolicy" class="spinner-border spinner-border-sm me-1"></span>
+                                                Save Discount Policy
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div v-else class="d-flex align-items-center justify-content-between gap-2 mt-1">
+                                        <small class="text-muted">Cashiers will not be able to apply discounts to this item.</small>
+                                        <button type="button" class="btn btn-sm btn-primary fw-semibold" :disabled="savingDiscountPolicy" @click="saveDiscountPolicy">
+                                            <span v-if="savingDiscountPolicy" class="spinner-border spinner-border-sm me-1"></span>
+                                            Save Policy
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
                                 <h6 class="mb-2">Recent stock changes</h6>
                                 <p v-if="!detail.movements?.length" class="text-muted small mb-0">No stock changes yet.</p>
                                 <div v-for="m in detail.movements" :key="m.id" class="activity-person py-2 border-bottom">
@@ -444,6 +498,7 @@ async function openProduct(id) {
     try {
         const { data } = await ProductsAPI.get(id)
         detail.value = data.data
+        syncDiscountForm(data.data)
     } catch (error) {
         console.error('Error fetching the product:', error)
         bootstrap.Modal.getOrCreateInstance(detailModalEl.value).hide()
@@ -458,6 +513,43 @@ function replaceRow(row) {
     detail.value = row
     const i = products.value.findIndex((p) => p.id === row.id)
     if (i > -1) products.value[i] = { ...products.value[i], ...row }
+}
+
+const savingDiscountPolicy = ref(false)
+const discountForm = ref({
+    allow_discount: true,
+    max_discount_without_approval_type: 'percent',
+    max_discount_without_approval_value: '',
+})
+
+function syncDiscountForm(row) {
+    discountForm.value = {
+        allow_discount: row?.allow_discount ?? true,
+        max_discount_without_approval_type: row?.max_discount_without_approval_type || 'percent',
+        max_discount_without_approval_value:
+            row?.max_discount_without_approval_value != null ? String(row.max_discount_without_approval_value) : '',
+    }
+}
+
+async function saveDiscountPolicy() {
+    if (!detail.value || savingDiscountPolicy.value) return
+    savingDiscountPolicy.value = true
+    try {
+        const rawVal = discountForm.value.max_discount_without_approval_value
+        const { data } = await ProductsAPI.update(detail.value.id, {
+            allow_discount: !!discountForm.value.allow_discount,
+            max_discount_without_approval_type: discountForm.value.max_discount_without_approval_type || 'percent',
+            max_discount_without_approval_value: rawVal === '' || rawVal === null ? null : Number(rawVal),
+        })
+        replaceRow(data.data)
+        syncDiscountForm(data.data)
+        showToast('Discount Policy Saved', `Updated counter discount rules for ${data.data.name}.`)
+    } catch (error) {
+        console.error('Error saving discount policy:', error)
+        showError('Could Not Save', error.response?.data?.message || 'Please try again.')
+    } finally {
+        savingDiscountPolicy.value = false
+    }
 }
 
 async function toggleSelling() {

@@ -165,6 +165,58 @@
                                                             </small>
                                                         </div>
                                                     </div>
+
+                                                    <!-- Counter Discount Controls -->
+                                                    <div class="col-12 pt-3 border-top">
+                                                        <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap mb-2">
+                                                            <div>
+                                                                <label class="form-label fw-semibold mb-0" for="productAllowDiscount">Counter Discount Policy</label>
+                                                                <div class="text-muted small">Set how much discount cashiers can give without manager email OTP approval.</div>
+                                                            </div>
+                                                            <div class="form-check form-switch mb-0">
+                                                                <input id="productAllowDiscount" v-model="form.allow_discount" class="form-check-input" type="checkbox">
+                                                                <label class="form-check-label small fw-medium" for="productAllowDiscount">
+                                                                    {{ form.allow_discount ? 'Discounts Allowed' : 'No Discounts' }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+
+                                                        <div v-if="form.allow_discount" class="row g-2 align-items-end mt-1">
+                                                            <div class="col-sm-7">
+                                                                <label class="form-label small mb-1" for="productMaxDiscount">Max discount without approval</label>
+                                                                <div class="input-group">
+                                                                    <button
+                                                                        type="button"
+                                                                        class="btn btn-sm"
+                                                                        :class="form.max_discount_without_approval_type === 'percent' ? 'btn-primary' : 'btn-white border'"
+                                                                        @click="form.max_discount_without_approval_type = 'percent'"
+                                                                    >%</button>
+                                                                    <button
+                                                                        type="button"
+                                                                        class="btn btn-sm"
+                                                                        :class="form.max_discount_without_approval_type === 'fixed' ? 'btn-primary' : 'btn-white border'"
+                                                                        @click="form.max_discount_without_approval_type = 'fixed'"
+                                                                    >KSh</button>
+                                                                    <input
+                                                                        id="productMaxDiscount"
+                                                                        v-model="form.max_discount_without_approval_value"
+                                                                        type="number"
+                                                                        min="0"
+                                                                        :max="form.max_discount_without_approval_type === 'percent' ? 100 : undefined"
+                                                                        step="any"
+                                                                        inputmode="decimal"
+                                                                        class="form-control"
+                                                                        :placeholder="form.max_discount_without_approval_type === 'percent' ? 'e.g. 5' : 'e.g. 100'"
+                                                                    >
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-5">
+                                                                <small class="text-muted d-block pb-1">
+                                                                    Leave blank or <strong>0</strong> to require manager email OTP for any discount.
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -340,6 +392,7 @@ const branches = ref([])
 const blankForm = () => ({
     name: '', category_id: null, unit: 'piece',
     selling_price: '', cost_price: '', opening_stock: '', vat_type: 'standard_16',
+    allow_discount: true, max_discount_without_approval_type: 'percent', max_discount_without_approval_value: '',
     packs: [], brand: '', size_label: '', description: '', barcode: '', sku: '',
     reorder_level: '', branch_id: null, generate_barcode: true,
     catalogue_product_id: null, lookup_source: 'manual',
@@ -514,6 +567,9 @@ async function save(after) {
             cost_price: num(form.cost_price),
             unit: form.unit,
             vat_type: form.vat_type,
+            allow_discount: !!form.allow_discount,
+            max_discount_without_approval_type: form.max_discount_without_approval_type || 'percent',
+            max_discount_without_approval_value: num(form.max_discount_without_approval_value),
             category_id: form.category_id || undefined,
             barcode: form.barcode || undefined,
             generate_barcode: noBarcode.value && !form.barcode ? !!form.generate_barcode : undefined,

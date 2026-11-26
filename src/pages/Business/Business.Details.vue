@@ -232,125 +232,288 @@
 
                 <!-- Tab 2: Contact & Headquarters -->
                 <div v-show="activeTab === 'contact'" class="col-12">
-                    <div class="card border rounded-2 bg-white p-4">
-                        <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
-                            <Icon icon="ri:map-pin-2-line" class="fs-4 text-primary" />
-                            <div>
-                                <h5 class="fw-bold text-dark mb-0 font-size-15">Contact &amp; Physical Headquarters</h5>
-                                <p class="text-muted font-size-12 mb-0">Official contact channels and administrative location in Kenya.</p>
-                            </div>
-                        </div>
-
-                        <div class="row g-3">
-                            <!-- Phone -->
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold font-size-12">Business Phone Number</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border text-muted"><Icon icon="ri:phone-line" /></span>
-                                    <input type="text" v-model="form.phone" class="form-control"
-                                        placeholder="e.g. +254 712 345 678" maxlength="30" />
-                                </div>
-                                <div class="text-muted font-size-11 mt-1">Customer support and receipt contact.</div>
-                            </div>
-
-                            <!-- Email -->
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold font-size-12">Business Email Address</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border text-muted"><Icon icon="ri:mail-line" /></span>
-                                    <input type="email" v-model="form.email" class="form-control"
-                                        placeholder="e.g. contact@business.co.ke" maxlength="120" />
-                                </div>
-                                <div class="text-muted font-size-11 mt-1">Receives daily summaries and billing receipts.</div>
-                            </div>
-
-                            <!-- Website -->
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold font-size-12">Website / Online Catalog</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border text-muted"><Icon icon="ri:external-link-line" /></span>
-                                    <input type="text" v-model="form.website" class="form-control"
-                                        placeholder="e.g. https://mybusiness.co.ke" maxlength="255" />
-                                </div>
-                                <div class="text-muted font-size-11 mt-1">Printed on receipts and QR checkout links.</div>
-                            </div>
-
-                            <!-- Street Address -->
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold font-size-12">Physical Street / Building Address</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border text-muted"><Icon icon="ri:map-pin-line" /></span>
-                                    <input type="text" v-model="form.address_line" class="form-control"
-                                        placeholder="e.g. 3rd Floor, Sarit Centre, Karuna Road" maxlength="255" />
-                                </div>
-                            </div>
-
-                            <!-- City & P.O. Box -->
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold font-size-12">City / Town</label>
-                                <input type="text" v-model="form.city" class="form-control"
-                                    placeholder="e.g. Nairobi" maxlength="100" />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold font-size-12">P.O. Box &amp; Postal Code</label>
-                                <input type="text" v-model="form.po_box" class="form-control"
-                                    placeholder="e.g. P.O. Box 45678-00100" maxlength="100" />
-                            </div>
-
-                            <!-- Kenya Administrative Cascaders -->
-                            <div class="col-12 mt-4 pt-3 border-top">
-                                <div class="d-flex align-items-center gap-2 mb-3">
-                                    <Icon icon="ri:compass-3-line" class="fs-5 text-primary" />
-                                    <h6 class="fw-bold text-dark mb-0 font-size-13">Kenyan Administrative Jurisdiction</h6>
+                    <div class="row g-3">
+                        <!-- Left: Contact & Headquarters Form -->
+                        <div class="col-lg-7">
+                            <div class="card border rounded-2 bg-white p-4 h-100">
+                                <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                                    <Icon icon="ri:map-pin-2-line" class="fs-4 text-primary" />
+                                    <div>
+                                        <h5 class="fw-bold text-dark mb-0 font-size-15">Contact &amp; Physical Headquarters</h5>
+                                        <p class="text-muted font-size-12 mb-0">Official contact channels and administrative location in Kenya.</p>
+                                    </div>
                                 </div>
 
                                 <div class="row g-3">
-                                    <!-- County -->
+                                    <!-- Phone -->
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold font-size-12">County</label>
-                                        <SelectSearchBox
-                                            :model-value="selectedCountyId"
-                                            :options="countyOptions"
-                                            :placeholder="loadingCounties ? 'Loading counties...' : 'Select County'"
-                                            @update:model-value="onCountySelect"
-                                        />
+                                        <label class="form-label fw-bold font-size-12">Business Phone Number</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border text-muted"><Icon icon="ri:phone-line" /></span>
+                                            <input type="text" v-model="form.phone" class="form-control"
+                                                placeholder="e.g. +254 712 345 678" maxlength="30" />
+                                        </div>
+                                        <div class="text-muted font-size-11 mt-1">Customer support and receipt contact.</div>
                                     </div>
 
-                                    <!-- Constituency -->
+                                    <!-- Email -->
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold font-size-12">Constituency</label>
-                                        <SelectSearchBox
-                                            :model-value="selectedConstituencyId"
-                                            :options="constituencyOptions"
-                                            :placeholder="!selectedCountyId ? 'Select county first' : (loadingConstituencies ? 'Loading...' : 'Select Constituency')"
-                                            :disabled="!selectedCountyId"
-                                            @update:model-value="onConstituencySelect"
-                                        />
+                                        <label class="form-label fw-bold font-size-12">Business Email Address</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border text-muted"><Icon icon="ri:mail-line" /></span>
+                                            <input type="email" v-model="form.email" class="form-control"
+                                                placeholder="e.g. contact@business.co.ke" maxlength="120" />
+                                        </div>
+                                        <div class="text-muted font-size-11 mt-1">Receives daily summaries and billing receipts.</div>
                                     </div>
 
-                                    <!-- Ward -->
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold font-size-12">Ward</label>
-                                        <SelectSearchBox
-                                            :model-value="form.ward_id"
-                                            :options="wardOptions"
-                                            :placeholder="!selectedConstituencyId ? 'Select constituency first' : (loadingWards ? 'Loading...' : 'Select Ward')"
-                                            :disabled="!selectedConstituencyId"
-                                            @update:model-value="onWardSelect"
-                                        />
+                                    <!-- Website -->
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold font-size-12">Website / Online Catalog</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border text-muted"><Icon icon="ri:external-link-line" /></span>
+                                            <input type="text" v-model="form.website" class="form-control"
+                                                placeholder="e.g. https://mybusiness.co.ke" maxlength="255" />
+                                        </div>
+                                        <div class="text-muted font-size-11 mt-1">Printed on receipts and QR checkout links.</div>
                                     </div>
 
-                                    <!-- Area / Estate -->
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold font-size-12">Area / Estate <span class="text-muted fw-normal">(Optional)</span></label>
-                                        <SelectSearchBox
-                                            :model-value="form.area_id"
-                                            :options="areaOptions"
-                                            :placeholder="!form.ward_id ? 'Select ward first' : (areasList.length ? 'Select Area' : 'No areas listed for this ward')"
-                                            :disabled="!form.ward_id || !areasList.length"
-                                            @update:model-value="(val) => form.area_id = val"
-                                        />
+                                    <!-- Street Address -->
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold font-size-12">Physical Street / Building Address</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border text-muted"><Icon icon="ri:map-pin-line" /></span>
+                                            <input type="text" v-model="form.address_line" class="form-control"
+                                                placeholder="e.g. 3rd Floor, Sarit Centre, Karuna Road" maxlength="255" />
+                                        </div>
                                     </div>
+
+                                    <!-- City & P.O. Box -->
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold font-size-12">City / Town</label>
+                                        <input type="text" v-model="form.city" class="form-control"
+                                            placeholder="e.g. Nairobi" maxlength="100" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold font-size-12">P.O. Box &amp; Postal Code</label>
+                                        <input type="text" v-model="form.po_box" class="form-control"
+                                            placeholder="e.g. P.O. Box 45678-00100" maxlength="100" />
+                                    </div>
+
+                                    <!-- Kenya Administrative Cascaders -->
+                                    <div class="col-12 mt-4 pt-3 border-top">
+                                        <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap mb-3">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <Icon icon="ri:compass-3-line" class="fs-5 text-primary" />
+                                                <h6 class="fw-bold text-dark mb-0 font-size-13">Kenyan Administrative Jurisdiction</h6>
+                                            </div>
+                                            <span
+                                                v-if="mainBranchRecord"
+                                                class="badge bg-primary-subtle text-primary border border-primary-subtle font-size-11 fw-semibold d-inline-flex align-items-center gap-1"
+                                            >
+                                                <Icon icon="ri:store-2-line" />
+                                                <span>Main Branch: {{ mainBranchRecord.name }}</span>
+                                            </span>
+                                        </div>
+
+                                        <div class="row g-3">
+                                            <!-- County -->
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold font-size-12">County</label>
+                                                <SelectSearchBox
+                                                    :model-value="selectedCountyId"
+                                                    :options="countyOptions"
+                                                    :placeholder="loadingCounties ? 'Loading counties...' : 'Select County'"
+                                                    @update:model-value="onCountySelect"
+                                                />
+                                            </div>
+
+                                            <!-- Constituency -->
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold font-size-12">Constituency</label>
+                                                <SelectSearchBox
+                                                    :model-value="selectedConstituencyId"
+                                                    :options="constituencyOptions"
+                                                    :placeholder="!selectedCountyId ? 'Select county first' : (loadingConstituencies ? 'Loading...' : 'Select Constituency')"
+                                                    :disabled="!selectedCountyId"
+                                                    @update:model-value="onConstituencySelect"
+                                                />
+                                            </div>
+
+                                            <!-- Ward -->
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold font-size-12">Ward</label>
+                                                <SelectSearchBox
+                                                    :model-value="form.ward_id"
+                                                    :options="wardOptions"
+                                                    :placeholder="!selectedConstituencyId ? 'Select constituency first' : (loadingWards ? 'Loading...' : 'Select Ward')"
+                                                    :disabled="!selectedConstituencyId"
+                                                    @update:model-value="onWardSelect"
+                                                />
+                                            </div>
+
+                                            <!-- Area / Estate -->
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold font-size-12">Area / Estate <span class="text-muted fw-normal">(Optional)</span></label>
+                                                <SelectSearchBox
+                                                    :model-value="form.area_id"
+                                                    :options="areaOptions"
+                                                    :placeholder="!form.ward_id ? 'Select ward first' : (areasList.length ? 'Select Area' : 'No areas listed for this ward')"
+                                                    :disabled="!form.ward_id || !areasList.length"
+                                                    @update:model-value="(val) => form.area_id = val"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Branch Physical Location Map Card -->
+                        <div class="col-lg-5">
+                            <div class="card border rounded-2 bg-white p-4 h-100 d-flex flex-column">
+                                <div class="d-flex align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom">
+                                    <div class="d-flex align-items-center gap-2 min-w-0">
+                                        <Icon icon="ri:map-2-line" class="fs-4 text-primary flex-shrink-0" />
+                                        <div class="min-w-0">
+                                            <h5 class="fw-bold text-dark mb-0 font-size-15 text-truncate">Branch Physical Location</h5>
+                                            <p class="text-muted font-size-12 mb-0 text-truncate">Map pin used for delivery distance &amp; ETA.</p>
+                                        </div>
+                                    </div>
+                                    <router-link
+                                        to="/branches"
+                                        class="btn btn-white btn-sm font-size-11 fw-semibold text-nowrap d-inline-flex align-items-center gap-1"
+                                    >
+                                        <span>Branches</span>
+                                        <Icon icon="ri:arrow-right-up-line" class="fs-6" />
+                                    </router-link>
+                                </div>
+
+                                <!-- Loading branches -->
+                                <div v-if="loadingBranches" class="py-2">
+                                    <SkeletonLoader variant="card" :count="1" />
+                                </div>
+
+                                <template v-else-if="activeMapBranch">
+                                    <!-- Branch selector (multi-branch) or branch pill (single-branch) -->
+                                    <div class="mb-3">
+                                        <div v-if="branchesList.length > 1">
+                                            <label class="form-label fw-bold font-size-12 mb-1">Viewing Branch</label>
+                                            <select
+                                                v-model="selectedMapBranchId"
+                                                class="form-select form-select-sm"
+                                                @change="onMapBranchChanged"
+                                            >
+                                                <option v-for="b in branchesList" :key="b.id" :value="b.id">
+                                                    {{ b.name }}{{ b.is_main ? ' (Main Branch)' : '' }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div
+                                            v-else
+                                            class="d-flex align-items-center justify-content-between gap-2 p-2 rounded border"
+                                            style="background-color: #f8fafc;"
+                                        >
+                                            <div class="d-flex align-items-center gap-2 min-w-0">
+                                                <Icon icon="ri:store-2-line" class="fs-5 text-primary flex-shrink-0" />
+                                                <span class="fw-bold font-size-13 text-dark text-truncate">{{ activeMapBranch.name }}</span>
+                                            </div>
+                                            <span v-if="activeMapBranch.is_main" class="badge bg-primary-subtle text-primary font-size-11">
+                                                Main Branch
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Map Preview or Empty Pin State -->
+                                    <div v-if="mapPreviewCoords" class="mb-3">
+                                        <GoogleMapPreview
+                                            :latitude="mapPreviewCoords.latitude"
+                                            :longitude="mapPreviewCoords.longitude"
+                                            :label="mapPreviewLabel"
+                                            height="240"
+                                            :zoom="16"
+                                        />
+
+                                        <div class="d-flex align-items-center justify-content-between gap-2 mt-2 flex-wrap">
+                                            <span class="font-monospace font-size-11 text-muted">
+                                                {{ Number(mapPreviewCoords.latitude).toFixed(5) }}, {{ Number(mapPreviewCoords.longitude).toFixed(5) }}
+                                            </span>
+                                            <a
+                                                :href="`https://www.google.com/maps?q=${mapPreviewCoords.latitude},${mapPreviewCoords.longitude}`"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="font-size-11 fw-semibold text-primary text-decoration-none d-inline-flex align-items-center gap-1"
+                                            >
+                                                <span>Open in Google Maps</span>
+                                                <Icon icon="ri:external-link-line" />
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        v-else
+                                        class="rounded border d-flex flex-column align-items-center justify-content-center text-center p-4 mb-3"
+                                        style="background-color: #f8fafc; min-height: 200px;"
+                                    >
+                                        <Icon icon="ri:map-pin-off-line" class="fs-1 text-muted mb-2" />
+                                        <div class="fw-bold font-size-13 text-dark mb-1">No map pin set yet</div>
+                                        <p class="text-muted font-size-12 mb-0" style="max-width: 260px;">
+                                            Search for <strong>{{ activeMapBranch.name }}</strong> below to pin its physical GPS location on the map.
+                                        </p>
+                                    </div>
+
+                                    <!-- Quick Location Search & Pin Update -->
+                                    <div class="mt-auto pt-3 border-top">
+                                        <label class="form-label fw-bold font-size-12 mb-1">
+                                            {{ mapPreviewCoords ? 'Update Branch Map Pin' : 'Pin Branch Location' }}
+                                        </label>
+                                        <GoogleLocationInput
+                                            v-model="branchLocationQuery"
+                                            placeholder="Search building, street or landmark..."
+                                            @location-selected="onBranchMapPinSelected"
+                                            @location-cleared="onBranchMapPinCleared"
+                                        />
+
+                                        <div
+                                            v-if="pendingBranchPin"
+                                            class="d-flex align-items-center justify-content-between gap-2 mt-2 pt-1"
+                                        >
+                                            <button
+                                                type="button"
+                                                class="btn btn-white btn-sm font-size-12"
+                                                :disabled="savingBranchPin"
+                                                @click="onBranchMapPinCleared"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="btn btn-primary btn-sm font-size-12 fw-semibold d-inline-flex align-items-center gap-1"
+                                                :disabled="savingBranchPin"
+                                                @click="saveBranchLocationPin"
+                                            >
+                                                <span v-if="savingBranchPin" class="spinner-border spinner-border-sm" role="status"></span>
+                                                <Icon v-else icon="ri:map-pin-add-line" class="fs-6" />
+                                                <span>{{ savingBranchPin ? 'Saving Pin...' : 'Save Location Pin' }}</span>
+                                            </button>
+                                        </div>
+                                        <div v-else class="text-muted font-size-11 mt-1">
+                                            Used as the starting point for POS delivery distance and ETA estimates.
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <div
+                                    v-else
+                                    class="rounded border d-flex flex-column align-items-center justify-content-center text-center p-4 flex-grow-1"
+                                    style="background-color: #f8fafc;"
+                                >
+                                    <Icon icon="ri:store-2-line" class="fs-1 text-muted mb-2" />
+                                    <div class="fw-bold font-size-13 text-dark mb-1">No branches found</div>
+                                    <p class="text-muted font-size-12 mb-3">Create a branch to set its physical location on the map.</p>
+                                    <router-link to="/branches" class="btn btn-primary btn-sm font-size-12">
+                                        Go to Branches
+                                    </router-link>
                                 </div>
                             </div>
                         </div>
@@ -547,35 +710,49 @@
                                             </div>
                                         </div>
 
-                                        <!-- Paper Width -->
+                                        <!-- Default POS Printer Type (58mm / 80mm / A4) -->
                                         <div class="mb-3">
-                                            <label class="form-label fw-bold font-size-12">Thermal Printer Paper Width</label>
+                                            <label class="form-label fw-bold font-size-12">Default POS Printer &amp; Receipt Format</label>
                                             <div class="row g-2">
-                                                <div class="col-6">
-                                                    <div class="paper-width-card p-3 rounded-2 border cursor-pointer"
-                                                        :class="{ 'border-primary bg-primary-subtle': form.receipt_paper_width === '58mm' }"
-                                                        @click="form.receipt_paper_width = '58mm'">
+                                                <div class="col-md-4">
+                                                    <div class="paper-width-card p-3 rounded-2 border cursor-pointer h-100"
+                                                        :class="{ 'border-primary bg-primary-subtle': form.receipt_printer_type === 'thermal_58' }"
+                                                        @click="form.receipt_printer_type = 'thermal_58'; form.receipt_paper_width = '58mm'">
                                                         <div class="d-flex align-items-center justify-content-between mb-1">
-                                                            <span class="fw-bold font-size-13 text-dark">58mm (2-inch)</span>
+                                                            <span class="fw-bold font-size-13 text-dark">58mm Thermal</span>
                                                             <Icon class="fs-5"
-                                                                :icon="form.receipt_paper_width === '58mm' ? 'ri:checkbox-circle-fill' : 'ri:checkbox-blank-circle-line'"
-                                                                :class="form.receipt_paper_width === '58mm' ? 'text-primary' : 'text-muted'" />
+                                                                :icon="form.receipt_printer_type === 'thermal_58' ? 'ri:checkbox-circle-fill' : 'ri:checkbox-blank-circle-line'"
+                                                                :class="form.receipt_printer_type === 'thermal_58' ? 'text-primary' : 'text-muted'" />
                                                         </div>
-                                                        <p class="text-muted font-size-11 mb-0">Portable bluetooth / mini handheld POS printers.</p>
+                                                        <p class="text-muted font-size-11 mb-0">2-inch handheld / bluetooth roll printers.</p>
                                                     </div>
                                                 </div>
 
-                                                <div class="col-6">
-                                                    <div class="paper-width-card p-3 rounded-2 border cursor-pointer"
-                                                        :class="{ 'border-primary bg-primary-subtle': form.receipt_paper_width === '80mm' }"
-                                                        @click="form.receipt_paper_width = '80mm'">
+                                                <div class="col-md-4">
+                                                    <div class="paper-width-card p-3 rounded-2 border cursor-pointer h-100"
+                                                        :class="{ 'border-primary bg-primary-subtle': form.receipt_printer_type === 'thermal_80' }"
+                                                        @click="form.receipt_printer_type = 'thermal_80'; form.receipt_paper_width = '80mm'">
                                                         <div class="d-flex align-items-center justify-content-between mb-1">
-                                                            <span class="fw-bold font-size-13 text-dark">80mm (3-inch)</span>
+                                                            <span class="fw-bold font-size-13 text-dark">80mm Thermal</span>
                                                             <Icon class="fs-5"
-                                                                :icon="form.receipt_paper_width === '80mm' ? 'ri:checkbox-circle-fill' : 'ri:checkbox-blank-circle-line'"
-                                                                :class="form.receipt_paper_width === '80mm' ? 'text-primary' : 'text-muted'" />
+                                                                :icon="form.receipt_printer_type === 'thermal_80' ? 'ri:checkbox-circle-fill' : 'ri:checkbox-blank-circle-line'"
+                                                                :class="form.receipt_printer_type === 'thermal_80' ? 'text-primary' : 'text-muted'" />
                                                         </div>
-                                                        <p class="text-muted font-size-11 mb-0">Standard high-speed desktop thermal printers.</p>
+                                                        <p class="text-muted font-size-11 mb-0">3-inch desktop thermal receipt printers.</p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="paper-width-card p-3 rounded-2 border cursor-pointer h-100"
+                                                        :class="{ 'border-primary bg-primary-subtle': form.receipt_printer_type === 'a4' }"
+                                                        @click="form.receipt_printer_type = 'a4'">
+                                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                                            <span class="fw-bold font-size-13 text-dark">A4 Sheet</span>
+                                                            <Icon class="fs-5"
+                                                                :icon="form.receipt_printer_type === 'a4' ? 'ri:checkbox-circle-fill' : 'ri:checkbox-blank-circle-line'"
+                                                                :class="form.receipt_printer_type === 'a4' ? 'text-primary' : 'text-muted'" />
+                                                        </div>
+                                                        <p class="text-muted font-size-11 mb-0">Standard laser / inkjet office printers.</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1597,9 +1774,14 @@ import { Icon } from "@iconify/vue";
 import { ref, reactive, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import { useShiftStore } from "@/stores/shift";
 import businessApi from "@/api/business";
+import branchesApi from "@/api/branches";
 import geoApi from "@/api/geography";
 import SelectSearchBox from "@/components/SelectSearchBox.vue";
+import GoogleLocationInput from "@/components/GoogleLocationInput.vue";
+import GoogleMapPreview from "@/components/GoogleMapPreview.vue";
+import SkeletonLoader from "@/components/Loaders/SkeletonLoader.vue";
 import ImageUploader from "@/components/ImageUploader.vue";
 import ImageToast from "@/components/ImageToast.vue";
 import successImage from "@/assets/images/icons/check.png";
@@ -1616,7 +1798,129 @@ import InvoiceSix from "@/components/Invoices/templates/Invoice.six.vue";
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+const shiftStore = useShiftStore();
 const logoPreview = ref("");
+
+// Branch physical location map state
+const branchesList = ref([]);
+const loadingBranches = ref(false);
+const selectedMapBranchId = ref(null);
+const branchLocationQuery = ref("");
+const pendingBranchPin = ref(null);
+const savingBranchPin = ref(false);
+
+const mainBranchRecord = computed(() => {
+    if (branchesList.value.length) {
+        return branchesList.value.find((b) => b.is_main) || branchesList.value[0];
+    }
+    return business.value?.main_branch || null;
+});
+
+const activeMapBranch = computed(() => {
+    if (!branchesList.value.length) return null;
+    return (
+        branchesList.value.find((b) => b.id === selectedMapBranchId.value) ||
+        branchesList.value.find((b) => b.is_main) ||
+        branchesList.value[0]
+    );
+});
+
+const mapPreviewCoords = computed(() => {
+    if (pendingBranchPin.value?.latitude && pendingBranchPin.value?.longitude) {
+        return {
+            latitude: pendingBranchPin.value.latitude,
+            longitude: pendingBranchPin.value.longitude,
+        };
+    }
+    const b = activeMapBranch.value;
+    if (b?.latitude != null && b?.longitude != null && Number(b.latitude) && Number(b.longitude)) {
+        return {
+            latitude: Number(b.latitude),
+            longitude: Number(b.longitude),
+        };
+    }
+    return null;
+});
+
+const mapPreviewLabel = computed(() => {
+    if (pendingBranchPin.value?.formatted_address) {
+        return pendingBranchPin.value.formatted_address;
+    }
+    const b = activeMapBranch.value;
+    if (!b) return "";
+    return b.address_line || b.premises_name || b.name || "";
+});
+
+async function fetchBranchesForMap() {
+    loadingBranches.value = true;
+    try {
+        const res = await branchesApi.list();
+        const list = res.data?.data || res.data || [];
+        branchesList.value = Array.isArray(list) ? list : [];
+        if (branchesList.value.length && !selectedMapBranchId.value) {
+            const preferred =
+                branchesList.value.find((b) => b.is_main) ||
+                branchesList.value[0];
+            selectedMapBranchId.value = preferred?.id || null;
+            branchLocationQuery.value = preferred?.address_line || "";
+        }
+    } catch (err) {
+        console.warn("Could not load branches for map preview:", err);
+    } finally {
+        loadingBranches.value = false;
+    }
+}
+
+function onMapBranchChanged() {
+    pendingBranchPin.value = null;
+    branchLocationQuery.value = activeMapBranch.value?.address_line || "";
+}
+
+function onBranchMapPinSelected(data) {
+    if (data?.latitude && data?.longitude) {
+        pendingBranchPin.value = data;
+        if (data.formatted_address) {
+            branchLocationQuery.value = data.formatted_address;
+        }
+    }
+}
+
+function onBranchMapPinCleared() {
+    pendingBranchPin.value = null;
+    branchLocationQuery.value = activeMapBranch.value?.address_line || "";
+}
+
+async function saveBranchLocationPin() {
+    if (!activeMapBranch.value || !pendingBranchPin.value) return;
+    savingBranchPin.value = true;
+    try {
+        const payload = {
+            latitude: Number(pendingBranchPin.value.latitude),
+            longitude: Number(pendingBranchPin.value.longitude),
+        };
+        if (pendingBranchPin.value.formatted_address) {
+            payload.address_line = pendingBranchPin.value.formatted_address;
+        }
+        const res = await branchesApi.update(activeMapBranch.value.id, payload);
+        const updated = res.data?.data;
+        if (updated) {
+            const idx = branchesList.value.findIndex((b) => b.id === updated.id);
+            if (idx !== -1) branchesList.value[idx] = updated;
+        }
+        pendingBranchPin.value = null;
+        // Refresh shift store branches so POS delivery distance/ETA immediately sees the new pin
+        shiftStore.fetchBranches?.(true).catch(() => {});
+        showToast("Location Pin Saved", `Updated map coordinates for ${activeMapBranch.value.name}.`);
+    } catch (err) {
+        console.error("Failed to save branch map pin:", err);
+        showErrorToast(
+            "Save Failed",
+            err.response?.data?.message || "Could not update branch GPS coordinates."
+        );
+    } finally {
+        savingBranchPin.value = false;
+    }
+}
 
 // Top Tabs
 const tabs = [
@@ -1764,6 +2068,7 @@ const form = reactive({
     accent_color: "#10b981",
 
     // Receipts
+    receipt_printer_type: "thermal_58",
     receipt_paper_width: "58mm",
     receipt_logo: "mono",
     receipt_footer: "Thank you for shopping with us! Karibu tena.",
@@ -1881,6 +2186,7 @@ async function fetchBusinessDetails() {
 
         // Receipts
         form.receipt_paper_width = data.receipt?.paper_width || "58mm";
+        form.receipt_printer_type = data.receipt?.printer_type || (form.receipt_paper_width === "80mm" ? "thermal_80" : "thermal_58");
         form.receipt_logo = data.receipt?.logo || "mono";
         form.receipt_footer = data.receipt?.footer || "Thank you for shopping with us! Karibu tena.";
         form.receipt_show_kra_pin = data.receipt?.show_kra_pin ?? true;
@@ -1925,8 +2231,8 @@ async function fetchBusinessDetails() {
 
         originalFormSnapshot.value = JSON.stringify(form);
 
-        if (data.ward) {
-            initJurisdictionFromWard(data.ward_id);
+        if (form.ward_id) {
+            initJurisdictionFromWard(form.ward_id);
         }
     } catch (err) {
         console.error("Failed to fetch business details:", err);
@@ -1952,6 +2258,7 @@ async function saveChanges() {
 
         business.value = updated;
         originalFormSnapshot.value = JSON.stringify(form);
+        fetchBranchesForMap();
         showToast("Details Saved", "Business details, document settings, and bank accounts updated successfully.");
     } catch (err) {
         console.error("Failed to update business details:", err);
@@ -2171,6 +2478,7 @@ function showErrorToast(title, message) {
 onMounted(() => {
     fetchBusinessDetails();
     loadCounties();
+    fetchBranchesForMap();
 });
 </script>
 

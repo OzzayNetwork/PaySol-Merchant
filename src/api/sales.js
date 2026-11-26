@@ -19,4 +19,8 @@ export default {
   get(id) {
     return tenantClient.get(`/sales/orders/${id}`);
   },
+
+  update(id, data) {
+    return tenantClient.patch(`/sales/orders/${id}`, data);
+  },
 };

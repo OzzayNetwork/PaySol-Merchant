@@ -361,6 +361,22 @@ then moves to §8.
 Newest first. One entry per session that changes this app; the matching backend entry has the
 same date in the backend README.
 
+### 26 Nov 2026 - POS Tab Audit Timeline, Counter Open Tab Filters & Checkout Polish
+- **Tab Audit Timeline (`src/pages/Sell/components/TabDetailsModal.vue`, `src/api/tabs.js`)**:
+  - Added `tabsApi.timeline(id)` calling `GET /api/v1/tenant/tabs/{id}/timeline`.
+  - Upgraded `TabDetailsModal.vue` with a **Bill Details | Timeline** view switcher (with live event count badge and refresh button).
+  - Renders a vertical chronological audit timeline with `SkeletonLoader`, status-coded Remix Icon (`ri:*`) badges per event type (`opened`, `items_added`, `item_voided`, `payment_recorded`, `settled`, `joint_settled`, `split_out`, `split_created`, `merged_into`, `merged_from`), staff actor attribution, relative & exact timestamps, itemized round breakdowns, void reasons, payment/order/joint-tab chips, running totals, and a subtle banner when reconstructed for pre-existing legacy tabs.
+  - Automatically refreshes the timeline when new item additions are saved from the modal.
+- **Split Bill Modal (`src/pages/Sell/components/SplitTabModal.vue`, `src/pages/Sell/Tabs.List.vue`, `src/api/tabs.js`)**:
+  - Replaced placeholder `prompt()` split with a full **Split Bill** modal: pick items and partial quantities (e.g. 2 of 5 drinks), preview **Stays on Original Tab** vs. **New Split Bill** totals live, and either **Split Only** or **Split & Pay** straight into Counter Checkout (`/sell?tab_id=<newTab>&checkout=1`).
+  - Table-view row actions in `Tabs.List.vue` now use PaySol’s white outlined button (`btn-white`), and `TabDetailsModal.vue` uses standard underline `nav-tabs-custom` navigation with subtle `#edf0f5` section borders.
+- **Counter Open Tabs Toolbar & Card Actions (`src/pages/Sell/Counter.vue`)**:
+  - Added PaySol-styled Customer, Cashier, and Sort dropdown buttons + urgency/payment pills (`All`, `Overdue`, `Aging`, `Fresh`, `Partial Paid`, `Mine`) with **Mine** enabled by default (and switching to `All Cashiers` when opening **View Customer Bills**).
+  - Aligned `Manage All` height uniformly with adjacent toolbar dropdown buttons via `align-items-stretch`.
+  - Added visible card-footer quick actions (**Pay**, **Split** with explanatory tooltip, **+ Joint**), a top-right three-dots (`⋮`) menu, right-click support, and **touch long-press (480ms)** context menu exposing **Bill Details**, **Timeline & Audit**, **Resume in Cart**, **Complete Payment**, **Split Bill**, **Add/Remove Joint Pay**, and **Copy Tab #** directly inside Counter (`/sell`) via `TabDetailsModal` and `SplitTabModal`.
+- **Checkout Offcanvas Header (`src/pages/Sell/components/SellingAside.vue`)**:
+  - Concise **`Settling N Tabs`** badge for joint settlements (full tab list in hover tooltip and directly below in the Joint Tab Settlement card) with overflow/truncation guards so the close button is never overlapped.
+
 ### 20 Nov 2026 - Stock module alignment: Movements, Receive, Adjustments, Transfers
 - Aligned all sub-pages under Stock (`/stock/movements`, `/stock/receive`, `/stock/adjust`, `/stock/transfers`) strictly to Kelvin's front-end design standard (`AGENTS.md` §0, §5, §7) and the model established in `Stock.List.vue`:
   - Standard Skote `page-title-box` with breadcrumb trail (`Home › Products & stock › ...`).

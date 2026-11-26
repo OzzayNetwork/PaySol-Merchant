@@ -12,6 +12,10 @@ export default {
     return tenantClient.get(`/tabs/${id}`);
   },
 
+  timeline(id) {
+    return tenantClient.get(`/tabs/${id}/timeline`);
+  },
+
   open(data) {
     return tenantClient.post("/tabs", data);
   },
@@ -34,9 +38,14 @@ export default {
     return tenantClient.post(`/tabs/${id}/settle`, data);
   },
 
-  split(id, itemIds, newTabName = null) {
+  split(id, itemsOrIds, newTabName = null) {
+    const isStructured =
+      Array.isArray(itemsOrIds) &&
+      itemsOrIds.length > 0 &&
+      typeof itemsOrIds[0] === "object";
+
     return tenantClient.post(`/tabs/${id}/split`, {
-      item_ids: itemIds,
+      ...(isStructured ? { items: itemsOrIds } : { item_ids: itemsOrIds }),
       new_tab_name: newTabName,
     });
   },

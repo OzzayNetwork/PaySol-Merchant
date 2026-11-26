@@ -10,19 +10,18 @@
     Toggle right offcanvas
   </button>
 
-  <!-- Save Tab Offcanvas Sidebar (Matching reference SaveTabAside.vue) -->
+  <!-- Save Tab Offcanvas Sidebar (Matches Cart width on desktop, responsive on tablet/mobile) -->
   <div
-    class="offcanvas offcanvas-end"
-    style="width: 430px; max-width: 95vw;"
+    class="offcanvas offcanvas-end save-tab-offcanvas"
     tabindex="-1"
     id="saveTabAside"
     ref="offcanvasRef"
   >
-    <!-- Header (Matching Reference Design) -->
-    <div class="offcanvas-header border-bottom py-2.5 px-3.5 d-flex align-items-center justify-content-between bg-white">
+    <!-- Header (Consistent Open Tabs icon) -->
+    <div class="offcanvas-header border-bottom py-3 px-3 d-flex align-items-center justify-content-between bg-white">
       <div class="d-flex align-items-center gap-2">
-        <div class="d-flex align-items-center justify-content-center rounded-3 bg-light border p-1.5 flex-shrink-0" style="width: 36px; height: 36px;">
-          <i class="mdi mdi-receipt-text-outline font-size-18 text-dark"></i>
+        <div class="d-flex align-items-center justify-content-center rounded-2 bg-primary-subtle text-primary border border-primary-subtle flex-shrink-0" style="width: 36px; height: 36px;">
+          <Icon icon="ri:bill-line" class="fs-5" />
         </div>
         <div>
           <h5 class="mb-0 fw-bold font-size-15 text-dark">Open Tabs</h5>
@@ -70,183 +69,280 @@
         </div>
 
         <div class="p-3">
-          <!-- Customer Search Input -->
-          <div class="search-box position-relative" ref="customerPickerRef">
-            <div class="w-100 mb-2 position-relative">
-              <div class="input-group bg-light rounded pb-0 flex-nowrap">
-                <div class="flex-grow-1 position-relative">
-                  <input
-                    style="border-radius: 0px; padding-right: 35px;"
-                    type="text"
-                    class="form-control bg-light rounded flex-grow-1"
-                    placeholder="Search Existing Customers..."
-                    spellcheck="false"
-                    v-model="searchQuery"
-                    @input="handleSearchInput"
-                    @focus="showCustomerDropdown = true"
-                  />
-                  <i class="bx bx-search-alt search-icon fs-4"></i>
-                  <i
-                    v-if="searchQuery !== ''"
-                    title="Clear search"
-                    style="right: 15px; left: unset;"
-                    class="mdi mdi-close search-icon cursor-pointer fs-3 waves-effect"
-                    @click="clearSelectedCustomer"
-                  ></i>
-                </div>
-              </div>
-
-              <!-- Customer Dropdown List -->
-              <div
-                v-if="showCustomerDropdown"
-                class="w-100 rounded bg-white border shadow-sm position-absolute start-0 mt-1"
-                style="z-index: 1050; max-height: 280px; overflow-y: auto;"
-              >
-                <div class="p-2">
-                  <ul class="list-group list-group-flush mb-0">
-                    <!-- Register New Customer Trigger -->
-                    <li
-                      class="list-group-item list-group-item-action cursor-pointer p-2 rounded mb-1"
-                      data-bs-toggle="modal"
-                      data-bs-target="#addCustomerModal"
-                      @click="showCustomerDropdown = false"
-                    >
-                      <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center gap-2">
-                          <span class="bg-primary-subtle text-primary btn-sm p-1 px-2 rounded">
-                            <i class="mdi mdi-plus fs-4"></i>
-                          </span>
-                          <span class="fw-bold font-size-13 text-primary">Register New Customer</span>
-                        </div>
-                        <i class="bx bx-chevron-right fs-5 text-muted"></i>
-                      </div>
-                    </li>
-
-                    <!-- Loading Skeletons -->
-                    <li v-if="loadingCustomers" class="list-group-item text-center py-3 border-0">
-                      <div class="spinner-border spinner-border-sm text-primary mb-1" role="status"></div>
-                      <p class="small text-muted mb-0">Searching customers...</p>
-                    </li>
-
-                    <!-- Empty state -->
-                    <li
-                      v-else-if="customers.length === 0 && searchQuery"
-                      class="list-group-item text-center text-muted py-3 border-0 font-size-13"
-                    >
-                      No customers found for "<strong>{{ searchQuery }}</strong>"
-                    </li>
-
-                    <!-- Customer Items -->
-                    <li
-                      v-for="contact in customers"
-                      :key="contact.id"
-                      class="list-group-item list-group-item-action border rounded cursor-pointer mb-1 p-2"
-                      :class="{ 'border-primary border-2 bg-primary-muted': String(form.customer_id) === String(contact.id) }"
-                      @click="selectCustomer(contact)"
-                    >
-                      <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-2">
-                          <div class="avatar-xs flex-shrink-0">
-                            <span class="avatar-title rounded-circle bg-dark-subtle text-dark font-size-12 fw-bold">
-                              {{ getInitials(contact.name) }}
-                            </span>
-                          </div>
-                          <div class="overflow-hidden">
-                            <p class="m-0 fw-bold text-dark font-size-13 text-truncate">{{ contact.name }}</p>
-                            <small class="text-muted font-size-11">
-                              {{ contact.phone || 'No phone' }} {{ contact.email ? `· ${contact.email}` : '' }}
-                            </small>
-                          </div>
-                        </div>
-                        <input
-                          type="radio"
-                          class="form-check-input"
-                          :checked="String(form.customer_id) === String(contact.id)"
-                        />
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Selected Customer Card (Matching Reference Design) -->
-          <SelectedCustomerCard
-            v-if="selectedCustomer"
-            :customer="selectedCustomer"
+          <CustomerPicker
+            :model-value="selectedCustomer"
             :unpaid-bills-count="customerUnpaidBillsCount"
             :outstanding-amount="customerOutstandingDebt"
+            :allow-change="true"
+            @select="onCustomerPicked"
             @view-bills="switchToExistingTabs"
             @open-profile="openCustomerProfileModal"
           />
-
-          <!-- Empty Customer Notice -->
-          <div v-else class="mb-3">
-            <p class="m-0 text-muted d-flex gap-2 align-items-start font-size-13">
-              <i class="bx bx-info-circle fs-4 mt-1"></i>
-              <span>
-                <i>Please select a customer.</i><br />
-                <span>If unknown, pick <span class="fw-semibold">Walk-in</span> or <a href="#" class="text-decoration-underline" data-bs-toggle="modal" data-bs-target="#addCustomerModal">register</a> a new customer.</span>
-              </span>
-            </p>
-          </div>
         </div>
 
-        <!-- Section: Table & Bill Details -->
+        <!-- Section: Dynamic Order / Service & Bill Details -->
         <div class="px-3 py-2 fw-bold text-dark sticky-top bg-light border-top" style="z-index: 1020;">
           <div class="d-flex gap-2 align-items-center justify-content-between">
-            <span>Table & Bill</span>
+            <span>{{ orderTypeProfile.sectionTitle }}</span>
           </div>
         </div>
 
         <div class="p-3">
           <div class="row">
-            <!-- Table selector with SelectSearchBox -->
+            <!-- Dynamic Order / Service Type Selector -->
             <div class="col-12 mb-3">
-              <label class="form-label fw-bold font-size-13 text-dark">Table No./Name (Optional)</label>
-              <SelectSearchBox
-                :options="tableOptions"
-                v-model="form.table_id"
-                placeholder="Select Table"
-                input-class="form-control form-select"
-                :is-multi="false"
-                @update:modelValue="onTableChange"
-              />
+              <label class="form-label fw-bold font-size-12 text-dark mb-2">
+                {{ orderTypeProfile.fieldTitle }} <span class="text-danger">*</span>
+              </label>
+              <div class="row g-2">
+                <div v-for="opt in orderTypeProfile.options" :key="opt.key" class="col-6">
+                  <button
+                    type="button"
+                    class="btn w-100 py-2 px-2 d-flex align-items-center justify-content-center gap-2 font-size-12 fw-semibold order-type-btn"
+                    :class="form.order_type === opt.key ? 'btn-outline-muted-primary is-active' : 'btn-white text-dark'"
+                    @click="selectOrderType(opt.key)"
+                  >
+                    <Icon :icon="opt.icon" class="fs-5 flex-shrink-0" />
+                    <span class="text-truncate">{{ opt.label }}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Table No./Name + Guests side-by-side (when business/option uses tables) -->
+            <div v-if="activeOrderTypeOption.usesTables" class="col-12 mb-3">
+              <div class="row g-2 align-items-start">
+                <div class="col-8">
+                  <label class="form-label fw-bold font-size-12 text-dark mb-1">Table No./Name (Optional)</label>
+                  <SelectSearchBox
+                    :options="tableOptions"
+                    v-model="form.table_id"
+                    placeholder="Select Table"
+                    show-create
+                    create-text="Add New Table"
+                    create-modal-id="addTableModal"
+                    input-class="form-control form-select"
+                    :is-multi="false"
+                    @update:modelValue="onTableChange"
+                  />
+                </div>
+                <div v-if="activeOrderTypeOption.usesGuests" class="col-4">
+                  <label class="form-label fw-bold font-size-12 text-dark mb-1">
+                    Guests <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="100"
+                    class="form-control font-size-13"
+                    placeholder="e.g. 4"
+                    v-model.number="form.guest_count"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Station / Chair / Room / Bay + Attendant side-by-side (Salon, Spa, Car Wash, Turf) -->
+            <div v-if="activeOrderTypeOption.usesStation" class="col-12 mb-3">
+              <div class="row g-2">
+                <div class="col-7">
+                  <label class="form-label fw-bold font-size-12 text-dark mb-1">
+                    {{ activeOrderTypeOption.stationLabel || 'Station / Area' }}
+                  </label>
+                  <input
+                    v-model="form.service_station"
+                    type="text"
+                    class="form-control font-size-12"
+                    :placeholder="activeOrderTypeOption.stationPlaceholder || 'e.g. Chair 2'"
+                  />
+                </div>
+                <div class="col-5">
+                  <label class="form-label fw-bold font-size-12 text-dark mb-1">
+                    {{ activeOrderTypeOption.attendantLabel || 'Attendant' }}
+                  </label>
+                  <input
+                    v-model="form.service_attendant"
+                    type="text"
+                    class="form-control font-size-12"
+                    :placeholder="activeOrderTypeOption.attendantPlaceholder || 'Optional'"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Delivery / Mobile Service Location & Rider Assignment -->
+            <div v-if="activeOrderTypeOption.usesDelivery" class="col-12 mb-3">
+              <div class="p-3 rounded border" style="background-color: #f8fafc;">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <Icon icon="ri:map-pin-2-line" class="fs-5 text-primary" />
+                  <span class="fw-bold font-size-12 text-dark">
+                    {{ activeOrderTypeOption.deliveryLabel || 'Delivery Location' }}
+                  </span>
+                </div>
+
+                <div class="mb-2">
+                  <GoogleLocationInput
+                    v-model="form.delivery_address"
+                    placeholder="Search delivery address or landmark..."
+                    @location-selected="onDeliveryLocationSelected"
+                    @location-cleared="onDeliveryLocationCleared"
+                  />
+                </div>
+
+                <GoogleMapPreview
+                  v-if="deliveryLocation?.latitude && deliveryLocation?.longitude"
+                  :latitude="deliveryLocation.latitude"
+                  :longitude="deliveryLocation.longitude"
+                  :label="form.delivery_address || 'Delivery Destination'"
+                  height="120"
+                  class="mb-2"
+                />
+
+                <!-- Delivery Distance & ETA Strip -->
+                <div
+                  v-if="deliveryLocation?.latitude && deliveryLocation?.longitude"
+                  class="mb-2"
+                >
+                  <div
+                    v-if="deliveryEstimateLoading"
+                    class="p-2 rounded border bg-white d-flex align-items-center gap-2 font-size-12 text-muted"
+                  >
+                    <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                    <span>Calculating distance &amp; travel time...</span>
+                  </div>
+                  <div
+                    v-else-if="deliveryEstimate"
+                    class="p-2 rounded border bg-white d-flex align-items-center justify-content-between gap-2 flex-wrap"
+                  >
+                    <div class="d-flex align-items-center gap-3">
+                      <span class="d-inline-flex align-items-center gap-1 font-size-12 fw-bold text-dark">
+                        <Icon icon="ri:route-line" class="fs-6 text-primary" />
+                        <span>{{ deliveryEstimate.distanceText }}</span>
+                      </span>
+                      <span class="d-inline-flex align-items-center gap-1 font-size-12 fw-bold text-dark">
+                        <Icon icon="ri:time-line" class="fs-6 text-success" />
+                        <span>{{ deliveryEstimate.durationText }}</span>
+                      </span>
+                    </div>
+                    <small class="text-muted font-size-11">
+                      from {{ deliveryOrigin?.name || 'Branch' }}
+                    </small>
+                  </div>
+                  <div
+                    v-else
+                    class="p-2 rounded border bg-white font-size-11 text-muted d-flex align-items-center gap-1"
+                  >
+                    <Icon icon="ri:information-line" class="fs-6 flex-shrink-0" />
+                    <span>Set branch GPS coordinates in Branches to calculate distance &amp; ETA.</span>
+                  </div>
+                </div>
+
+                <div class="row g-2 mb-3">
+                  <div class="col-7">
+                    <label class="form-label font-size-11 text-muted fw-semibold mb-1">Building / Door / Directions</label>
+                    <input
+                      v-model="form.delivery_directions"
+                      type="text"
+                      class="form-control form-control-sm"
+                      placeholder="e.g. Apt 4B, Gate 2"
+                    />
+                  </div>
+                  <div class="col-5">
+                    <label class="form-label font-size-11 text-muted fw-semibold mb-1">Delivery Fee (KES)</label>
+                    <input
+                      v-model.number="form.delivery_fee"
+                      type="number"
+                      min="0"
+                      step="any"
+                      class="form-control form-control-sm"
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+
+                <!-- Assigned Rider (Business Rider vs Customer's Rider) -->
+                <div class="border-top pt-3">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <Icon icon="ri:e-bike-2-line" class="fs-5 text-primary" />
+                    <span class="fw-bold font-size-12 text-dark">Assigned Rider</span>
+                  </div>
+
+                  <div class="btn-group btn-group-sm w-100 mb-2" role="group">
+                    <button
+                      type="button"
+                      class="btn fw-semibold"
+                      :class="form.rider_source === 'business' ? 'btn-primary' : 'btn-white'"
+                      @click="form.rider_source = 'business'"
+                    >
+                      Business Rider
+                    </button>
+                    <button
+                      type="button"
+                      class="btn fw-semibold"
+                      :class="form.rider_source === 'customer' ? 'btn-primary' : 'btn-white'"
+                      @click="form.rider_source = 'customer'"
+                    >
+                      Customer's Rider
+                    </button>
+                  </div>
+                  <small class="text-muted d-block font-size-11 mb-2">
+                    {{ form.rider_source === 'business'
+                      ? 'Rider arranged by the business on behalf of the customer.'
+                      : 'Rider brought or sent directly by the customer.' }}
+                  </small>
+
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <label class="form-label font-size-11 text-muted fw-semibold mb-1">Rider Name</label>
+                      <input
+                        v-model="form.rider_name"
+                        type="text"
+                        class="form-control form-control-sm"
+                        placeholder="e.g. Peter Mwangi"
+                      />
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label font-size-11 text-muted fw-semibold mb-1">Rider Phone</label>
+                      <input
+                        v-model="form.rider_phone"
+                        type="text"
+                        class="form-control form-control-sm"
+                        placeholder="e.g. 0712 345 678"
+                      />
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label font-size-11 text-muted fw-semibold mb-1">
+                        Bike Plate / Courier <span class="fw-normal">(Optional)</span>
+                      </label>
+                      <input
+                        v-model="form.rider_reference"
+                        type="text"
+                        class="form-control form-control-sm"
+                        placeholder="e.g. KMFQ 123A or Glovo / Uber Package"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Tab Name -->
-            <div class="col-12 mb-2.5">
+            <div class="col-12 mb-3">
               <label class="form-label fw-bold font-size-12 text-dark mb-1">
                 Bill Name/Label (Optional)
               </label>
               <input
                 type="text"
-                class="form-control font-size-12 py-1.5"
+                class="form-control font-size-12"
                 placeholder="e.g. John-Table 4 (Optional)"
                 v-model="form.tab_name"
               />
-              <small class="text-muted font-size-11">Leave blank to auto-generate from customer or table</small>
-            </div>
-
-            <!-- Guest Count -->
-            <div class="col-12 mb-2.5">
-              <label class="form-label fw-bold font-size-12 text-dark mb-1">
-                Number of Guests <span class="text-danger fw-bold">*</span>
-              </label>
-              <input
-                type="text"
-                class="form-control font-size-12 py-1.5"
-                placeholder="e.g. 4"
-                v-model="form.guest_count"
-                pattern="^[0-9]+$"
-                required
-              />
-              <small class="text-muted font-size-11">Enter the number of guests for this table</small>
+              <small class="text-muted font-size-11">Leave blank to auto-generate with time &amp; customer/table</small>
             </div>
 
             <!-- Notes -->
-            <div class="col-12 mb-2.5">
+            <div class="col-12 mb-3">
               <label class="form-label fw-bold font-size-12 text-dark mb-1">Notes (Optional)</label>
               <textarea
                 class="form-control font-size-12"
@@ -256,11 +352,16 @@
               ></textarea>
             </div>
 
-            <!-- Dine-In badge -->
-            <div class="col-12 mt-2">
-              <div class="p-2 text-muted text-center border border-1 fw-medium border-dark-subtle bg-light rounded d-flex gap-2 justify-content-center align-items-center font-size-12">
-                <span class="bx bx-info-circle font-size-16"></span>
-                <div>This tab will be created as Dine-In</div>
+            <!-- Dynamic Order Type Summary Strip -->
+            <div class="col-12 mt-1">
+              <div class="p-2 text-muted text-center border fw-medium bg-light rounded d-flex gap-2 justify-content-center align-items-center font-size-12">
+                <Icon :icon="activeOrderTypeOption.icon" class="fs-5 text-primary flex-shrink-0" />
+                <div>
+                  This tab will be created as <strong class="text-dark">{{ activeOrderTypeOption.label }}</strong>
+                  <template v-if="activeOrderTypeOption.usesDelivery">
+                    · {{ form.rider_source === 'business' ? 'Business Rider' : "Customer's Rider" }}
+                  </template>
+                </div>
               </div>
             </div>
           </div>
@@ -347,9 +448,28 @@
         </div>
       </div>
 
-      <div v-if="loadingOpenTabs" class="text-center py-4">
-        <div class="spinner-border text-primary spinner-border-sm mb-2" role="status"></div>
-        <p class="text-muted font-size-12 mb-0">Loading open tabs...</p>
+      <div v-if="loadingOpenTabs" class="d-flex flex-column gap-3 p-1">
+        <div
+          v-for="n in 3"
+          :key="`sk-tab-${n}`"
+          class="card border shadow-none mb-0"
+          style="border-radius: 6px;"
+        >
+          <div class="card-body p-3">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div class="flex-grow-1 pe-3">
+                <SkeletonLoader type="text" :lines="1" height="14px" width="65%" class="mb-2" />
+                <SkeletonLoader type="text" :lines="1" height="10px" width="45%" />
+              </div>
+              <div style="width: 80px;">
+                <SkeletonLoader type="text" :lines="1" height="14px" width="100%" class="mb-1" />
+                <SkeletonLoader type="text" :lines="1" height="14px" width="75%" />
+              </div>
+            </div>
+            <SkeletonLoader type="text" :lines="2" height="10px" class="mb-3" />
+            <SkeletonLoader type="text" :lines="1" height="32px" width="100%" />
+          </div>
+        </div>
       </div>
 
       <div v-else-if="filteredOpenTabs.length === 0" class="text-center py-5 text-muted">
@@ -366,7 +486,7 @@
           class="card border-0 shadow-none text-start overflow-hidden position-relative transition-all"
           :style="{
             backgroundColor: getTabAgingTheme(tab).cardBg,
-            borderRadius: '14px',
+            borderRadius: '6px',
             border: '1px solid ' + getTabAgingTheme(tab).cardBorder + ' !important',
             borderBottom: '3.5px solid ' + getTabAgingTheme(tab).bottomBorder + ' !important',
             marginBottom: '14px !important',
@@ -414,32 +534,36 @@
             <div class="position-relative pt-1 mt-1 mb-3">
               <div
                 class="d-flex flex-column gap-2 transition-all"
-                :style="(!expandedTabs[tab.id] && (tab.items?.length > 2)) ? 'max-height: 52px; overflow: hidden;' : ''"
+                :style="(!expandedTabs[tab.id] && (groupTabItems(tab.items).length > 2)) ? 'max-height: 52px; overflow: hidden;' : ''"
               >
                 <div
-                  v-for="(item, idx) in (tab.items || [])"
+                  v-for="(item, idx) in groupTabItems(tab.items)"
                   :key="item.id || idx"
-                  class="d-flex justify-content-between align-items-baseline"
+                  class="d-flex align-items-baseline gap-1.5"
                   style="color: #334155; font-size: 11px; line-height: 1.45;"
                 >
-                  <div class="text-truncate pe-2">
+                  <div class="text-truncate" style="min-width: 0;">
                     <span class="fw-medium">{{ idx + 1 }}. {{ item.item_name || item.name || 'Item' }}</span>
                     <span v-if="item.quantity && Number(item.quantity) > 1" class="text-muted ms-1">({{ Number(item.quantity) }})</span>
                   </div>
-                  <div class="fw-semibold text-dark text-nowrap" style="font-size: 11px;">
+                  <span
+                    class="flex-grow-1"
+                    style="border-bottom: 1px dotted rgba(100, 116, 139, 0.35); min-width: 14px; transform: translateY(-2px);"
+                  ></span>
+                  <div class="fw-semibold text-dark text-nowrap flex-shrink-0" style="font-size: 11px;">
                     KES {{ Number(item.total_amount ?? (Number(item.unit_price || 0) * Number(item.quantity || 1))).toFixed(2) }}
                   </div>
                 </div>
 
                 <!-- Fallback if no items array -->
-                <div v-if="!tab.items || tab.items.length === 0" class="text-muted fst-italic py-0.5" style="font-size: 11px;">
+                <div v-if="groupTabItems(tab.items).length === 0" class="text-muted fst-italic py-0.5" style="font-size: 11px;">
                   {{ tab.active_items_count || 0 }} item(s) on tab
                 </div>
               </div>
 
               <!-- Fog Fade Overlay: gently fades the 2nd/3rd item into the muted card background -->
               <div
-                v-if="!expandedTabs[tab.id] && (tab.items?.length > 2)"
+                v-if="!expandedTabs[tab.id] && (groupTabItems(tab.items).length > 2)"
                 class="position-absolute bottom-0 start-0 end-0 pointer-events-none"
                 :style="{
                   height: '28px',
@@ -451,11 +575,11 @@
             <!-- Items Count & Show Details Toggle -->
             <div class="d-flex justify-content-between align-items-center font-size-11 pt-1 mb-3" style="color: #64748b;">
               <span class="fw-medium">
-                {{ (tab.items?.length || tab.active_items_count || 1) }} item{{ (tab.items?.length || tab.active_items_count || 1) === 1 ? '' : 's' }}
+                {{ (groupTabItems(tab.items).length || tab.active_items_count || 1) }} item{{ (groupTabItems(tab.items).length || tab.active_items_count || 1) === 1 ? '' : 's' }}
               </span>
 
               <button
-                v-if="tab.items && tab.items.length > 2"
+                v-if="groupTabItems(tab.items).length > 2"
                 type="button"
                 class="btn btn-link p-0 fw-semibold font-size-11 text-decoration-none d-inline-flex align-items-center gap-1 shadow-none"
                 :style="{ color: getTabAgingTheme(tab).priceColor }"
@@ -469,7 +593,7 @@
             <!-- Action Button: Outline Style -->
             <button
               type="button"
-              class="btn w-100 fw-semibold font-size-12 py-2 rounded-2 d-flex align-items-center justify-content-center gap-1.5 shadow-none transition-all"
+              class="btn w-100 fw-semibold font-size-12 py-2 rounded-1 d-flex align-items-center justify-content-center gap-1.5 shadow-none transition-all"
               :style="{
                 backgroundColor: 'transparent',
                 color: getTabAgingTheme(tab).outlineBtnColor || getTabAgingTheme(tab).priceColor,
@@ -493,19 +617,48 @@
     modal-id="saveTabCustomerProfileModal"
     :customer="selectedCustomer"
   />
+
+  <TableAddModal
+    :existing-tables="availableTables"
+    show-select
+    @table-added="onTableAddedFromModal"
+    @table-selected="onTableSelectedFromModal"
+  />
+
+  <Teleport to="body">
+    <ImageToast
+      :status="toastStatus"
+      :title="toastTitle"
+      :message="toastMessage"
+      :image="toastImage"
+      :image-height="64"
+      @hide="toastStatus = null"
+    />
+  </Teleport>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { Icon } from '@iconify/vue';
 import customersApi from '@/api/customers';
 import tablesApi from '@/api/tables';
 import tabsApi from '@/api/tabs';
 import SelectSearchBox from '@/components/SelectSearchBox.vue';
+import SkeletonLoader from '@/components/Loaders/SkeletonLoader.vue';
+import GoogleLocationInput from '@/components/GoogleLocationInput.vue';
+import GoogleMapPreview from '@/components/GoogleMapPreview.vue';
+import ImageToast from '@/components/ImageToast.vue';
+import successImage from '@/assets/images/icons/check.png';
+import errorImage from '@/assets/images/icons/error.png';
 import CustomerProfileModal from './CustomerProfileModal.vue';
-import SelectedCustomerCard from './SelectedCustomerCard.vue';
-import { useCartStore } from '@/stores/cart';
+import CustomerPicker from './CustomerPicker.vue';
+import TableAddModal from './TableAddModal.vue';
+import { useAuthStore } from '@/stores/auth';
+import { useCartStore, WALK_IN_CUSTOMER } from '@/stores/cart';
 import { useShiftStore } from '@/stores/shift';
-import { getTabAgingTheme, formatTabRelativeTime } from '@/utils/tabAging';
+import { getTabAgingTheme, formatTabRelativeTime, groupTabItems } from '@/utils/tabAging';
+import { resolveOrderTypeProfile } from '@/utils/orderTypes';
+import { resolveBranchOrigin, calculateDeliveryEstimate } from '@/utils/deliveryEstimate';
 
 const props = defineProps({
   cart: { type: Array, default: () => [] },
@@ -516,28 +669,160 @@ const props = defineProps({
 
 const emit = defineEmits(['saved', 'cancel']);
 
+const authStore = useAuthStore();
 const cartStore = useCartStore();
 const shiftStore = useShiftStore();
+
+const orderTypeProfile = computed(() =>
+  resolveOrderTypeProfile(authStore.tenant?.business_type)
+);
 
 const offcanvasRef = ref(null);
 const customerPickerRef = ref(null);
 const newTab = ref(true);
 const saving = ref(false);
 
+// Toast state (ImageToast handles circular loader on 'loading', check/error on result)
+const toastStatus = ref(null);
+const toastTitle = ref('');
+const toastMessage = ref('');
+const toastImage = ref(null);
+
+function showToast(status, title, message) {
+  toastStatus.value = status;
+  toastTitle.value = title;
+  toastMessage.value = message;
+  toastImage.value = status === 'success' ? successImage : status === 'error' ? errorImage : null;
+}
+
 // Form
 const form = ref({
+  order_type: orderTypeProfile.value.defaultType,
   tab_name: '',
   table_id: null,
   customer_id: null,
   guest_count: 1,
+  service_station: '',
+  service_attendant: '',
   notes: '',
+  delivery_address: '',
+  delivery_directions: '',
+  delivery_fee: 0,
+  rider_source: 'business', // 'business' | 'customer'
+  rider_name: '',
+  rider_phone: '',
+  rider_reference: '',
 });
+
+const deliveryLocation = ref(null);
+const deliveryEstimate = ref(null);
+const deliveryEstimateLoading = ref(false);
+const deliveryOrigin = computed(() => resolveBranchOrigin(shiftStore));
+
+async function refreshDeliveryEstimate(dest) {
+  if (!dest?.latitude || !dest?.longitude) {
+    deliveryEstimate.value = null;
+    return;
+  }
+  let origin = resolveBranchOrigin(shiftStore);
+  if (!origin) {
+    await shiftStore.fetchBranches(true);
+    origin = resolveBranchOrigin(shiftStore);
+  }
+  if (!origin) {
+    deliveryEstimate.value = null;
+    return;
+  }
+  deliveryEstimateLoading.value = true;
+  try {
+    deliveryEstimate.value = await calculateDeliveryEstimate(origin, dest);
+  } finally {
+    deliveryEstimateLoading.value = false;
+  }
+}
+
+function applyCustomerSavedLocation(contact, { overwrite = false } = {}) {
+  if (!contact?.addresses?.length) return;
+  if (!overwrite && (form.value.delivery_address.trim() || deliveryLocation.value)) return;
+
+  const addr = contact.addresses.find((a) => a.is_default) || contact.addresses[0];
+  if (!addr) return;
+
+  const formatted = [addr.building, addr.street, addr.estate_area, addr.town_city]
+    .filter(Boolean)
+    .join(', ');
+  if (formatted) {
+    form.value.delivery_address = formatted;
+  }
+  if (addr.additional_directions) {
+    form.value.delivery_directions = addr.additional_directions;
+  }
+  if (addr.latitude && addr.longitude) {
+    deliveryLocation.value = {
+      latitude: Number(addr.latitude),
+      longitude: Number(addr.longitude),
+      formatted_address: formatted,
+    };
+    refreshDeliveryEstimate(deliveryLocation.value);
+  }
+}
+
+const activeOrderTypeOption = computed(
+  () =>
+    orderTypeProfile.value.options.find((o) => o.key === form.value.order_type) ||
+    orderTypeProfile.value.options[0]
+);
+
+watch(
+  () => orderTypeProfile.value.defaultType,
+  (nextDefault) => {
+    if (!orderTypeProfile.value.options.some((o) => o.key === form.value.order_type)) {
+      form.value.order_type = nextDefault;
+    }
+  }
+);
+
+function selectOrderType(typeKey) {
+  form.value.order_type = typeKey;
+  const opt = orderTypeProfile.value.options.find((o) => o.key === typeKey);
+  if (!opt?.usesTables) {
+    form.value.table_id = null;
+  }
+  if (opt?.usesDelivery && selectedCustomer.value?.id) {
+    applyCustomerSavedLocation(selectedCustomer.value, { overwrite: false });
+  }
+}
+
+function onDeliveryLocationSelected(data) {
+  if (data?.formatted_address) {
+    form.value.delivery_address = data.formatted_address;
+  }
+  if (data?.latitude && data?.longitude) {
+    deliveryLocation.value = data;
+    refreshDeliveryEstimate(data);
+  }
+}
+
+function onDeliveryLocationCleared() {
+  deliveryLocation.value = null;
+  deliveryEstimate.value = null;
+}
 
 // Data
 const customers = ref([]);
 const availableTables = ref([]);
 const openTabs = ref([]);
-const selectedCustomer = ref(null);
+const selectedCustomer = ref({ ...WALK_IN_CUSTOMER });
+
+function onCustomerPicked(customer) {
+  if (customer && customer.id) {
+    selectCustomer(customer);
+  } else {
+    selectedCustomer.value = { ...WALK_IN_CUSTOMER };
+    form.value.customer_id = null;
+    cartStore.clearCustomer();
+  }
+}
 const searchQuery = ref('');
 const existingTabFilter = ref('');
 const showCustomerDropdown = ref(false);
@@ -594,11 +879,30 @@ const canSave = computed(() => {
 });
 
 const tableOptions = computed(() => {
-  return availableTables.value.map((tbl) => ({
-    label: tbl.table_number ? `Table ${tbl.table_number}${tbl.name ? ' - ' + tbl.name : ''}` : (tbl.name || 'Table'),
-    value: tbl.id,
-  }));
+  return availableTables.value.map((tbl) => {
+    const base = tbl.table_number
+      ? `Table ${tbl.table_number}${tbl.label ? ' - ' + tbl.label : tbl.name ? ' - ' + tbl.name : ''}`
+      : (tbl.label || tbl.name || 'Table');
+    const statusTag = tbl.status && tbl.status !== 'available' ? ` (${tbl.status})` : '';
+    return {
+      label: `${base}${statusTag}`,
+      value: tbl.id,
+    };
+  });
 });
+
+async function onTableAddedFromModal(createdTable) {
+  if (createdTable?.id && !availableTables.value.some((t) => t.id === createdTable.id)) {
+    availableTables.value = [...availableTables.value, createdTable];
+  }
+  await loadTables();
+}
+
+function onTableSelectedFromModal(tableId) {
+  if (!tableId) return;
+  form.value.table_id = tableId;
+  onTableChange();
+}
 
 const formatLastSeen = (val) => {
   if (!val) {
@@ -755,7 +1059,23 @@ async function loadCustomers(silent = false) {
 
 async function loadTables() {
   try {
-    const res = await tablesApi.list({ status: 'available' });
+    if (
+      !shiftStore.activeShift?.branch_id &&
+      !shiftStore.selectedBranchId &&
+      !shiftStore.branches?.length
+    ) {
+      await shiftStore.fetchBranches();
+    }
+    const branchId =
+      shiftStore.activeShift?.branch_id ||
+      shiftStore.selectedBranchId ||
+      (shiftStore.branches?.length
+        ? shiftStore.branches.find((b) => b.is_main)?.id || shiftStore.branches[0].id
+        : null);
+
+    if (!branchId) return;
+
+    const res = await tablesApi.list({ branch_id: branchId });
     availableTables.value = res.data?.data || [];
   } catch (err) {
     console.error('Failed to load tables:', err);
@@ -794,6 +1114,9 @@ function selectCustomer(contact) {
   if (!form.value.tab_name.trim()) {
     form.value.tab_name = `${contact.name}'s Tab`;
   }
+
+  // Pre-fill customer's saved delivery location if available
+  applyCustomerSavedLocation(contact, { overwrite: true });
 }
 
 function clearSelectedCustomer() {
@@ -826,24 +1149,37 @@ function onTableChange() {
 
 function resetForm() {
   form.value = {
+    order_type: orderTypeProfile.value.defaultType,
     tab_name: '',
     table_id: null,
     customer_id: null,
     guest_count: 1,
+    service_station: '',
+    service_attendant: '',
     notes: '',
+    delivery_address: '',
+    delivery_directions: '',
+    delivery_fee: 0,
+    rider_source: 'business',
+    rider_name: '',
+    rider_phone: '',
+    rider_reference: '',
   };
-  selectedCustomer.value = null;
+  deliveryLocation.value = null;
+  deliveryEstimate.value = null;
+  selectedCustomer.value = { ...WALK_IN_CUSTOMER };
   searchQuery.value = '';
 }
 
 async function saveTab() {
   if (!canSave.value) {
     if (props.cart.length === 0) {
-      alert('Please add at least one item to the cart before saving a tab.');
+      showToast('error', 'Cart is Empty', 'Please add at least one item to the cart before saving a tab.');
     }
     return;
   }
   saving.value = true;
+  showToast('loading', 'Saving Open Bill', 'Creating the tab and adding your items...');
 
   try {
     const pickedTable = availableTables.value.find(
@@ -851,13 +1187,56 @@ async function saveTab() {
     );
     const tableNumber = pickedTable?.table_number ?? null;
 
-    // Sensible fallback name if cashier left it blank
-    const fallbackName = selectedCustomer.value
-      ? `${selectedCustomer.value.name}'s Tab`
+    // Sensible time-prefixed fallback name if cashier left it blank
+    const timePrefix = new Date().toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+    const fallbackName = selectedCustomer.value?.id
+      ? `${timePrefix} · ${selectedCustomer.value.name}`
       : pickedTable
-      ? `Table ${pickedTable.table_number}`
-      : 'Open Tab';
+      ? `${timePrefix} · Table ${pickedTable.table_number}`
+      : form.value.service_station.trim()
+      ? `${timePrefix} · ${form.value.service_station.trim()}`
+      : `${timePrefix} · ${activeOrderTypeOption.value.label}`;
     const finalName = form.value.tab_name.trim() || fallbackName;
+
+    // Compose structured order/service type & delivery metadata into notes so nothing is lost
+    const metaParts = [`Type: ${activeOrderTypeOption.value.label}`];
+    if (activeOrderTypeOption.value.usesGuests && form.value.guest_count) {
+      metaParts.push(`Guests: ${form.value.guest_count}`);
+    }
+    if (activeOrderTypeOption.value.usesStation) {
+      if (form.value.service_station.trim()) {
+        metaParts.push(`${activeOrderTypeOption.value.stationLabel || 'Station'}: ${form.value.service_station.trim()}`);
+      }
+      if (form.value.service_attendant.trim()) {
+        metaParts.push(`${activeOrderTypeOption.value.attendantLabel || 'Attendant'}: ${form.value.service_attendant.trim()}`);
+      }
+    }
+    if (activeOrderTypeOption.value.usesDelivery) {
+      const addr = [form.value.delivery_address.trim(), form.value.delivery_directions.trim()]
+        .filter(Boolean)
+        .join(', ');
+      if (addr) metaParts.push(`Location: ${addr}`);
+      if (deliveryEstimate.value) {
+        metaParts.push(`${deliveryEstimate.value.distanceText} · ${deliveryEstimate.value.durationText}`);
+      }
+      const riderKind = form.value.rider_source === 'business' ? 'Business Rider' : "Customer's Rider";
+      const riderInfo = [
+        form.value.rider_name.trim(),
+        form.value.rider_phone.trim(),
+        form.value.rider_reference.trim(),
+      ]
+        .filter(Boolean)
+        .join(' · ');
+      metaParts.push(riderInfo ? `${riderKind}: ${riderInfo}` : riderKind);
+    }
+    const combinedNotes = [metaParts.join(' | '), form.value.notes.trim()]
+      .filter(Boolean)
+      .join(' — ')
+      .slice(0, 500);
 
     const branchId =
       shiftStore.activeShift?.branch_id ||
@@ -869,13 +1248,13 @@ async function saveTab() {
       branch_id: Number(branchId),
       shift_id: shiftStore.activeShiftId || shiftStore.activeShift?.id || null,
       customer_id: form.value.customer_id || null,
-      table_id: form.value.table_id || null,
-      table_number: tableNumber,
+      table_id: activeOrderTypeOption.value.usesTables ? (form.value.table_id || null) : null,
+      table_number: activeOrderTypeOption.value.usesTables ? tableNumber : null,
       name: finalName,
       guest_count: parseInt(form.value.guest_count) || 1,
-      notes: form.value.notes || '',
+      notes: combinedNotes,
       discount_amount: cartStore.discountAmount || 0,
-      delivery_fee: cartStore.deliveryFee || 0,
+      delivery_fee: activeOrderTypeOption.value.usesDelivery ? (Number(form.value.delivery_fee) || 0) : (cartStore.deliveryFee || 0),
       items: props.cart.map((i) => ({
         product_id: i.product?.id || i.id,
         quantity: i.quantity,
@@ -889,7 +1268,7 @@ async function saveTab() {
     const res = await tabsApi.open(payload);
     const openedTab = res.data?.data || res.data;
 
-    await loadOpenTabs();
+    await loadOpenTabs(true);
 
     // Close offcanvas
     closeOffcanvas();
@@ -898,10 +1277,19 @@ async function saveTab() {
     cartStore.clearCart();
     resetForm();
 
+    showToast(
+      'success',
+      'Tab Saved',
+      `<strong>${openedTab?.tab_number || finalName}</strong> has been saved.`
+    );
     emit('saved', openedTab);
   } catch (err) {
     console.error('Failed to open tab:', err);
-    alert(err?.response?.data?.message || 'Failed to save tab. Please check shift and try again.');
+    showToast(
+      'error',
+      'Could Not Save Tab',
+      err?.response?.data?.message || 'Failed to save tab. Please check shift and try again.'
+    );
   } finally {
     saving.value = false;
   }
@@ -909,7 +1297,11 @@ async function saveTab() {
 
 async function appendToExistingTab(tab) {
   if (props.cart.length === 0) return;
+  const itemCount = props.cart.reduce((sum, i) => sum + Number(i.quantity || 1), 0);
+  const tabLabel = tab.tab_number || tab.name || 'tab';
+
   saving.value = true;
+  showToast('loading', 'Adding Items to Tab', `Adding ${itemCount} item${itemCount === 1 ? '' : 's'} to ${tabLabel}...`);
 
   try {
     const items = props.cart.map((i) => ({
@@ -925,10 +1317,21 @@ async function appendToExistingTab(tab) {
 
     closeOffcanvas();
     cartStore.clearCart();
+    await loadOpenTabs(true);
+
+    showToast(
+      'success',
+      'Items Added to Tab',
+      `Added ${itemCount} item${itemCount === 1 ? '' : 's'} to <strong>${tabLabel}</strong>.`
+    );
     emit('saved', tab);
   } catch (err) {
     console.error('Failed to append to tab:', err);
-    alert(err?.response?.data?.message || 'Failed to append to existing tab.');
+    showToast(
+      'error',
+      'Could Not Add Items',
+      err?.response?.data?.message || 'Failed to append to existing tab.'
+    );
   } finally {
     saving.value = false;
   }
@@ -975,16 +1378,36 @@ watch(
   }
 );
 
+function syncAsideWidthToCart() {
+  const asideEl = offcanvasRef.value || document.getElementById('saveTabAside');
+  if (!asideEl) return;
+
+  if (window.innerWidth < 992) {
+    asideEl.style.removeProperty('--pos-cart-width');
+    return;
+  }
+
+  const cartEl = document.querySelector('[data-pos-cart]');
+  if (cartEl) {
+    const width = Math.round(cartEl.getBoundingClientRect().width);
+    if (width >= 360) {
+      asideEl.style.setProperty('--pos-cart-width', `${width}px`);
+      return;
+    }
+  }
+  asideEl.style.removeProperty('--pos-cart-width');
+}
+
 function handleOffcanvasShow() {
+  syncAsideWidthToCart();
   refreshDrawerData(true);
 }
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
-  loadCustomers();
-  loadTables();
-  loadOpenTabs();
+  window.addEventListener('resize', syncAsideWidthToCart);
 
+  // Lazy-load customers, tables, and open tabs only when the drawer opens
   const asideEl = document.getElementById('saveTabAside');
   if (asideEl) {
     asideEl.addEventListener('show.bs.offcanvas', handleOffcanvasShow);
@@ -993,6 +1416,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside);
+  window.removeEventListener('resize', syncAsideWidthToCart);
   const asideEl = document.getElementById('saveTabAside');
   if (asideEl) {
     asideEl.removeEventListener('show.bs.offcanvas', handleOffcanvasShow);
@@ -1001,6 +1425,39 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.save-tab-offcanvas {
+  --bs-offcanvas-width: var(--pos-cart-width, clamp(430px, 33.33vw, 560px));
+  width: var(--bs-offcanvas-width);
+  max-width: 95vw;
+}
+
+@media (max-width: 991.98px) {
+  .save-tab-offcanvas {
+    --bs-offcanvas-width: min(500px, 92vw);
+    width: var(--bs-offcanvas-width);
+    max-width: 92vw;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .save-tab-offcanvas {
+    --bs-offcanvas-width: 100vw;
+    width: 100vw;
+    max-width: 100vw;
+  }
+}
+
+.order-type-btn.is-active,
+.order-type-btn.is-active:hover,
+.order-type-btn.is-active:focus,
+.order-type-btn.is-active:focus-visible,
+.order-type-btn.is-active:active {
+  color: var(--bs-primary) !important;
+  background-color: color-mix(in srgb, var(--bs-primary) 12%, #fff) !important;
+  border-color: color-mix(in srgb, var(--bs-primary) 55%, #fff) !important;
+  box-shadow: none;
+}
+
 .cursor-pointer {
   cursor: pointer;
 }

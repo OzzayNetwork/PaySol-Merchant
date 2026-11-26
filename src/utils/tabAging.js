@@ -97,6 +97,40 @@ export function resetTabAgingConfig(tenantId = null) {
 }
 
 /**
+ * Combine duplicate tab line items (same product / name & unit price) into
+ * single aggregated rows with summed quantity and total_amount.
+ */
+export function groupTabItems(items = []) {
+  if (!Array.isArray(items) || items.length === 0) return [];
+  const map = new Map();
+
+  for (const item of items) {
+    const name = String(item?.item_name || item?.name || 'Item').trim();
+    const unitPrice = Number(item?.unit_price ?? 0);
+    const qty = Number(item?.quantity ?? 1);
+    const lineTotal = Number(item?.total_amount ?? (unitPrice * qty));
+    const key = `${item?.product_id ?? name.toLowerCase()}::${unitPrice.toFixed(2)}`;
+
+    if (map.has(key)) {
+      const existing = map.get(key);
+      existing.quantity = Number((existing.quantity + qty).toFixed(3));
+      existing.total_amount = Number((existing.total_amount + lineTotal).toFixed(2));
+    } else {
+      map.set(key, {
+        ...item,
+        _groupKey: key,
+        item_name: name,
+        unit_price: unitPrice,
+        quantity: qty,
+        total_amount: lineTotal,
+      });
+    }
+  }
+
+  return Array.from(map.values());
+}
+
+/**
  * Format a duration in minutes into a concise human label (e.g. 45m, 2h, 2h 30m).
  */
 export function formatMinutesShort(minutes) {

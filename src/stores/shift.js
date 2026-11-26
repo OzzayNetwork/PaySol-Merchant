@@ -2,6 +2,8 @@ import { defineStore } from "pinia";
 import shiftsApi from "@/api/shifts";
 import branchesApi from "@/api/branches";
 
+let pendingShiftCheck = null;
+
 export const useShiftStore = defineStore("shift", {
   state: () => ({
     activeShift: null,
@@ -29,8 +31,8 @@ export const useShiftStore = defineStore("shift", {
   },
 
   actions: {
-    async fetchBranches() {
-      if (this.branches.length > 0) return;
+    async fetchBranches(force = false) {
+      if (!force && this.branches.length > 0) return;
       try {
         const res = await branchesApi.list();
         this.branches = res.data?.data || res.data || [];
@@ -44,32 +46,47 @@ export const useShiftStore = defineStore("shift", {
     },
 
     async checkCurrentShift(branchId = null) {
-      this.isLoading = true;
-      try {
-        await this.fetchBranches();
-        const targetBranch = branchId || this.selectedBranchId;
-        const res = await shiftsApi.current({ branch_id: targetBranch || undefined });
-        const data = res.data || {};
-
-        this.hasActiveShift = !!data.has_active_shift;
-        this.isJoined = !!data.is_joined;
-        this.isLead = !!data.is_lead;
-        this.myRole = data.my_role || null;
-        this.joinedAt = data.joined_at || null;
-        this.activeShift = data.shift || null;
-        this.lastCheckedAt = new Date().toISOString();
-
-        if (this.activeShift?.branch?.id) {
-          this.selectedBranchId = this.activeShift.branch.id;
-        }
-
-        return data;
-      } catch (err) {
-        console.error("Failed to check active shift:", err);
-        return null;
-      } finally {
-        this.isLoading = false;
+      // Reuse in-flight request when HeaderShiftWidget and Counter mount simultaneously
+      if (pendingShiftCheck && !branchId) {
+        return pendingShiftCheck;
       }
+
+      this.isLoading = true;
+      const run = (async () => {
+        try {
+          const targetBranch = branchId || this.selectedBranchId;
+          const [, res] = await Promise.all([
+            this.fetchBranches(),
+            shiftsApi.current({ branch_id: targetBranch || undefined }),
+          ]);
+          const data = res.data || {};
+
+          this.hasActiveShift = !!data.has_active_shift;
+          this.isJoined = !!data.is_joined;
+          this.isLead = !!data.is_lead;
+          this.myRole = data.my_role || null;
+          this.joinedAt = data.joined_at || null;
+          this.activeShift = data.shift || null;
+          this.lastCheckedAt = new Date().toISOString();
+
+          if (this.activeShift?.branch?.id) {
+            this.selectedBranchId = this.activeShift.branch.id;
+          }
+
+          return data;
+        } catch (err) {
+          console.error("Failed to check active shift:", err);
+          return null;
+        } finally {
+          this.isLoading = false;
+          pendingShiftCheck = null;
+        }
+      })();
+
+      if (!branchId) {
+        pendingShiftCheck = run;
+      }
+      return run;
     },
 
     async openShift(payload) {

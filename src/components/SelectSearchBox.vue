@@ -1,5 +1,6 @@
 <script setup>
 import { defineProps, defineEmits } from 'vue'
+import { Icon } from '@iconify/vue'
 import VueSelect from 'vue3-select-component'
 
 const props = defineProps({
@@ -26,10 +27,14 @@ const props = defineProps({
   contactMode: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['update:modelValue', 'create'])
+const emit = defineEmits(['update:modelValue', 'create', 'option-created'])
 
 const updateValue = (newValue) => {
   emit('update:modelValue', newValue)
+}
+
+const handleOptionCreated = (newOption) => {
+  emit('option-created', newOption)
 }
 
 // The create row: open the Bootstrap modal whose id is createModalId (the
@@ -53,19 +58,28 @@ const createBoard = () => {
   :input-class="props.inputClass"
   :class="props.className"
   @update:modelValue="updateValue"
+  @option-created="handleOptionCreated"
 >
   <!-- Selected value -->
   <template v-if="props.showImages || props.contactMode" #value="{ option }">
     <span v-if="props.contactMode" class="text-body">{{ option.label }}</span>
     <template v-else>
-    <div class="d-flex align-items-center gap-2">
+    <div class="d-flex align-items-center gap-2 min-w-0">
       <img
         v-if="option?.[props.imageKey]"
         :src="option[props.imageKey]"
         class="select-image"
       />
+      <span
+        v-else-if="option?.icon"
+        class="select-icon-badge"
+        :style="{ background: option.iconBg || '#f1f5f9', color: option.iconColor || '#334155' }"
+      >
+        <Icon :icon="option.icon" class="font-size-14" />
+      </span>
 
-      <span>{{ option.label }}</span>
+      <span class="text-truncate">{{ option.label }}</span>
+      <small v-if="option?.subtitle" class="text-muted text-truncate d-none d-sm-inline">· {{ option.subtitle }}</small>
     </div>
     </template>
   </template>
@@ -87,14 +101,24 @@ const createBoard = () => {
       </span>
     </div>
     <template v-else>
-    <div class="d-flex align-items-center gap-2">
+    <div class="d-flex align-items-center gap-2 min-w-0 py-1">
       <img
         v-if="option?.[props.imageKey]"
         :src="option[props.imageKey]"
-        class="select-image"
+        class="select-image-rich"
       />
+      <span
+        v-else-if="option?.icon"
+        class="select-icon-badge-rich"
+        :style="{ background: option.iconBg || '#f1f5f9', color: option.iconColor || '#334155' }"
+      >
+        <Icon :icon="option.icon" class="font-size-16" />
+      </span>
 
-      <span>{{ option.label }}</span>
+      <span class="d-flex flex-column min-w-0">
+        <span class="fw-semibold text-dark text-truncate">{{ option.label }}</span>
+        <small v-if="option?.subtitle" class="text-muted font-size-11 text-truncate">{{ option.subtitle }}</small>
+      </span>
     </div>
     </template>
   </template>
@@ -154,9 +178,37 @@ const createBoard = () => {
 
 .select-image {
   width: 22px;
-  height: 16px;
-  object-fit: cover;
-  border-radius: 2px;
+  height: 22px;
+  object-fit: contain;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.select-image-rich {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.select-icon-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.select-icon-badge-rich {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 

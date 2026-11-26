@@ -120,6 +120,45 @@
     <ScrollUp />
     <ImageToast :status="toastStatus" :title="toastTitle" :message="toastMessage" :image="toastImage"
         :imageHeight="70" @hide="toastStatus = null" />
+
+    <!-- Active Cart Logout Warning Modal -->
+    <Teleport to="body">
+        <div
+            v-if="showLogoutCartWarning"
+            class="modal fade show d-block"
+            tabindex="-1"
+            style="background-color: rgba(15, 23, 42, 0.55); z-index: 1080;"
+            @click.self="showLogoutCartWarning = false"
+        >
+            <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+                <div class="modal-content border-0 rounded-3 overflow-hidden shadow">
+                    <div class="modal-header bg-white border-bottom py-3 px-4">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="avatar-xs rounded-circle bg-warning-subtle text-warning d-inline-flex align-items-center justify-content-center">
+                                <Icon icon="ri:alert-line" class="fs-5" />
+                            </span>
+                            <h5 class="modal-title font-size-16 fw-bold mb-0 text-dark">Active Cart Unsaved</h5>
+                        </div>
+                        <button type="button" class="btn-close shadow-none" @click="showLogoutCartWarning = false"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <p class="text-dark font-size-13 mb-0">
+                            You have <strong>{{ cartStore.isEditingTab ? cartStore.pendingTabItemsCount : cartStore.itemCount }} unsaved item{{ (cartStore.isEditingTab ? cartStore.pendingTabItemsCount : cartStore.itemCount) === 1 ? '' : 's' }}</strong> in your active cart.
+                            Signing out now will discard them. Do you want to continue?
+                        </p>
+                    </div>
+                    <div class="modal-footer bg-white border-top py-3 px-4 d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-white" @click="showLogoutCartWarning = false">
+                            Cancel
+                        </button>
+                        <button type="button" class="btn btn-outline-muted-danger" @click="confirmLogoutWithCart">
+                            Discard &amp; Sign Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </Teleport>
 </template>
 
 <script setup>
@@ -150,6 +189,7 @@ import GlobalSearch from "@/components/search/GlobalSearch.vue";
 // Utils
 import { useAuthStore } from "@/stores/auth";
 import { useShiftStore } from "@/stores/shift";
+import { useCartStore } from "@/stores/cart";
 import { useSessionStart } from "@/composables/useSessionStart";
 import errorImage from "@/assets/images/icons/error.png";
 import HeaderShiftWidget from "@/components/Shifts/HeaderShiftWidget.vue";
@@ -157,7 +197,9 @@ import ShiftActionModal from "@/components/Shifts/ShiftActionModal.vue";
 
 const auth = useAuthStore();
 const shiftStore = useShiftStore();
+const cartStore = useCartStore();
 const router = useRouter();
+const showLogoutCartWarning = ref(false);
 const { startSession } = useSessionStart();
 
 function onShiftUpdated() {
@@ -207,14 +249,28 @@ async function switchTo(business) {
 }
 
 // ---- Sign out ----
-// Revoke the token first (it is logged as a sign-out), then clear local state
-// whatever the server said, so nobody is ever trapped inside.
+// Warn if an active cart has unsaved items before signing out.
 async function handleLogout() {
+    if (cartStore.hasUnsavedCart) {
+        showLogoutCartWarning.value = true;
+        return;
+    }
+    await performLogout();
+}
+
+async function confirmLogoutWithCart() {
+    showLogoutCartWarning.value = false;
+    cartStore.clearCart();
+    await performLogout();
+}
+
+async function performLogout() {
     try {
         await authApi.logout();
     } catch (err) {
         console.warn("Server sign-out skipped or already expired:", err?.message || err);
     } finally {
+        cartStore.clearCart();
         auth.clearAuth();
         router.push("/login");
     }

@@ -167,11 +167,11 @@
         </div>
 
         <!-- Footer -->
-        <div class="modal-footer bg-white border-top py-2.5 px-4 d-flex justify-content-between align-items-center">
+        <div class="modal-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center">
           <button
             v-if="canManage"
             type="button"
-            class="btn btn-link text-muted text-decoration-none font-size-12 p-0 shadow-none"
+            class="btn btn-link text-muted text-decoration-none font-size-13 p-0 shadow-none"
             @click="handleReset"
           >
             Reset to Defaults (2h / 4h)
@@ -179,13 +179,13 @@
           <span v-else></span>
 
           <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-sm btn-light border px-3 font-size-12" @click="$emit('close')">
+            <button type="button" class="btn btn-light border" @click="$emit('close')">
               Cancel
             </button>
             <button
               v-if="canManage"
               type="button"
-              class="btn btn-sm btn-primary px-3 font-size-12 fw-semibold"
+              class="btn btn-primary fw-semibold"
               :disabled="!!validationError"
               @click="handleSave"
             >
